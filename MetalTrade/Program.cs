@@ -1,3 +1,7 @@
+using MetalTrade.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 namespace MetalTrade
 {
     public class Program
@@ -8,6 +12,11 @@ namespace MetalTrade
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<MetalTradeDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+                .AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<MetalTradeDbContext>();
 
             var app = builder.Build();
 
@@ -22,6 +31,7 @@ namespace MetalTrade
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
