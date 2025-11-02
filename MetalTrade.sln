@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Web", "MetalTrade.Web\MetalTrade.Web.csproj", "{C7D98652-1C38-48A3-B304-A0C8AD6B9061}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Business", "MetalTrade.Business\MetalTrade.Business.csproj", "{C84AEC31-12A4-4415-8CBC-E71410941CDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.DataAccess", "MetalTrade.DataAccess\MetalTrade.DataAccess.csproj", "{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Domain", "MetalTrade.Domain\MetalTrade.Domain.csproj", "{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7D98652-1C38-48A3-B304-A0C8AD6B9061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D98652-1C38-48A3-B304-A0C8AD6B9061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D98652-1C38-48A3-B304-A0C8AD6B9061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D98652-1C38-48A3-B304-A0C8AD6B9061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C84AEC31-12A4-4415-8CBC-E71410941CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C84AEC31-12A4-4415-8CBC-E71410941CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C84AEC31-12A4-4415-8CBC-E71410941CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C84AEC31-12A4-4415-8CBC-E71410941CDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
