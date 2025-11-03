@@ -1,4 +1,4 @@
-namespace MetalTrade.Models
+namespace MetalTrade.Domain.Entities
 {
     public class ErrorViewModel
     {

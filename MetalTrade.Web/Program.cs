@@ -1,8 +1,10 @@
-using MetalTrade.Models;
+using MetalTrade.DataAccess;
+using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace MetalTrade
+
+namespace MetalTrade.Web
 {
     public class Program
     {
@@ -14,7 +16,7 @@ namespace MetalTrade
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<MetalTradeDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+                    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
                 .AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<MetalTradeDbContext>();
 
@@ -36,8 +38,8 @@ namespace MetalTrade
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
