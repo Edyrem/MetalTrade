@@ -1,3 +1,4 @@
+using MetalTrade.Business;
 using MetalTrade.DataAccess;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,7 @@ namespace MetalTrade.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +18,31 @@ namespace MetalTrade.Web
 
             builder.Services.AddDbContext<MetalTradeDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
-                .AddIdentity<User, IdentityRole<int>>()
+                .AddIdentity<User, IdentityRole<int>>(options =>
+                {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequiredLength = 6;
+                })
                 .AddEntityFrameworkStores<MetalTradeDbContext>();
 
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var userManager = services.GetRequiredService<UserManager<User>>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+                    await AdminInitializer.SeedAdminUser(roleManager, userManager);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
