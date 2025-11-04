@@ -32,7 +32,7 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateSupplier(UserViewModel model, [FromServices] IWebHostEnvironment env)
+    public async Task<IActionResult> CreateSupplier(RegisterViewModel model, [FromServices] IWebHostEnvironment env)
     {
         if(ModelState.IsValid)
         {

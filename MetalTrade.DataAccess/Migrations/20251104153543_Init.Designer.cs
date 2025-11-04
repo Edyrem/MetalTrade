@@ -3,6 +3,7 @@ using System;
 using MetalTrade.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    partial class MetalTradeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104153543_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,6 +272,7 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("WhatsAppNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

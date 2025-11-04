@@ -1,9 +1,10 @@
 using MetalTrade.Business;
+using MetalTrade.Business.Interfaces;
+using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace MetalTrade.Web
 {
@@ -13,12 +14,13 @@ namespace MetalTrade.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            
             builder.Services.AddDbContext<MetalTradeDbContext>(options =>
-                    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
-                .AddIdentity<User, IdentityRole<int>>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Identity + Password Options + Token Providers
+            builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
                     options.Password.RequireDigit = true;
                     options.Password.RequireLowercase = true;
@@ -26,9 +28,15 @@ namespace MetalTrade.Web
                     options.Password.RequireUppercase = true;
                     options.Password.RequiredLength = 6;
                 })
-                .AddEntityFrameworkStores<MetalTradeDbContext>();
+                .AddEntityFrameworkStores<MetalTradeDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Business Layer services
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             var app = builder.Build();
+
+            // Создание администратора при старте
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -44,25 +52,23 @@ namespace MetalTrade.Web
                 }
             }
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapStaticAssets();
             app.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

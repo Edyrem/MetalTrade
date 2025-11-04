@@ -1,0 +1,29 @@
+@model MetalTrade.Web.ViewModel.LoginViewModel
+
+@{
+    ViewBag.Title = "Вход";
+}
+
+<h2>Login</h2>
+
+
+<form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        <label asp-for="Login"></label>
+        <input asp-for="Login" />
+        <span asp-validation-for="Login"></span>
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div>
+        <input asp-for="RememberMe" />
+        <label asp-for="RememberMe"></label>
+    </div>
+    <div>
+        <button type="submit">Login</button>
+    </div>
+</form>
