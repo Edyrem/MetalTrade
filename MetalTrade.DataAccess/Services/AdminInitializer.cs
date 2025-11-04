@@ -1,7 +1,7 @@
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace MetalTrade.Business;
+namespace MetalTrade.DataAccess;
 
 public class AdminInitializer
 {
