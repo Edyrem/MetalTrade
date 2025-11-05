@@ -1,4 +1,4 @@
-using MetalTrade.DataAccess;
+using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
