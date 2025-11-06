@@ -7,7 +7,7 @@
         {
             _env = env;
         }
-        public async Task<List<string>> SavePhotos(IFormFile[] photos)
+        public async Task<List<string>> SavePhotosAsync(IFormFile[] photos)
         {
             var saved_paths = new List<string>();
 
