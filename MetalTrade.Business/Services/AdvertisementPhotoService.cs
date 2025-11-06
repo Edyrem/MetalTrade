@@ -1,4 +1,5 @@
-﻿using MetalTrade.DataAccess.Repositories;
+﻿using MetalTrade.DataAccess.Data;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 
 namespace MetalTrade.Business.Services
@@ -6,9 +7,9 @@ namespace MetalTrade.Business.Services
     public class AdvertisementPhotoService
     {
         private readonly AdvertisementPhotoRepository _repository;
-        public AdvertisementPhotoService(AdvertisementPhotoRepository repository)
+        public AdvertisementPhotoService(MetalTradeDbContext context)
         {
-            _repository = repository;
+            _repository = new AdvertisementPhotoRepository(context);
         }
         public async Task Create(AdvertisementPhoto adsPhoto)
         {
