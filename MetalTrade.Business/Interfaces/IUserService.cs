@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace MetalTrade.Business.Interfaces;
 
-public interface IAdminService
+public interface IUserService
 {
-    Task<List<User>> GetAllUsersAsync();
-
-    Task<bool> CreateSupplierAsync(UserDto model);
+    Task<IEnumerable<User>> GetAllUsersAsync();
+    Task<bool> CreateUserAsync(UserDto model, string role);
 }

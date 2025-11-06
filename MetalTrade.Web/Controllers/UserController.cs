@@ -11,29 +11,29 @@ using Microsoft.AspNetCore.Mvc;
 namespace MetalTrade.Web.Controllers;
 
 [Authorize(Roles = "admin")]
-public class AdminController : Controller
+public class UserController : Controller
 {
-    private readonly IAdminService _adminService;
+    private readonly IUserService _userService;
 
-    public AdminController(IAdminService adminService)
+    public UserController(IUserService userService)
     {
-        _adminService = adminService;
+        _userService = userService;
     }
     
     public async Task<IActionResult> Index()
     {
-        var users = await _adminService.GetAllUsersAsync();
+        var users = await _userService.GetAllUsersAsync();
         return View(users);
     } 
     
-    public async Task<IActionResult> CreateSupplier()
+    public async Task<IActionResult> CreateUser()
     {
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateSupplier(UserViewModel model)
+    public async Task<IActionResult> CreateUser(UserViewModel model)
     {
         if (!ModelState.IsValid)
             return View(model);
@@ -47,7 +47,7 @@ public class AdminController : Controller
             Photo = model.Photo,
             Password = model.Password
         };
-        bool success = await _adminService.CreateSupplierAsync(dto);
+        bool success = await _userService.CreateUserAsync(dto, "supplier");
 
         if (success)
             return RedirectToAction("Index", "Admin");
