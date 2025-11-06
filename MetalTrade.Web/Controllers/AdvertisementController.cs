@@ -40,23 +40,26 @@ namespace MetalTrade.Web.Controllers
                     PhoneNumber = model.PhoneNumber ?? string.Empty,
                     City = model.City
                 };
-                User? user = await _userManager.GetUserAsync(User);
-                if (user != null)
-                    ads.UserId = user.Id;
-                int adsId = await adsService.CreateAsync(ads);
-                if (model.Images != null)
+                if (false)
                 {
-                    List<string> photoLinks = await adsPhotoSaveService.SavePhotosAsync(model.Images);
-                    if (photoLinks.Count > 0)
+                    User? user = await _userManager.GetUserAsync(User);
+                    if (user != null)
+                        ads.UserId = user.Id;
+                    int adsId = await adsService.CreateAsync(ads);
+                    if (model.Images != null)
                     {
-                        foreach (var link in photoLinks)
+                        List<string> photoLinks = await adsPhotoSaveService.SavePhotosAsync(model.Images);
+                        if (photoLinks.Count > 0)
                         {
-                            var adsPhoto = new AdvertisementPhoto()
+                            foreach (var link in photoLinks)
                             {
-                                PhotoLink = link,
-                                AdvertisementId = adsId
-                            };
-                            await adsPhotoService.CreateAsync(adsPhoto);
+                                var adsPhoto = new AdvertisementPhoto()
+                                {
+                                    PhotoLink = link,
+                                    AdvertisementId = adsId
+                                };
+                                await adsPhotoService.CreateAsync(adsPhoto);
+                            }
                         }
                     }
                 }
