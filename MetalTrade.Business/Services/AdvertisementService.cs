@@ -11,7 +11,7 @@ namespace MetalTrade.Business.Services
         {
             _repository = new AdvertisementRepository(context);
         }
-        public async Task Create(Advertisement ads)
+        public async Task CreateAsync(Advertisement ads)
         {
             await _repository.CreateAsync(ads);
             await _repository.SaveChangesAsync();
