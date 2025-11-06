@@ -1,5 +1,4 @@
-﻿using MetalTrade.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
@@ -24,6 +23,7 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Город")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
         public string? City { get; set; }
-        IFormFile[]? Images { get; set; }
+        [Display(Name = "Фото")]
+        public IFormFile[]? Images { get; set; }
     }
 }
