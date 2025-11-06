@@ -22,4 +22,8 @@
       <ProjectReference Include="..\MetalTrade.Business\MetalTrade.Business.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Views\Advertisement\" />
+    </ItemGroup>
+
 </Project>
