@@ -1,9 +1,9 @@
 ﻿namespace MetalTrade.Web.Services.Advertisement
 {
-    public class AdvertisementPhotoFileService
+    public class AdvertisementPhotoSaveService
     {
         private readonly IWebHostEnvironment _env;
-        public AdvertisementPhotoFileService(IWebHostEnvironment env)
+        public AdvertisementPhotoSaveService(IWebHostEnvironment env)
         {
             _env = env;
         }
