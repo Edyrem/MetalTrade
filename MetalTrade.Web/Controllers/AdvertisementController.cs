@@ -38,7 +38,7 @@ namespace MetalTrade.Web.Controllers
                 User? user = await _userManager.GetUserAsync(User);
                 if (user != null)
                     ads.UserId = user.Id;
-                int adsId = await adsService.CreateAsync(ads);
+                await adsService.CreateAsync(ads);
                 return Json(ads);
             }
             return View(model);
