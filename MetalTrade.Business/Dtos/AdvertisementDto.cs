@@ -2,7 +2,7 @@
 
 namespace MetalTrade.Business.Dtos
 {
-    internal class AdvertisementDto
+    public class AdvertisementDto
     {
         public int Id { get; set; }
         public string Title { get; set; }

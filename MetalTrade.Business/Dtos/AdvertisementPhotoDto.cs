@@ -2,7 +2,7 @@
 
 namespace MetalTrade.Business.Dtos
 {
-    internal class AdvertisementPhotoDto
+    public class AdvertisementPhotoDto
     {
         public int Id { get; set; }
         public string PhotoLink { get; set; }
