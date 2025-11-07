@@ -7,8 +7,8 @@ namespace MetalTrade.DataAccess.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly MetalTradeDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly MetalTradeDbContext _context;
+        protected readonly DbSet<T> _dbSet;
 
         public Repository(MetalTradeDbContext context)
         {

@@ -1,31 +1,27 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.DataAccess;
+using MetalTrade.DataAccess.Data;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 
 namespace MetalTrade.Business;
 
-public class AdminService : IAdminService
+public class UserService : IUserService
 {
-    private readonly MetalTradeDbContext _context;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManagerRepository _userRepository;
     private readonly IWebHostEnvironment _env;
 
-    public AdminService(MetalTradeDbContext context, UserManager<User> userManager, IWebHostEnvironment env)
+    public UserService(MetalTradeDbContext context, UserManager<User> userManager, IWebHostEnvironment env)
     {
-        _context = context;
-        _userManager = userManager;
+        _userRepository = new UserManagerRepository(context, userManager);
         _env = env;
     }
 
-    public async Task<List<User>> GetAllUsersAsync()
-    {
-        return _context.Users.Skip(1).ToList();
-    }
+    public async Task<IEnumerable<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
 
-    public async Task<bool> CreateSupplierAsync(UserDto model)
+    public async Task<bool> CreateUserAsync(UserDto model, string role)
     {
         string avatarPath = "";
         if (model.Photo != null && model.Photo.Length > 0)
@@ -54,13 +50,27 @@ public class AdminService : IAdminService
             Photo = avatarPath
         };
 
-        var result = await _userManager.CreateAsync(user, model.Password);
+        var result = await _userRepository.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(user, "supplier");
+            await _userRepository.AddToRoleAsync(user, role);
             return true;
         }
 
         return false;
     }
+
+    public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+        var result = new Dictionary<User, string?>();
+        foreach (var user in users)
+        {
+            var role = await _userRepository.GetUserRoleAsync(user);
+            result[user] = role;
+        }
+
+        return result;
+    }
+    
 }

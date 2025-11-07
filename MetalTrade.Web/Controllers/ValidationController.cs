@@ -1,4 +1,4 @@
-using MetalTrade.DataAccess;
+using MetalTrade.DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;

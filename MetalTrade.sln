@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Web", "MetalTrade.Web\MetalTrade.Web.csproj", "{C7D98652-1C38-48A3-B304-A0C8AD6B9061}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Business", "MetalTrade.Business\MetalTrade.Business.csproj", "{C84AEC31-12A4-4415-8CBC-E71410941CDF}"
@@ -30,5 +33,11 @@ Global
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F295E6A-1F65-4FA1-83D4-DB9F6A5FA658}
 	EndGlobalSection
 EndGlobal

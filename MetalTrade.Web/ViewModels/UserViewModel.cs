@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MetalTrade.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.ViewModels;
@@ -46,4 +47,8 @@ public class UserViewModel
     [DataType(DataType.Password)]
     [Display(Name = "Подтвердить пароль")]
     public string PasswordConfirm { get; set; }
+    
+    [Required(ErrorMessage = "Укажите роль")]
+    [Display(Name = "Роль")]
+    public UserRole Role { get; set; }
 }
