@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;
 
-[Authorize(Roles = "admin")]
+//[Authorize(Roles = "admin")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -22,7 +22,7 @@ public class UserController : Controller
     
     public async Task<IActionResult> Index()
     {
-        var users = await _userService.GetAllUsersAsync();
+        var users = await _userService.GetAllUsersWithRolesAsync();
         return View(users);
     } 
     
@@ -47,12 +47,12 @@ public class UserController : Controller
             Photo = model.Photo,
             Password = model.Password
         };
-        bool success = await _userService.CreateUserAsync(dto, "supplier");
-
+        bool success = await _userService.CreateUserAsync(dto, model.Role.ToString().ToLower());
         if (success)
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("Index", "User");
 
         ModelState.AddModelError("", "Ошибка при создании пользователя");
         return View(model);
     }
+    
 }

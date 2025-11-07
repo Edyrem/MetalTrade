@@ -1,4 +1,4 @@
-@model List<User>
+@model Dictionary<User, string?>
 @{
     ViewBag.Title = "Список пользователей";
 }
@@ -18,14 +18,30 @@
                     <th>Логин</th>
                     <th>Email</th>
                     <th>Номер телефона</th>
+                    <th>Роль</th>
                 </tr>
-                @foreach (var user in @Model)
+                @foreach (var dictionary in Model)
                 {
+                    var user = dictionary.Key;
+                    var role = dictionary.Value;
+                    
                     <tr>
                         <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
                         <td>@user.UserName</td>
                         <td>@user.Email</td>
                         <td>@user.PhoneNumber</td>
+                        @if (role == "admin")
+                        {
+                            <td class="text-danger">Админ</td>
+                        }
+                        @if (role == "moderator")
+                        {
+                            <td class="text-success">Модератор</td>
+                        }
+                        @if (role == "supplier")
+                        {
+                            <td>Поставщик</td>
+                        }
                     </tr>
                 }
             </table>
