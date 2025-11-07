@@ -1,15 +1,15 @@
-﻿using MetalTrade.Domain.Entities;
+﻿using MetalTrade.Business.Dtos;
 
 namespace MetalTrade.Business.Interfaces
 {
     internal interface IAdvertisementService
     {
-        Task GetAsync(int advertisementId);
-        Task GetAllAsync();
-        Task CreateAsync();
-        Task UpdateAsync();
-        Task DeleteAsync();
-        Task CreatePhotosAsync();
-        Task DeletePhotoAsync();
+        Task<AdvertisementDto> GetAsync(int advertisementId);
+        Task<List<AdvertisementDto>> GetAllAsync();
+        Task<int> CreateAsync(AdvertisementDto advertisement);
+        Task UpdateAsync(AdvertisementDto advertisement);
+        Task DeleteAsync(int advertisementId);
+        Task CreatePhotosAsync(List<AdvertisementPhotoDto> photos);
+        Task DeletePhotoAsync(int adsPhotoId);
     }
 }
