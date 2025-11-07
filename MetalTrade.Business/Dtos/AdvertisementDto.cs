@@ -1,5 +1,4 @@
-﻿
-using MetalTrade.Domain.Entities;
+﻿using MetalTrade.Domain.Entities;
 
 namespace MetalTrade.Business.Dtos
 {
