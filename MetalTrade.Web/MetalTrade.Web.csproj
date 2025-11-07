@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MetalTrade.Domain\MetalTrade.Domain.csproj" />
+      <ProjectReference Include="..\MetalTrade.DataAccess\MetalTrade.DataAccess.csproj" />
+      <ProjectReference Include="..\MetalTrade.Business\MetalTrade.Business.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Account\Login.en.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Login.en.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Account\Login.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Login.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Account\Register.en.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Register.en.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Account\Register.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Register.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Views\Account\Login.en.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Login.en.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Views\Account\Login.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Login.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Views\Account\Register.en.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Register.en.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Views\Account\Register.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Register.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\Account\Login.en.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Login.en.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Account\Login.ru.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Login.ru.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Account\Register.en.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Register.en.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Account\Register.ru.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Register.ru.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Views\" />
+    </ItemGroup>
+
+</Project>
