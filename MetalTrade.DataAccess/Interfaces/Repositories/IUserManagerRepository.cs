@@ -14,5 +14,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task<User?> GetByUserNameAsync(string userName);
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<IdentityResult> AddToRoleAsync(User user, string role);
+        Task<string?> GetUserRoleAsync(User user);
     }
 }

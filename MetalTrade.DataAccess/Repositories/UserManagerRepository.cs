@@ -38,5 +38,12 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _userManager.AddToRoleAsync(user, role);
         }
+
+        public async Task<string?> GetUserRoleAsync(User user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.FirstOrDefault();
+        }
+        
     }
 }
