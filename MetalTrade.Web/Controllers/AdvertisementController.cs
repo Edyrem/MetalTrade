@@ -1,4 +1,5 @@
-﻿using MetalTrade.Business.Services;
+﻿using MetalTrade.Business.Dtos;
+using MetalTrade.Business.Services;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModels.Advertisement;
@@ -26,7 +27,7 @@ namespace MetalTrade.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                Advertisement ads = new()
+                AdvertisementDto adsDto = new()
                 {
                     Title = model.Title ?? string.Empty,
                     Body = model.Body ?? string.Empty,
@@ -37,9 +38,8 @@ namespace MetalTrade.Web.Controllers
                 };
                 User? user = await _userManager.GetUserAsync(User);
                 if (user != null)
-                    ads.UserId = user.Id;
-                await adsService.CreateAsync(ads);
-                return Json(ads);
+                    adsDto.UserId = user.Id;
+                return Json(adsDto);
             }
             return View(model);
         }
