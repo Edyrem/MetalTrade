@@ -1,4 +1,6 @@
-﻿using MetalTrade.DataAccess.Data;
+﻿using MetalTrade.Business.Dtos;
+using MetalTrade.Business.Interfaces;
+using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 
@@ -11,10 +13,6 @@ namespace MetalTrade.Business.Services
         {
             _repository = new AdvertisementRepository(context);
         }
-        public async Task CreateAsync(Advertisement ads)
-        {
-            await _repository.CreateAsync(ads);
-            await _repository.SaveChangesAsync();
-        }
+
     }
 }
