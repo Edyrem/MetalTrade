@@ -8,7 +8,7 @@ namespace MetalTrade.Business.Dtos
         public string Title { get; set; }
         public string Body { get; set; }
         public decimal Price { get; set; }
-        public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreateDate { get; set; }
         public string? Address { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public int ProductId { get; set; }

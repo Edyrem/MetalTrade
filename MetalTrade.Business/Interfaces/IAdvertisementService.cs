@@ -4,12 +4,12 @@ namespace MetalTrade.Business.Interfaces
 {
     public interface IAdvertisementService
     {
-        Task<AdvertisementDto> GetAsync(int advertisementId);
+        Task<AdvertisementDto?> GetAsync(int advertisementId);
         Task<List<AdvertisementDto>> GetAllAsync();
-        Task<int> CreateAsync(AdvertisementDto advertisement);
-        Task UpdateAsync(AdvertisementDto advertisement);
+        Task<int> CreateAsync(AdvertisementDto adsDto);
+        Task UpdateAsync(AdvertisementDto adsDto);
         Task DeleteAsync(int advertisementId);
-        Task CreatePhotosAsync(List<AdvertisementPhotoDto> photos);
+        Task CreatePhotosAsync(List<AdvertisementPhotoDto> adsPhotoDtos);
         Task DeletePhotoAsync(int adsPhotoId);
     }
 }

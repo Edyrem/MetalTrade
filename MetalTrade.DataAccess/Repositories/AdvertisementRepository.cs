@@ -30,9 +30,11 @@ namespace MetalTrade.DataAccess.Repositories
             if (advPhotos.Count > 0)
                 await _photoDbSet.AddRangeAsync(advPhotos);
         }
-        public void DeletePhotoAsync(AdvertisementPhoto photo)
+        public async Task DeletePhotoAsync(int advertisementPhotoId)
         {
-            _photoDbSet.Remove(photo);
+            AdvertisementPhoto? photo = await _photoDbSet.FirstOrDefaultAsync(p => p.Id == advertisementPhotoId);
+            if (photo != null)
+                _photoDbSet.Remove(photo);
         }
     }
 }
