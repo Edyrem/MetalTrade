@@ -60,5 +60,17 @@ public class UserService : IUserService
         return false;
     }
 
+    public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+        var result = new Dictionary<User, string?>();
+        foreach (var user in users)
+        {
+            var role = await _userRepository.GetUserRoleAsync(user);
+            result[user] = role;
+        }
+
+        return result;
+    }
     
 }
