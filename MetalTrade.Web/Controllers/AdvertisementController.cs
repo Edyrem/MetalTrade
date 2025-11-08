@@ -56,5 +56,29 @@ namespace MetalTrade.Web.Controllers
             }
             return View(model);
         }
+        public async Task<IActionResult> Index()
+        {
+            List<AdvertisementDto> adsDtos = await _adsService.GetAllAsync();
+            List<IndexViewModel> models = [];
+            foreach (var dto in adsDtos)
+            {
+                models.Add(new IndexViewModel
+                {
+                    Id = dto.Id,
+                    Title = dto.Title,
+                    Body = dto.Body,
+                    Price = dto.Price,
+                    CreateDate = dto.CreateDate,
+                    Address = dto.Address,
+                    PhoneNumber = dto.PhoneNumber,
+                    City = dto.City,
+                    Status = dto.Status,
+                    IsTop = dto.IsTop,
+                    IsAd = dto.IsAd,
+                    Photoes = dto.Photoes
+                });
+            }
+            return View(models);
+        }
     }
 }
