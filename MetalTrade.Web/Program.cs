@@ -45,6 +45,7 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             
             var app = builder.Build();
+
             
             var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
             var localizationOptions = new RequestLocalizationOptions
