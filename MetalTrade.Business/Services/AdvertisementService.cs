@@ -62,7 +62,7 @@ namespace MetalTrade.Business.Services
             return adsDto;
         }
 
-        public async Task<int> CreateAsync(AdvertisementDto adsDto)
+        public async Task CreateAsync(AdvertisementDto adsDto)
         {
             Advertisement ads = new()
             {
@@ -78,9 +78,19 @@ namespace MetalTrade.Business.Services
                 ProductId = adsDto.ProductId,
                 UserId = adsDto.UserId
             };
+            if (adsDto.Photoes != null && adsDto.Photoes.Count > 0)
+            {
+                foreach (var photoDto in adsDto.Photoes)
+                {
+                    ads.Photoes.Add(new AdvertisementPhoto
+                    {
+                        PhotoLink = photoDto.PhotoLink,
+                        Advertisement = ads
+                    });
+                }
+            }
             await _repository.CreateAsync(ads);
             await _repository.SaveChangesAsync();
-            return adsDto.Id;
         }
         public async Task UpdateAsync(AdvertisementDto adsDto)
         {
