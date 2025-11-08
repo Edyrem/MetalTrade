@@ -1,5 +1,6 @@
 using MetalTrade.Business;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
@@ -31,6 +32,7 @@ namespace MetalTrade.Web
                 .AddEntityFrameworkStores<MetalTradeDbContext>();
 
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())

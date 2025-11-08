@@ -6,7 +6,7 @@ namespace MetalTrade.Business.Interfaces
     {
         Task<AdvertisementDto?> GetAsync(int advertisementId);
         Task<List<AdvertisementDto>> GetAllAsync();
-        Task<int> CreateAsync(AdvertisementDto adsDto);
+        Task CreateAsync(AdvertisementDto adsDto);
         Task UpdateAsync(AdvertisementDto adsDto);
         Task DeleteAsync(int advertisementId);
     }
