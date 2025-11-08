@@ -8,10 +8,8 @@ namespace MetalTrade.DataAccess.Repositories
 {
     public class AdvertisementRepository : Repository<Advertisement>, IAdvertisementRepository
     {
-        private readonly DbSet<AdvertisementPhoto> _photoDbSet;
         public AdvertisementRepository(MetalTradeDbContext context) : base(context)
         {
-            _photoDbSet = context.Set<AdvertisementPhoto>();
         }
         public async override Task<IEnumerable<Advertisement>> GetAllAsync()
         {
@@ -24,17 +22,6 @@ namespace MetalTrade.DataAccess.Repositories
         public async override Task<IEnumerable<Advertisement>> FindAsync(Expression<Func<Advertisement, bool>> predicate)
         {
             return await _dbSet.Include(a => a.Photoes).Where(predicate).ToListAsync();
-        }
-        public async Task CreatePhotosAsync(List<AdvertisementPhoto> advPhotos)
-        {
-            if (advPhotos.Count > 0)
-                await _photoDbSet.AddRangeAsync(advPhotos);
-        }
-        public async Task DeletePhotoAsync(int advertisementPhotoId)
-        {
-            AdvertisementPhoto? photo = await _photoDbSet.FirstOrDefaultAsync(p => p.Id == advertisementPhotoId);
-            if (photo != null)
-                _photoDbSet.Remove(photo);
         }
     }
 }
