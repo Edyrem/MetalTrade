@@ -1,5 +1,5 @@
 ﻿using MetalTrade.Business.Dtos;
-using MetalTrade.Business.Services;
+using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModels.Advertisement;
@@ -10,10 +10,10 @@ namespace MetalTrade.Web.Controllers
 {
     public class AdvertisementController : Controller
     {
-        private readonly AdvertisementService _adsService;
+        private readonly IAdvertisementService _adsService;
         private readonly UserManager<User> _userManager;
 
-        public AdvertisementController(AdvertisementService adsService, UserManager<User> userManager)
+        public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager)
         {
             _adsService = adsService;
             _userManager = userManager;
