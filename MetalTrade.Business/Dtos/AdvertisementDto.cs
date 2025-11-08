@@ -19,6 +19,6 @@ namespace MetalTrade.Business.Dtos
         public bool IsAd { get; set; }
         public int UserId { get; set; }
         public User? User { get; set; }
-        public List<AdvertisementPhoto>? Photoes { get; set; }
+        public List<AdvertisementPhotoDto>? Photoes { get; set; }
     }
 }
