@@ -25,5 +25,6 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         public string? City { get; set; }
         [Display(Name = "Фото")]
         public IFormFile[]? Images { get; set; }
+        public int ProductId { get; set; }
     }
 }
