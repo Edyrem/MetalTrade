@@ -5,6 +5,6 @@ namespace MetalTrade.Business.Dtos
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        private List<ProductDto>? Products { get; set; }
+        public List<ProductDto>? Products { get; set; }
     }
 }
