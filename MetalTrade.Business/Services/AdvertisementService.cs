@@ -20,7 +20,7 @@ namespace MetalTrade.Business.Services
             List<AdvertisementDto> adsDtos = [];
             foreach (var ad in ads)
             {
-                adsDtos.Add(new AdvertisementDto()
+                AdvertisementDto adsDto = new()
                 {
                     Id = ad.Id,
                     Title = ad.Title,
@@ -32,9 +32,18 @@ namespace MetalTrade.Business.Services
                     City = ad.City,
                     Status = ad.Status,
                     IsTop = ad.IsTop,
-                    IsAd = ad.IsAd,
-                    Photoes = ad.Photoes
-                });
+                    IsAd = ad.IsAd
+                };
+                foreach (var photo in ad.Photoes)
+                {
+                    adsDto.Photoes.Add(new AdvertisementPhotoDto
+                    {
+                        Id = photo.Id,
+                        PhotoLink = photo.PhotoLink,
+                        AdvertisementId = photo.AdvertisementId
+                    });
+                }
+                adsDtos.Add(adsDto);
             }
             return adsDtos;
         }
@@ -56,9 +65,17 @@ namespace MetalTrade.Business.Services
                 City = ads.City,
                 Status = ads.Status,
                 IsTop = ads.IsTop,
-                IsAd = ads.IsAd,
-                Photoes = ads.Photoes
+                IsAd = ads.IsAd
             };
+            foreach (var photo in ads.Photoes)
+            {
+                adsDto.Photoes.Add( new AdvertisementPhotoDto
+                {
+                    Id = photo.Id,
+                    PhotoLink = photo.PhotoLink,
+                    AdvertisementId = photo.AdvertisementId
+                });
+            }
             return adsDto;
         }
 
@@ -94,23 +111,30 @@ namespace MetalTrade.Business.Services
         }
         public async Task UpdateAsync(AdvertisementDto adsDto)
         {
-            Advertisement ads = new()
+            Advertisement? ads = await _repository.GetAsync(adsDto.Id);
+            if (ads != null)
             {
-                Id = adsDto.Id,
-                Title = adsDto.Title,
-                Body = adsDto.Body,
-                Price = adsDto.Price,
-                Address = adsDto.Address,
-                PhoneNumber = adsDto.PhoneNumber,
-                City = adsDto.City,
-                Status = adsDto.Status,
-                IsTop = adsDto.IsTop,
-                IsAd = adsDto.IsAd,
-                ProductId = adsDto.ProductId,
-                UserId = adsDto.UserId
-            };
-            await _repository.UpdateAsync(ads);
-            await _repository.SaveChangesAsync();
+                ads.Title = adsDto.Title;
+                ads.Body = adsDto.Body;
+                ads.Price = adsDto.Price;
+                ads.Address = adsDto.Address;
+                ads.PhoneNumber = adsDto.PhoneNumber;
+                ads.City = adsDto.City;
+                ads.Status = adsDto.Status;
+                ads.IsTop = adsDto.IsTop;
+                ads.IsAd = adsDto.IsAd;
+                if (ads.Photoes != null && adsDto.Photoes.Count > 0)
+                {
+                    var adsPhotoIds = ads.Photoes.Select(x => x.Id).ToHashSet();
+                    foreach (var photoDto in adsDto.Photoes)
+                    {
+                        if (!adsPhotoIds.Contains(photoDto.Id))
+                            ads.Photoes.Add(new AdvertisementPhoto { PhotoLink = photoDto.PhotoLink });
+                    }
+                }
+                await _repository.UpdateAsync(ads);
+                await _repository.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteAsync(int advertisementId)
