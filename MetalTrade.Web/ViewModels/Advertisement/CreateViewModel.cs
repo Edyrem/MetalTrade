@@ -25,6 +25,8 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         public string? City { get; set; }
         [Display(Name = "Фото")]
         public IFormFile[]? Images { get; set; }
+        [Display(Name = "Продукт")]
+        [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }
     }
 }
