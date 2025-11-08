@@ -2,6 +2,7 @@
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
+using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,14 @@ namespace MetalTrade.Web.Controllers
     {
         private readonly IAdvertisementService _adsService;
         private readonly UserManager<User> _userManager;
+        private readonly AdvertisementPhotoSaveService _photoSaveService;
 
-        public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager)
+        public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
+            IWebHostEnvironment env)
         {
             _adsService = adsService;
             _userManager = userManager;
+            _photoSaveService = new AdvertisementPhotoSaveService(env);
         }
         public IActionResult Create()
         {
@@ -25,7 +29,8 @@ namespace MetalTrade.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
-            if (ModelState.IsValid)
+            User? user = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid && user != null)
             {
                 AdvertisementDto adsDto = new()
                 {
@@ -34,12 +39,20 @@ namespace MetalTrade.Web.Controllers
                     Price = model.Price,
                     Address = model.Address,
                     PhoneNumber = model.PhoneNumber ?? string.Empty,
-                    City = model.City
+                    City = model.City,
+                    ProductId = model.ProductId,
+                    UserId = user.Id
                 };
-                User? user = await _userManager.GetUserAsync(User);
-                if (user != null)
-                    adsDto.UserId = user.Id;
-                return Json(adsDto);
+                if (model.Photoes != null)
+                {
+                    List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
+                    foreach (var link in photoLinks)
+                    {
+                        adsDto.Photoes.Add( new AdvertisementPhotoDto{ PhotoLink = link});
+                    }
+                }
+                await _adsService.CreateAsync(adsDto);
+                return RedirectToAction("Index", "Home");
             }
             return View(model);
         }
