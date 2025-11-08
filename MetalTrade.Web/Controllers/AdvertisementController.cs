@@ -10,12 +10,12 @@ namespace MetalTrade.Web.Controllers
 {
     public class AdvertisementController : Controller
     {
-        private readonly AdvertisementService adsService;
+        private readonly AdvertisementService _adsService;
         private readonly UserManager<User> _userManager;
 
-        public AdvertisementController(MetalTradeDbContext context, UserManager<User> userManager)
+        public AdvertisementController(AdvertisementService adsService, UserManager<User> userManager)
         {
-            adsService = new AdvertisementService(context);
+            _adsService = adsService;
             _userManager = userManager;
         }
         public IActionResult Create()
