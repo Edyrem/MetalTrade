@@ -109,25 +109,5 @@ namespace MetalTrade.Business.Services
             await _repository.SaveChangesAsync();
         }
 
-        public async Task CreatePhotosAsync(List<AdvertisementPhotoDto> adsPhotoDtos)
-        {
-            List<AdvertisementPhoto> adsPhotos = [];
-            foreach (var adsPhotoDto in adsPhotoDtos)
-            {
-                adsPhotos.Add(new AdvertisementPhoto
-                {
-                    PhotoLink = adsPhotoDto.PhotoLink,
-                    AdvertisementId = adsPhotoDto.AdvertisementId
-                });
-            }
-            await _repository.CreatePhotosAsync(adsPhotos);
-            await _repository.SaveChangesAsync();
-        }
-
-        public async Task DeletePhotoAsync(int adsPhotoId)
-        {
-            await _repository.DeletePhotoAsync(adsPhotoId);
-        }
-
     }
 }
