@@ -121,9 +121,11 @@ namespace MetalTrade.Web.Controllers
                     ProductId = adsDto.ProductId,
                     Products = []
                 };
+                return View(model);
             }
             return RedirectToAction("Index");
         }
+        [HttpPost]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
             AdvertisementDto adsDto = new()
@@ -147,6 +149,19 @@ namespace MetalTrade.Web.Controllers
             }
             await _adsService.UpdateAsync(adsDto);
             return RedirectToAction("Details", new { id = model.Id});
+        }
+        public async Task<IActionResult> Delete(int id)
+        {
+            AdvertisementDto? adsDto = await _adsService.GetAsync(id);
+            if (adsDto != null)
+                return View(new DeleteViewModel { Id = adsDto.Id, Title = adsDto.Title });
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> Delete(DeleteViewModel model)
+        {
+            await _adsService.DeleteAsync(model.Id);
+            return RedirectToAction("Index");
         }
     }
 }
