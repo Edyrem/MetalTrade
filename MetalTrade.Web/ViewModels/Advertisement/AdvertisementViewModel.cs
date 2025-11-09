@@ -3,7 +3,7 @@ using MetalTrade.Domain.Entities;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
-    public class IndexViewModel
+    public class AdvertisementViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

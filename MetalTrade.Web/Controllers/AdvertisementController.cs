@@ -59,10 +59,10 @@ namespace MetalTrade.Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<AdvertisementDto> adsDtos = await _adsService.GetAllAsync();
-            List<IndexViewModel> models = [];
+            List<AdvertisementViewModel> models = [];
             foreach (var dto in adsDtos)
             {
-                models.Add(new IndexViewModel
+                models.Add(new AdvertisementViewModel
                 {
                     Id = dto.Id,
                     Title = dto.Title,
@@ -79,6 +79,29 @@ namespace MetalTrade.Web.Controllers
                 });
             }
             return View(models);
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            AdvertisementDto? adsDto = await _adsService.GetAsync(id);
+            if (adsDto != null)
+            {
+                AdvertisementViewModel model = new()
+                {
+                    Id = adsDto.Id,
+                    Title = adsDto.Title,
+                    Body = adsDto.Body,
+                    Price = adsDto.Price,
+                    CreateDate = adsDto.CreateDate,
+                    Address = adsDto.Address,
+                    PhoneNumber = adsDto.PhoneNumber,
+                    City = adsDto.City,
+                    Status = adsDto.Status,
+                    IsTop = adsDto.IsTop,
+                    IsAd = adsDto.IsAd
+                };
+                return View(model);
+            }
+            return RedirectToAction("Index");
         }
     }
 }
