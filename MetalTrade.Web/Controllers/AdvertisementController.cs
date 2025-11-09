@@ -6,6 +6,7 @@ using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.Controllers
 {
@@ -24,7 +25,7 @@ namespace MetalTrade.Web.Controllers
         }
         public IActionResult Create()
         {
-            return View();
+            return View(new CreateViewModel { Products = [] });
         }
         [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
@@ -102,6 +103,50 @@ namespace MetalTrade.Web.Controllers
                 return View(model);
             }
             return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Edit(int id)
+        {
+            AdvertisementDto? adsDto = await _adsService.GetAsync(id);
+            if (adsDto != null)
+            {
+                EditViewModel model = new()
+                {
+                    Id = adsDto.Id,
+                    Title = adsDto.Title,
+                    Body = adsDto.Body,
+                    Price = adsDto.Price,
+                    Address = adsDto.Address,
+                    PhoneNumber = adsDto.PhoneNumber,
+                    City = adsDto.City,
+                    ProductId = adsDto.ProductId,
+                    Products = []
+                };
+            }
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Edit(EditViewModel model)
+        {
+            AdvertisementDto adsDto = new()
+            {
+                Id = model.Id,
+                Title = model.Title ?? string.Empty,
+                Body = model.Body ?? string.Empty,
+                Price = model.Price,
+                Address = model.Address,
+                PhoneNumber = model.PhoneNumber ?? string.Empty,
+                City = model.City,
+                ProductId = model.ProductId,
+            };
+            if (model.Photoes != null)
+            {
+                List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
+                foreach (var link in photoLinks)
+                {
+                    adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
+                }
+            }
+            await _adsService.UpdateAsync(adsDto);
+            return RedirectToAction("Details", new { id = model.Id});
         }
     }
 }
