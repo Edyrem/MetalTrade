@@ -6,17 +6,22 @@ namespace MetalTrade.Business.Services
     public class ImageUploadService : IImageUploadService
     {
         
-        public Task<string> UploadFileAsync(IFormFile file, string folder)
+        public async Task<string> UploadFileAsync(IFormFile file, string folder)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string[]> UploadFilesAsync(IEnumerable<IFormFile> file, string folder)
+        public async Task<string[]> UploadFilesAsync(IEnumerable<IFormFile> file, string folder)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteFileAsync(string filePath)
+        public async Task DeleteFileAsync(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<string>> DeleteFilesAsync(IEnumerable<string> filePaths)
         {
             throw new NotImplementedException();
         }
