@@ -120,9 +120,7 @@ namespace MetalTrade.Business.Services
                 ads.Address = adsDto.Address;
                 ads.PhoneNumber = adsDto.PhoneNumber;
                 ads.City = adsDto.City;
-                ads.Status = adsDto.Status;
-                ads.IsTop = adsDto.IsTop;
-                ads.IsAd = adsDto.IsAd;
+                ads.ProductId = adsDto.ProductId;
                 if (ads.Photoes != null && adsDto.Photoes.Count > 0)
                 {
                     var adsPhotoIds = ads.Photoes.Select(x => x.Id).ToHashSet();

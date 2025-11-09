@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using MetalTrade.Business.Dtos;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
-    public class CreateViewModel
+    public class EditViewModel
     {
+        public int Id { get; set; }
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле Название объязательно")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
