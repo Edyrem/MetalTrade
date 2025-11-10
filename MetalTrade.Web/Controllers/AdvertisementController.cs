@@ -1,6 +1,5 @@
 ﻿using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
