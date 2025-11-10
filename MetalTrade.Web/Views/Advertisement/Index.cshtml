@@ -11,7 +11,7 @@
 		{
 			<div class="col-md-4 mb-4">
 				<div class="card shadow-sm">
-					@if (ads.Photoes != null && ads.Photoes.Count > 0)
+					@if (ads.Photoes.Count > 0)
 					{
 						string carouselId = $"carousel-{ads.Id}";
 						<div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
@@ -38,6 +38,7 @@
 					<div class="card-body">
 						<h5 class="card-title">@ads.Title</h5>
 						<p class="card-text text-muted">@ads.Price</p>
+						<p class="card-text text-muted">@ads.Product.Name</p>
 						<p class="card-text fw-bold">@ads.PhoneNumber</p>
 						<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary w-100">Подробнее</a>
 					</div>
