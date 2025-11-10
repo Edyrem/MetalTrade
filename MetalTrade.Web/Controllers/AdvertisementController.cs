@@ -114,6 +114,15 @@ namespace MetalTrade.Web.Controllers
                     ProductId = adsDto.ProductId,
                     Product = new() { Id = adsDto.ProductId, Name = adsDto.Product.Name }
                 };
+                foreach (var photo in adsDto.Photoes)
+                {
+                    model.Photoes.Add( new AdvertisementPhotoViewModel
+                    {
+                        Id = photo.Id,
+                        PhotoLink = photo.PhotoLink,
+                        AdvertisementId = photo.AdvertisementId
+                    });
+                }
                 return View(model);
             }
             return RedirectToAction("Index");
