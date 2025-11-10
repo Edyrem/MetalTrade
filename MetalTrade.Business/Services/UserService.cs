@@ -6,22 +6,24 @@ using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 
-namespace MetalTrade.Business;
+namespace MetalTrade.Business.Services;
 
 public class UserService : IUserService
 {
     private readonly UserManagerRepository _userRepository;
     private readonly IWebHostEnvironment _env;
+    private readonly SignInManager<User> _signInManager;
 
-    public UserService(MetalTradeDbContext context, UserManager<User> userManager, IWebHostEnvironment env)
+    public UserService(MetalTradeDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment env)
     {
         _userRepository = new UserManagerRepository(context, userManager);
+        _signInManager = signInManager;
         _env = env;
     }
 
     public async Task<IEnumerable<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
 
-    public async Task<bool> CreateUserAsync(UserDto model, string role)
+    public async Task<bool> CreateUserAsync(UserDto model, string role, bool autoLogin = false)
     {
         string avatarPath = "";
         if (model.Photo != null && model.Photo.Length > 0)
@@ -41,7 +43,7 @@ public class UserService : IUserService
             avatarPath = "/images/avatars/" + uniqueFileName;
         }
 
-        var user = new User()
+        var user = new User
         {
             Email = model.Email,
             UserName = model.UserName,
@@ -54,11 +56,41 @@ public class UserService : IUserService
         if (result.Succeeded)
         {
             await _userRepository.AddToRoleAsync(user, role);
+            
+            var userManager = _signInManager.UserManager;
+            var freshUser = await userManager.FindByNameAsync(user.UserName);
+
+            if (freshUser != null)
+            {
+                await _signInManager.SignInAsync(freshUser, isPersistent: false);
+            }
+
             return true;
         }
 
-        return false;
+
+        await _userRepository.AddToRoleAsync(user, role);
+        
+        if (autoLogin)
+        {
+            var createdUser = await _userRepository.GetByEmailAsync(model.Email);
+            if (createdUser != null)
+            {
+                var signInResult = await _signInManager.PasswordSignInAsync(
+                    createdUser.UserName,
+                    model.Password,
+                    isPersistent: false,
+                    lockoutOnFailure: false
+                );
+
+                if (!signInResult.Succeeded)
+                    Console.WriteLine("⚠ Не удалось автоматически войти после регистрации");
+            }
+        }
+
+        return true;
     }
+
 
     public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
     {
@@ -71,6 +103,16 @@ public class UserService : IUserService
         }
 
         return result;
+    }
+    
+    public async Task<SignInResult> LoginAsync(string login, string password, bool rememberMe)
+    {
+        return await _signInManager.PasswordSignInAsync(login, password, rememberMe, false);
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _signInManager.SignOutAsync();
     }
     
 }

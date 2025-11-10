@@ -1,3 +1,4 @@
+using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.ViewModel;
 using MetalTrade.Web.ViewModels;
@@ -7,39 +8,40 @@ namespace MetalTrade.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IAccountService _account;
+        private readonly IUserService _userService;
 
-        public AccountController(IAccountService account)
+        public AccountController(IUserService userService)
         {
-            _account = account;
+            _userService = userService;
         }
 
         [HttpGet]
         public IActionResult Register() => View();
-        
+
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _account.RegisterAsync(
-                model.UserName,
-                model.Email,
-                model.Password,
-                model.PhoneNumber,
-                model.WhatsAppNumber,
-                model.Photo);
+            var dto = new UserDto
+            {
+                Email = model.Email,
+                UserName = model.UserName,
+                PhoneNumber = model.PhoneNumber,
+                WhatsAppNumber = model.WhatsAppNumber,
+                Password = model.Password,
+                Photo = model.Photo
+            };
 
-            if (result.Succeeded)
+            var success = await _userService.CreateUserAsync(dto, "Supplier");
+
+            if (success)
                 return RedirectToAction("Index", "Home");
 
-            foreach (var err in result.Errors)
-                ModelState.AddModelError("", err.Description);
-
+            ModelState.AddModelError("", "Ошибка при регистрации пользователя.");
             return View(model);
         }
-
 
         [HttpGet]
         public IActionResult Login() => View();
@@ -50,20 +52,19 @@ namespace MetalTrade.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _account.LoginAsync(
-                model.Login, model.Password, model.RememberMe);
+            var result = await _userService.LoginAsync(model.Login, model.Password, model.RememberMe);
 
             if (result.Succeeded)
                 return RedirectToAction("Index", "Home");
 
-            ModelState.AddModelError("", "Неверный логин или пароль");
+            ModelState.AddModelError("", "Неверный логин или пароль.");
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _account.LogoutAsync();
+            await _userService.LogoutAsync();
             return RedirectToAction("Login");
         }
     }

@@ -39,15 +39,12 @@ namespace MetalTrade.Web
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
             
-          builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
-
-var app = builder.Build();
-
-
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             
+
+            var app = builder.Build();
             var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
             var localizationOptions = new RequestLocalizationOptions
             {
@@ -79,10 +76,13 @@ var app = builder.Build();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapStaticAssets();
             app.MapControllerRoute(
