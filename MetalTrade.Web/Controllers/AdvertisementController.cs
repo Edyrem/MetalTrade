@@ -4,6 +4,7 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
+using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -63,7 +64,7 @@ namespace MetalTrade.Web.Controllers
             List<AdvertisementViewModel> models = [];
             foreach (var dto in adsDtos)
             {
-                models.Add(new AdvertisementViewModel
+                AdvertisementViewModel model = new()
                 {
                     Id = dto.Id,
                     Title = dto.Title,
@@ -76,8 +77,19 @@ namespace MetalTrade.Web.Controllers
                     Status = dto.Status,
                     IsTop = dto.IsTop,
                     IsAd = dto.IsAd,
-                    Photoes = dto.Photoes
-                });
+                    ProductId = dto.ProductId,
+                    Product = new() { Id = dto.ProductId, Name = dto.Product.Name }
+                };
+                foreach (var photo in dto.Photoes)
+                {
+                    model.Photoes.Add(new AdvertisementPhotoViewModel
+                    {
+                        Id = photo.Id,
+                        PhotoLink = photo.PhotoLink,
+                        AdvertisementId = photo.AdvertisementId
+                    });
+                }
+                models.Add(model);
             }
             return View(models);
         }
@@ -98,7 +110,9 @@ namespace MetalTrade.Web.Controllers
                     City = adsDto.City,
                     Status = adsDto.Status,
                     IsTop = adsDto.IsTop,
-                    IsAd = adsDto.IsAd
+                    IsAd = adsDto.IsAd,
+                    ProductId = adsDto.ProductId,
+                    Product = new() { Id = adsDto.ProductId, Name = adsDto.Product.Name }
                 };
                 return View(model);
             }

@@ -12,7 +12,7 @@ namespace MetalTrade.Business.Dtos
         public string? Address { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public int ProductId { get; set; }
-        public Product? Product { get; set; }
+        public ProductDto Product { get; set; } = new();
         public string? City { get; set; }
         public int Status { get; set; }
         public bool IsTop { get; set; }

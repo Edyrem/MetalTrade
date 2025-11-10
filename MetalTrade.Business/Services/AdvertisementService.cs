@@ -32,7 +32,9 @@ namespace MetalTrade.Business.Services
                     City = ad.City,
                     Status = ad.Status,
                     IsTop = ad.IsTop,
-                    IsAd = ad.IsAd
+                    IsAd = ad.IsAd,
+                    ProductId = ad.ProductId,
+                    Product = new() { Id = ad.ProductId, Name = ad.Product.Name }
                 };
                 foreach (var photo in ad.Photoes)
                 {
@@ -65,7 +67,9 @@ namespace MetalTrade.Business.Services
                 City = ads.City,
                 Status = ads.Status,
                 IsTop = ads.IsTop,
-                IsAd = ads.IsAd
+                IsAd = ads.IsAd,
+                ProductId = ads.ProductId,
+                Product = new ProductDto { Id = ads.ProductId, Name = ads.Product.Name }
             };
             foreach (var photo in ads.Photoes)
             {
@@ -95,7 +99,7 @@ namespace MetalTrade.Business.Services
                 ProductId = adsDto.ProductId,
                 UserId = adsDto.UserId
             };
-            if (adsDto.Photoes != null && adsDto.Photoes.Count > 0)
+            if (adsDto.Photoes.Count > 0)
             {
                 foreach (var photoDto in adsDto.Photoes)
                 {
