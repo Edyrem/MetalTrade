@@ -4,7 +4,9 @@
 @{
 	ViewData["Title"] = "Advertisements";
 }
-
+<div class="mb-2">
+	<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
+</div>
 <div class="container mt-4">
 	<div class="row">
 		@foreach (var ads in Model)
@@ -37,7 +39,6 @@
 					}
 					<div class="card-body">
 						<h5 class="card-title">@ads.Title</h5>
-						<p class="card-text text-muted">@ads.Price</p>
 						<p class="card-text text-muted">@ads.Product.Name</p>
 						<p class="card-text fw-bold">@ads.PhoneNumber</p>
 						<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary w-100">Подробнее</a>

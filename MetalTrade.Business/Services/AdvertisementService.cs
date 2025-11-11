@@ -105,7 +105,8 @@ namespace MetalTrade.Business.Services
                 IsTop = adsDto.IsTop,
                 IsAd = adsDto.IsAd,
                 ProductId = adsDto.ProductId,
-                UserId = adsDto.UserId
+                UserId = adsDto.UserId,
+                Photoes = []
             };
             if (adsDto.Photoes.Count > 0)
             {
