@@ -3,10 +3,13 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
+using MetalTrade.DataAccess.Repositories;
+using MetalTrade.DataAccess.Interfaces;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 namespace MetalTrade.Web
 {
@@ -15,10 +18,15 @@ namespace MetalTrade.Web
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            builder.Services
+                .AddControllersWithViews()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+         
             builder.Services.AddDbContext<MetalTradeDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
                 .AddIdentity<User, IdentityRole<int>>(options =>
@@ -29,12 +37,24 @@ namespace MetalTrade.Web
                     options.Password.RequireUppercase = true;
                     options.Password.RequiredLength = 6;
                 })
-                .AddEntityFrameworkStores<MetalTradeDbContext>();
-
+                .AddEntityFrameworkStores<MetalTradeDbContext>()
+                .AddDefaultTokenProviders();
+            
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             
             var app = builder.Build();
+
+            
+            var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("ru"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+            app.UseRequestLocalization(localizationOptions);
+            
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -49,25 +69,25 @@ namespace MetalTrade.Web
                     Console.WriteLine(ex.Message);
                 }
             }
-
-            // Configure the HTTP request pipeline.
+            
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.MapStaticAssets();
             app.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}")
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
