@@ -33,6 +33,7 @@ namespace MetalTrade.Web
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+            builder.Services.AddAutoMapper(typeof(MetalTrade.Business.Common.Mapping.MappingProfile));
 
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
