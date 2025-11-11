@@ -33,7 +33,7 @@ namespace MetalTrade.Web
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
-            
+
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {

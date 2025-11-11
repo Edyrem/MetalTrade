@@ -6,7 +6,7 @@ using MetalTrade.Domain.Entities;
 
 namespace MetalTrade.Business.Services
 {
-    public class AdvertisementService: IAdvertisementService
+    public class AdvertisementService : IAdvertisementService
     {
         private readonly AdvertisementRepository _repository;
         public AdvertisementService(MetalTradeDbContext context)

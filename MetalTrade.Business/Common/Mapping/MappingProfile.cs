@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Common.Mapping
 {
-    internal class MappingProfile : Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile() 
         {
