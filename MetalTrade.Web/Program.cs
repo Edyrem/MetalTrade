@@ -3,6 +3,7 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
+using MetalTrade.DataAccess.Interceptors;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,14 @@ namespace MetalTrade.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddDbContext<MetalTradeDbContext>(options =>
-                    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
-                .AddIdentity<User, IdentityRole<int>>(options =>
+            builder.Services.AddDbContext<MetalTradeDbContext>(( serviceProvider, options )=>
+            {
+                var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+                options.UseNpgsql(conn)
+                    .AddInterceptors(serviceProvider.GetRequiredService<SoftDeleteInterceptor>());
+            });
+            
+            builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
                     options.Password.RequireDigit = true;
                     options.Password.RequireLowercase = true;
@@ -33,6 +39,7 @@ namespace MetalTrade.Web
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+            builder.Services.AddSingleton<SoftDeleteInterceptor>();
             
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
