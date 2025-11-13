@@ -12,10 +12,13 @@ public class UserService : IUserService
 {
     private readonly UserManagerRepository _userRepository;
     private readonly IWebHostEnvironment _env;
+    private readonly SignInManager<User> _signInManager;
 
-    public UserService(MetalTradeDbContext context, UserManager<User> userManager, IWebHostEnvironment env)
+    public UserService(MetalTradeDbContext context, UserManager<User> userManager,
+        SignInManager<User> signInManager, IWebHostEnvironment env)
     {
         _userRepository = new UserManagerRepository(context, userManager);
+        _signInManager = signInManager;
         _env = env;
     }
 
@@ -59,6 +62,45 @@ public class UserService : IUserService
 
         return false;
     }
+    
+    public async Task<bool> RegisterUserAsync(UserDto model)
+    {
+        string avatarPath = "";
+
+        if (model.Photo != null && model.Photo.Length > 0)
+        {
+            string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "avatars");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await model.Photo.CopyToAsync(stream);
+
+            avatarPath = "/images/avatars/" + uniqueFileName;
+        }
+
+        var user = new User
+        {
+            Email = model.Email,
+            UserName = model.UserName,
+            PhoneNumber = model.PhoneNumber,
+            WhatsAppNumber = model.WhatsAppNumber,
+            Photo = avatarPath
+        };
+
+        var result = await _userRepository.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+            await _userRepository.AddToRoleAsync(user, "User");
+            return true;
+        }
+
+        return false;
+    }
+    
 
     public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
     {
@@ -72,5 +114,25 @@ public class UserService : IUserService
 
         return result;
     }
+    
+    public async Task<SignInResult> LoginAsync(string login, string password, bool rememberMe)
+    {
+        var user = login.Contains('@')
+            ? await _signInManager.UserManager.FindByEmailAsync(login)
+            : await _signInManager.UserManager.FindByNameAsync(login);
+
+        if (user == null)
+            return SignInResult.Failed;
+
+        return await _signInManager.PasswordSignInAsync(
+            user.UserName,
+            password,
+            rememberMe,
+            lockoutOnFailure: false);
+    }
+
+
+    public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+    
     
 }
