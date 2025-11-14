@@ -6,8 +6,9 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interceptors;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-
+using System.Globalization;
 
 namespace MetalTrade.Web
 {
@@ -17,10 +18,15 @@ namespace MetalTrade.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services
+                .AddControllersWithViews()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
 
-            builder.Services.AddDbContext<MetalTradeDbContext>(( serviceProvider, options )=>
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            
+            builder.Services.AddSingleton<SoftDeleteInterceptor>();
+            builder.Services.AddDbContext<MetalTradeDbContext>((serviceProvider, options) =>
             {
                 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseNpgsql(conn)
@@ -35,13 +41,23 @@ namespace MetalTrade.Web
                     options.Password.RequireUppercase = true;
                     options.Password.RequiredLength = 6;
                 })
-                .AddEntityFrameworkStores<MetalTradeDbContext>();
-
+                .AddEntityFrameworkStores<MetalTradeDbContext>()
+                .AddDefaultTokenProviders();
+            
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
-            builder.Services.AddSingleton<SoftDeleteInterceptor>();
-            
+
             var app = builder.Build();
+            
+            var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("ru"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+            app.UseRequestLocalization(localizationOptions);
+            
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -50,6 +66,11 @@ namespace MetalTrade.Web
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
                     await AdminInitializer.SeedAdminUser(roleManager, userManager);
+                    
+                    var context = services.GetRequiredService<MetalTradeDbContext>();
+                    await UserInitializer.SeedUserAsync(userManager);
+                    await ProductInitializer.SeedProductAsync(context);
+                    await AdvertisementInitializer.SeedAdvertisementAsync(context);
                 }
                 catch (Exception ex)
                 {
@@ -57,15 +78,14 @@ namespace MetalTrade.Web
                 }
             }
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthentication();
@@ -73,8 +93,8 @@ namespace MetalTrade.Web
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}")
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
