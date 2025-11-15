@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    [Migration("20251113174242_MakeWhatsAppNullable")]
-    partial class MakeWhatsAppNullable
+    [Migration("20251115205357_userid")]
+    partial class userid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

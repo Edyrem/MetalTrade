@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    [Migration("20251111115101_AddFieldIsDelete")]
-    partial class AddFieldIsDelete
+    [Migration("20251115210045_commentMetalId")]
+    partial class commentMetalId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,16 +140,11 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("MetalTypeId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MetalTypeId");
 
                     b.ToTable("Products");
                 });
@@ -217,7 +212,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("WhatsAppNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -392,17 +386,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Advertisement");
-                });
-
-            modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
-                {
-                    b.HasOne("MetalTrade.Domain.Entities.MetalType", "MetalType")
-                        .WithMany()
-                        .HasForeignKey("MetalTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MetalType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

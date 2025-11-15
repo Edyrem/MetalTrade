@@ -16,9 +16,9 @@ namespace MetalTrade.Business.Common.Mapping
         {
             CreateMap<AdvertisementDto, Advertisement>().ReverseMap();
             CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
-           // CreateMap<MetalTypeDto, MetalType>().ReverseMap();
+           //CreateMap<MetalTypeDto, MetalType>().ReverseMap();
             CreateMap<ProductDto, Product>().ReverseMap();
-          //  CreateMap<UserDto, User>().ReverseMap();
+            CreateMap<UserDto, User>().ReverseMap();
         }
     } 
 }
