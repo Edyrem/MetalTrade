@@ -36,6 +36,5 @@ public class ProductInitializer
             context.Products.AddRange(products);
             await context.SaveChangesAsync();
         }
-
     }
 }

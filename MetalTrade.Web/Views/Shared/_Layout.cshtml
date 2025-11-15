@@ -26,7 +26,7 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
-                    
+
                     @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
                     {
                         <li class="nav-item">
@@ -38,6 +38,19 @@
                     }
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Advertisement" asp-action="Index">Объявления</a>
+                    <li>
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit">Выход</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login">Вход </a>
+                            <a asp-controller="Account" asp-action="Register">Регистрация</a>
+                        }
                     </li>
                 </ul>
             </div>
