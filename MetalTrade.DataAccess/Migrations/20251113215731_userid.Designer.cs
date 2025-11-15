@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    [Migration("20251105165335_DbUpdate")]
-    partial class DbUpdate
+    [Migration("20251113215731_userid")]
+    partial class userid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

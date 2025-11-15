@@ -14,11 +14,11 @@ namespace MetalTrade.Business.Common.Mapping
     {
         public MappingProfile() 
         {
-            CreateMap<Advertisement, AdvertisementDto>().ReverseMap();
-            CreateMap<AdvertisementPhoto, AdvertisementPhotoDto>().ReverseMap();
-            CreateMap<MetalType, MetalTypeDto>().ReverseMap();
-            CreateMap<Product, ProductDto>().ReverseMap();
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<AdvertisementDto, Advertisement>().ReverseMap();
+            CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
+           // CreateMap<MetalTypeDto, MetalType>().ReverseMap();
+            CreateMap<ProductDto, Product>().ReverseMap();
+          //  CreateMap<UserDto, User>().ReverseMap();
         }
     } 
 }

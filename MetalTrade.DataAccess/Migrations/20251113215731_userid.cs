@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class userid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,32 +66,6 @@ namespace MetalTrade.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MetalTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductProperties",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductProperties", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Regions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Regions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -221,26 +195,6 @@ namespace MetalTrade.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cities",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    RegionId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cities", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Cities_Regions_RegionId",
-                        column: x => x.RegionId,
-                        principalTable: "Regions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Advertisements",
                 columns: table => new
                 {
@@ -251,8 +205,12 @@ namespace MetalTrade.DataAccess.Migrations
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
-                    CityId = table.Column<int>(type: "integer", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    IsTop = table.Column<bool>(type: "boolean", nullable: false),
+                    IsAd = table.Column<bool>(type: "boolean", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -262,12 +220,6 @@ namespace MetalTrade.DataAccess.Migrations
                         name: "FK_Advertisements_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Advertisements_Cities_CityId",
-                        column: x => x.CityId,
-                        principalTable: "Cities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -298,52 +250,10 @@ namespace MetalTrade.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "AdvertisementProductProperties",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Size = table.Column<float>(type: "real", nullable: false),
-                    PropertyId = table.Column<int>(type: "integer", nullable: false),
-                    AdvertisementId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AdvertisementProductProperties", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AdvertisementProductProperties_Advertisements_Advertisement~",
-                        column: x => x.AdvertisementId,
-                        principalTable: "Advertisements",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AdvertisementProductProperties_ProductProperties_PropertyId",
-                        column: x => x.PropertyId,
-                        principalTable: "ProductProperties",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AdvertisementPhotos_AdvertisementId",
                 table: "AdvertisementPhotos",
                 column: "AdvertisementId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AdvertisementProductProperties_AdvertisementId",
-                table: "AdvertisementProductProperties",
-                column: "AdvertisementId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AdvertisementProductProperties_PropertyId",
-                table: "AdvertisementProductProperties",
-                column: "PropertyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Advertisements_CityId",
-                table: "Advertisements",
-                column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Advertisements_ProductId",
@@ -393,11 +303,6 @@ namespace MetalTrade.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_RegionId",
-                table: "Cities",
-                column: "RegionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_MetalTypeId",
                 table: "Products",
                 column: "MetalTypeId");
@@ -408,9 +313,6 @@ namespace MetalTrade.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AdvertisementPhotos");
-
-            migrationBuilder.DropTable(
-                name: "AdvertisementProductProperties");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -431,22 +333,13 @@ namespace MetalTrade.DataAccess.Migrations
                 name: "Advertisements");
 
             migrationBuilder.DropTable(
-                name: "ProductProperties");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Cities");
-
-            migrationBuilder.DropTable(
                 name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "Regions");
 
             migrationBuilder.DropTable(
                 name: "MetalTypes");

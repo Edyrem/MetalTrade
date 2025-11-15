@@ -44,6 +44,11 @@ namespace MetalTrade.Web
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
                     await AdminInitializer.SeedAdminUser(roleManager, userManager);
+
+                    var context = services.GetRequiredService<MetalTradeDbContext>();
+                    await UserInitializer.SeedUserAsync(userManager);
+                    await ProductInitializer.SeedProductAsync(context);
+                    await AdvertisementInitializer.SeedAdvertisementAsync(context);
                 }
                 catch (Exception ex)
                 {
