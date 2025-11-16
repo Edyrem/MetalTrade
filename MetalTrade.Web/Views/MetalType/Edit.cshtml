@@ -1,0 +1,27 @@
+@model MetalTrade.Web.ViewModels.MetalType.EditMetalViewModel
+
+@{
+    ViewBag.Title = "Редактирование типа металла";
+}
+
+<h2>Изменение типа металла </h2>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post" >
+            <div class="form_row mt-3">
+                <label for="name">Название металла</label>
+                <input asp-for="Name" type="text" id="name" class="form-control">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-4 text-center">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

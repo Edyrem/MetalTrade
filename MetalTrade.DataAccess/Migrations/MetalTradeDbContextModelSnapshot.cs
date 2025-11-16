@@ -46,6 +46,9 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Property<bool>("IsAd")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsTop")
                         .HasColumnType("boolean");
 
@@ -89,6 +92,9 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Property<int>("AdvertisementId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PhotoLink")
                         .IsRequired()
                         .HasColumnType("text");
@@ -108,6 +114,9 @@ namespace MetalTrade.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -124,6 +133,9 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("MetalTypeId")
                         .HasColumnType("integer");
@@ -159,6 +171,9 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
@@ -199,7 +214,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("WhatsAppNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
