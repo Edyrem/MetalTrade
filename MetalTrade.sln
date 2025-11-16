@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.DataAccess", "Me
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Domain", "MetalTrade.Domain\MetalTrade.Domain.csproj", "{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Application", "MetalTrade.Application\MetalTrade.Application.csproj", "{F5FDFDBD-32C5-4FED-98E7-6B3A119F9A1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5FDFDBD-32C5-4FED-98E7-6B3A119F9A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5FDFDBD-32C5-4FED-98E7-6B3A119F9A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5FDFDBD-32C5-4FED-98E7-6B3A119F9A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5FDFDBD-32C5-4FED-98E7-6B3A119F9A1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

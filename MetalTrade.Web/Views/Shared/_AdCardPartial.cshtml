@@ -1,0 +1,33 @@
+@model MetalTrade.Domain.Entities.Advertisement
+
+<div class="card h-100 shadow-sm">
+    <img src="@(Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "/images/no-image.png")"
+         class="card-img-top"
+         style="height:160px; object-fit:cover;" alt="Фото" />
+
+    <div class="card-body">
+        <h6 class="card-title text-truncate">@Model.Title</h6>
+        <p class="card-text small text-muted">
+            @(string.IsNullOrEmpty(Model.Body)
+                ? ""
+                : (Model.Body.Length > 80 ? Model.Body.Substring(0, 80) + "..." : Model.Body))
+        </p>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Advertisement"
+               asp-action="Details"
+               asp-route-id="@Model.Id"
+               class="btn btn-outline-primary btn-sm">Просмотр</a>
+            
+            @if (User.IsInRole("Supplier"))
+            {
+                <a asp-controller="Advertisement"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-outline-warning btn-sm">Редактировать</a>
+            }
+
+            
+        </div>
+    </div>
+</div>

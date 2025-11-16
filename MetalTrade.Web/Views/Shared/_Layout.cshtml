@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<User> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -24,34 +26,56 @@
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-dark" asp-controller="Advertisement" asp-action="Index">Объявления</a>
                     </li>
 
                     @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="CreateUser">Создать поставщика</a>
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="CreateUser">Создать поставщика</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Список пользователей</a>
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Список пользователей</a>
                         </li>
                     }
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Advertisement" asp-action="Index">Объявления</a>
-                    <li>
-                        @if (User?.Identity?.IsAuthenticated ?? false)
-                        {
-                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit">Выход</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <a asp-controller="Account" asp-action="Login">Вход </a>
-                            <a asp-controller="Account" asp-action="Register">Регистрация</a>
-                        }
-                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        var currentUser = await UserManager.GetUserAsync(User);
+                        var avatar = string.IsNullOrEmpty(currentUser?.Photo)
+                            ? "/images/default-avatar.png"
+                            : currentUser.Photo;
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="@avatar" alt="Аватар"
+                                     style="width:40px;height:40px;object-fit:cover;border-radius:50%;margin-right:8px;">
+                                <span>@currentUser?.UserName</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Личный кабинет</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-3">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-link p-0 text-danger">Выйти</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Вход</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">Регистрация</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

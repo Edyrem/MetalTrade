@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
+
 namespace MetalTrade.Web
 {
     public class Program
@@ -46,6 +47,7 @@ namespace MetalTrade.Web
             
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
 
             var app = builder.Build();
             

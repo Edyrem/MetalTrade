@@ -12,6 +12,8 @@ namespace MetalTrade.DataAccess.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Advertisement> Advertisements { get; set; }
         public DbSet<AdvertisementPhoto> AdvertisementPhotos { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+
 
         public MetalTradeDbContext(DbContextOptions<MetalTradeDbContext> options) : base(options) { }
         
@@ -22,6 +24,7 @@ namespace MetalTrade.DataAccess.Data
             modelBuilder.Entity<MetalType>().HasQueryFilter(m => !m.IsDeleted);
             modelBuilder.Entity<Advertisement>().HasQueryFilter(a => !a.IsDeleted);
             modelBuilder.Entity<AdvertisementPhoto>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Favorite>().HasQueryFilter(f => !f.IsDeleted);
             base.OnModelCreating(modelBuilder);
         }
     }
