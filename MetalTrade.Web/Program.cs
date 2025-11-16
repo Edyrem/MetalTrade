@@ -46,6 +46,8 @@ namespace MetalTrade.Web
             
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+            builder.Services.AddScoped<IMetalService, MetalService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             var app = builder.Build();
             
