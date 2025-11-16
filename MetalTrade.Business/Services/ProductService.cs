@@ -67,7 +67,7 @@ public class ProductService : IProductService
         Product product = new Product()
         {
             Id = productDto.Id,
-            Name = productDto.Name,
+            Name = productDto.Name.ToLower(),
             MetalTypeId = productDto.MetalTypeId
         };
         await _repository.CreateAsync(product);
@@ -81,7 +81,7 @@ public class ProductService : IProductService
             return;
         
         product.Id = productDto.Id;
-        product.Name = productDto.Name;
+        product.Name = productDto.Name.ToLower();
         product.MetalTypeId = productDto.MetalTypeId;
         await _repository.UpdateAsync(product);
         await _repository.SaveChangesAsync();

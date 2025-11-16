@@ -44,7 +44,7 @@ public class MetalService : IMetalService
         MetalType metalType = new MetalType()
         {
             Id = metalTypeDto.Id,
-            Name = metalTypeDto.Name
+            Name = metalTypeDto.Name.ToLower()
         };
         await _repository.CreateAsync(metalType);
         await _repository.SaveChangesAsync();
@@ -57,7 +57,7 @@ public class MetalService : IMetalService
             throw new Exception($"Metal type not found by id = {metalTypeDto.Id}");
         
         metalType.Id = metalTypeDto.Id;
-        metalType.Name = metalTypeDto.Name;
+        metalType.Name = metalTypeDto.Name.ToLower();
         
         await _repository.UpdateAsync(metalType);
         await _repository.SaveChangesAsync();
