@@ -137,11 +137,16 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("MetalTypeId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MetalTypeId");
 
                     b.ToTable("Products");
                 });
@@ -383,6 +388,17 @@ namespace MetalTrade.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Advertisement");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
+                {
+                    b.HasOne("MetalTrade.Domain.Entities.MetalType", "MetalType")
+                        .WithMany()
+                        .HasForeignKey("MetalTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MetalType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

@@ -77,7 +77,7 @@ namespace MetalTrade.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-          var adsDtos = await _adsService.GetAllAsync();
+             var adsDtos = await _adsService.GetAllAsync();
             var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
             return View(models);
         }
@@ -93,6 +93,7 @@ namespace MetalTrade.Web.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
+            List<string> ExistingPhotos;
             var adsDto = await _adsService.GetAsync(id);
             if (adsDto == null) return RedirectToAction("Index");
             var model = _mapper.Map<EditViewModel>(adsDto);
@@ -102,7 +103,7 @@ namespace MetalTrade.Web.Controllers
                 {
                     Value = p.Id.ToString(),
                     Text = p.Name,
-                    Selected = (p.Id == model.ProductId)
+                    Selected = p.Id == model.ProductId
                 })
                 .ToList();
 
@@ -126,10 +127,8 @@ namespace MetalTrade.Web.Controllers
                 ModelState.AddModelError("", "Пользователь не найден");
                 return View(model);
             }
-
             var adsDto = _mapper.Map<AdvertisementDto>(model);
-            adsDto.UserId = user.Id; // обязательно, иначе FK ломается
-
+            adsDto.UserId = user.Id; 
             await _adsService.UpdateAsync(adsDto);
             return RedirectToAction("Details", new { id = model.Id });
         }

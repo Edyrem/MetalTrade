@@ -21,20 +21,21 @@ public class ProductInitializer
             await context.SaveChangesAsync();
         }
 
-        //if (!await context.Products.AnyAsync())
-        //{
-        //    var iron = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "железо");
-        //    var aluminum = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "алюминий");
-        //    var steel = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "сталь");
-        //    var products = new[]
-        //    {
-        //        new Product { Name = "труба", MetalTypeId = iron.Id },
-        //        new Product { Name = "арматура", MetalTypeId = steel.Id },
-        //        new Product { Name = "лист", MetalTypeId = iron.Id },
-        //        new Product { Name = "уголок", MetalTypeId = aluminum.Id },
-        //    };
-        //    context.Products.AddRange(products);
-        //    await context.SaveChangesAsync();
-        //}
+        if (!await context.Products.AnyAsync())
+        {
+            var iron = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "железо");
+            var aluminum = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "алюминий");
+            var steel = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "сталь");
+
+            var products = new[]
+            {
+                new Product { Name = "труба", MetalTypeId = iron.Id },
+                new Product { Name = "арматура", MetalTypeId = steel.Id },
+                new Product { Name = "лист", MetalTypeId = iron.Id },
+                new Product { Name = "уголок", MetalTypeId = aluminum.Id },
+            };
+            context.Products.AddRange(products);
+            await context.SaveChangesAsync();
+        }
     }
 }

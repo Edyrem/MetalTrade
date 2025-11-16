@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class userid : Migration
+    public partial class commentMetalId3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

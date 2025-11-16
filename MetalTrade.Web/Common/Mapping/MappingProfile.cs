@@ -11,6 +11,7 @@ namespace MetalTrade.Web.Common.Mapping
         public MappingProfile()
         {
             CreateMap<AdvertisementDto, AdvertisementViewModel>()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes))
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
                 .ReverseMap();
@@ -19,16 +20,16 @@ namespace MetalTrade.Web.Common.Mapping
                 .ReverseMap(); 
 
             CreateMap<ProductDto, ProductViewModel>()
+                .ForMember(dest => dest.MetalType, opt => opt.Ignore()) 
                 .ReverseMap();
 
-            CreateMap<CreateViewModel, AdvertisementDto>()
+            CreateMap<AdvertisementDto, EditViewModel>()
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore())
                 .ReverseMap()
-                .ForMember(dest => dest.Photoes, opt => opt.Ignore()); 
-            
+                .ForMember(dest => dest.Photoes, opt => opt.Ignore());
 
-            CreateMap<EditViewModel, AdvertisementDto>()
-                .ForMember(dest => dest.Photoes, opt => opt.Ignore())
+            CreateMap<AdvertisementDto, EditViewModel>()
+                .ForMember(dest => dest.Photoes, opt => opt.Ignore()) 
                 .ReverseMap()
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore());
 
