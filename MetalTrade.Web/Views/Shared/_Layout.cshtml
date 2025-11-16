@@ -20,12 +20,6 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
 
                     @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
                     {
@@ -34,6 +28,16 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Список пользователей</a>
+                        </li>
+                    }
+                    @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator")))
+                    {
+                        
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="MetalType" asp-action="Index">Металлы</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Продукты</a>
                         </li>
                     }
                     <li class="nav-item">
@@ -52,6 +56,8 @@
                             <a asp-controller="Account" asp-action="Register">Регистрация</a>
                         }
                     </li>
+                    
+                    
                 </ul>
             </div>
         </div>

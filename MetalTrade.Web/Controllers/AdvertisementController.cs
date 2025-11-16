@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class AdvertisementController : Controller
     {
         private readonly IAdvertisementService _adsService;

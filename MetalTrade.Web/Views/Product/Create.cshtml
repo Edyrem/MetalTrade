@@ -1,0 +1,35 @@
+@model MetalTrade.Web.ViewModels.Product.CreateProductViewModel
+
+@{
+    ViewBag.Title = "Создание продукта";
+}
+
+<h2>Добавление нового продукта </h2>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post" >
+            <div class="form_row mt-3">
+                <label for="name">Название продукта</label>
+                <input asp-for="Name" type="text" id="name" class="form-control">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-2">
+                <label asp-for="MetalTypeId" class="control-label"></label>
+                <select asp-for="MetalTypeId" class="form-control" asp-items="@Model.MetalTypes">
+                    <option value="">-- Выберите тип металла --</option>
+                </select>
+                <span asp-validation-for="MetalTypeId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-4 text-center">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
