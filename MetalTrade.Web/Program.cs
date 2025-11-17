@@ -48,6 +48,8 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             builder.Services.AddScoped<IMetalService, MetalService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            
 
             var app = builder.Build();
             
@@ -96,7 +98,7 @@ namespace MetalTrade.Web
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Advertisement}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

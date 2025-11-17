@@ -39,7 +39,7 @@ namespace MetalTrade.Web.Controllers
             {
                 var loginResult = await _userService.LoginAsync(model.UserName, model.Password, false);
                 if (loginResult.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Advertisement");
             }
 
             ModelState.AddModelError("", "Ошибка при регистрации пользователя.");
@@ -59,7 +59,7 @@ namespace MetalTrade.Web.Controllers
             var result = await _userService.LoginAsync(model.Login, model.Password, model.RememberMe);
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Advertisement");
 
             ModelState.AddModelError("", "Неверный логин или пароль.");
             return View(model);
