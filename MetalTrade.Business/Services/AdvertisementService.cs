@@ -60,17 +60,13 @@ namespace MetalTrade.Business.Services
             var entity = await _repository.GetAsync(adsDto.Id);
             if (entity == null) throw new ArgumentException("Объявление не найдено");
 
-            // Очищаем связанные сущности
             adsDto.Product = null;
             adsDto.User = null;
 
-            // Маппим основные поля
             _mapper.Map(adsDto, entity);
 
-            // Обрабатываем новые фото если есть
             if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Any())
             {
-                // Сохраняем новые фото
                 foreach (var photoFile in adsDto.PhotoFiles)
                 {
                     var fileName = $"{Guid.NewGuid()}_{photoFile.FileName}";

@@ -38,7 +38,7 @@ namespace MetalTrade.DataAccess.Repositories
         }
         public virtual async Task DeleteAsync(int id)
         {
-            T entity = _dbSet.Find(id);
+            T entity = await _dbSet.FindAsync(id);
             if (entity != null)
             {
                 _dbSet.Remove(entity);

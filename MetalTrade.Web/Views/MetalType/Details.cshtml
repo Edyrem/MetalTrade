@@ -1,0 +1,17 @@
+@model MetalTrade.Web.ViewModels.MetalType.MetalTypeViewModel
+
+@{
+    ViewBag.Title = "Детали типа металла";
+}
+
+<div class="container  justify-content-center">
+    <div class="card" style="width: 25rem;">
+        <div class="card-body text-center ">
+            <h3 class="card-title my-3">@Model.Name</h3>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="card-link btn btn-secondary">Редактировать</a>
+
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="card-link btn btn-danger">Удалить</a>
+        </div>
+    </div>
+</div>
+
