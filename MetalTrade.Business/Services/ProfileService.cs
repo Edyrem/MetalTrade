@@ -22,9 +22,8 @@ public class ProfileService : IProfileService
 
     public async Task<ProfileWithAdsDto> GetProfileAsync(User user)
     {
-        var roles = (await _userManager.GetRolesAsync(user)).ToList();
-        bool isSupplier = roles.Any(r => r.Equals("supplier", StringComparison.OrdinalIgnoreCase));
-        
+        bool isSupplier = await _userManager.IsInRoleAsync(user, "supplier");
+
         if (!isSupplier)
         {
             bool anyAd = await _context.Advertisements
@@ -42,7 +41,7 @@ public class ProfileService : IProfileService
             PhotoPath = user.Photo,
             IsSupplier = isSupplier
         };
-        
+
         if (isSupplier)
         {
             dto.Advertisements = await _context.Advertisements
@@ -75,7 +74,6 @@ public class ProfileService : IProfileService
 
         return dto;
     }
-
     public async Task<bool> UpdateProfileAsync(User user, ProfileDto dto, IFormFile? photo, IWebHostEnvironment env)
     {
         user.UserName = dto.UserName;
