@@ -32,14 +32,56 @@ namespace MetalTrade.Business.Services
 
         public async Task CreateAsync(AdvertisementDto adsDto)
         {
+            adsDto.Product = null;
+            adsDto.User = null;
+
             var entity = _mapper.Map<Advertisement>(adsDto);
+
+            entity.CreateDate = DateTime.UtcNow;
+
+            if (adsDto.Photoes != null && adsDto.Photoes.Any())
+            {
+                entity.Photoes = adsDto.Photoes.Select(photoDto => new AdvertisementPhoto
+                {
+                    PhotoLink = photoDto.PhotoLink,
+                }).ToList();
+            }
+
             await _repository.CreateAsync(entity);
             await _repository.SaveChangesAsync();
         }
+
         public async Task UpdateAsync(AdvertisementDto adsDto)
         {
-            var entity = _mapper.Map<Advertisement>(adsDto);
-            await _repository.UpdateAsync(entity);
+            var existingEntity = await _repository.GetAsync(adsDto.Id);
+            if (existingEntity == null)
+                throw new ArgumentException($"Объявление с ID {adsDto.Id} не найдено");
+
+            var currentPhotoes = existingEntity.Photoes?.ToList() ?? new List<AdvertisementPhoto>();
+
+            adsDto.Photoes = null;
+            adsDto.Product = null;
+            adsDto.User = null;
+            _mapper.Map(adsDto, existingEntity);
+
+            if (adsDto.Photoes != null && adsDto.Photoes.Any())
+            {
+                foreach (var photo in currentPhotoes)
+                {
+                    photo.IsDeleted = true;
+                }
+
+                existingEntity.Photoes = adsDto.Photoes.Select(photoDto => new AdvertisementPhoto
+                {
+                    PhotoLink = photoDto.PhotoLink
+                }).ToList();
+            }
+            else
+            {
+                existingEntity.Photoes = currentPhotoes;
+            }
+
+            await _repository.UpdateAsync(existingEntity);
             await _repository.SaveChangesAsync();
         }
 

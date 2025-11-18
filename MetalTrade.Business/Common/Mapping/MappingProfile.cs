@@ -1,24 +1,28 @@
 ﻿using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Common.Mapping
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() 
+        public MappingProfile()
         {
-            CreateMap<AdvertisementDto, Advertisement>().ReverseMap();
+            CreateMap<AdvertisementDto, Advertisement>()
+                .ForMember(dest => dest.Product, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes));
+
+            CreateMap<Advertisement, AdvertisementDto>()
+                .ForMember(dest => dest.User, opt => opt.Ignore()); 
+
             CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
-           //CreateMap<MetalTypeDto, MetalType>().ReverseMap();
+
+            // User - ВООБЩЕ УБИРАЕМ маппинг!
+            // CreateMap<User, UserDto>().ReverseMap(); // ЗАКОММЕНТИРОВАТЬ!
+
+            CreateMap<MetalTypeDto, MetalType>().ReverseMap();
             CreateMap<ProductDto, Product>().ReverseMap();
-            CreateMap<UserDto, User>().ReverseMap();
         }
-    } 
+    }
 }

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.Controllers
 {
@@ -44,6 +45,7 @@ namespace MetalTrade.Web.Controllers
             return View(model);
         }
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             User? user = await _userManager.GetUserAsync(User);
@@ -51,13 +53,14 @@ namespace MetalTrade.Web.Controllers
             if (!ModelState.IsValid || user == null)
             {
                 model.Products = [.. _context.Products.Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.Name
-                })];
-
+        {
+            Value = p.Id.ToString(),
+            Text = p.Name
+        })];
                 return View(model);
             }
+
+            // Используем маппер, но потом явно устанавливаем UserId
             var adsDto = _mapper.Map<AdvertisementDto>(model);
             adsDto.UserId = user.Id;
 
@@ -127,8 +130,15 @@ namespace MetalTrade.Web.Controllers
                 ModelState.AddModelError("", "Пользователь не найден");
                 return View(model);
             }
+
             var adsDto = _mapper.Map<AdvertisementDto>(model);
-            adsDto.UserId = user.Id; 
+
+            var existingAds = await _adsService.GetAsync(model.Id);
+            if (existingAds != null)
+            {
+                adsDto.UserId = existingAds.UserId; 
+            }
+
             await _adsService.UpdateAsync(adsDto);
             return RedirectToAction("Details", new { id = model.Id });
         }

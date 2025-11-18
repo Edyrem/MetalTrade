@@ -18,7 +18,7 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Адрес")]
         public string? Address { get; set; }
         [Display(Name = "Телефон")]
-        public string PhoneNumber { get; set; } = null!;
+        public string PhoneNumber { get; set; } = string.Empty;
         public int ProductId { get; set; }
         [Display(Name = "Продукт")]
         public ProductViewModel Product { get; set; } = new();
