@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Http;
+
 namespace MetalTrade.Business.Dtos
 {
     public class AdvertisementDto
@@ -19,5 +21,6 @@ namespace MetalTrade.Business.Dtos
         public int UserId { get; set; }
         public UserDto? User { get; set; }
         public List<AdvertisementPhotoDto> Photoes { get; set; } = [];
+        public List<IFormFile>? PhotoFiles { get; set; } 
     }
 }

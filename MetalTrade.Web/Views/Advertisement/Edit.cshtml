@@ -51,9 +51,9 @@
                 <span asp-validation-for="ProductId" class="text-danger"></span>
             </div>
             <div class="form-group mt-2">
-                <label asp-for="Photoes" class="control-label"></label>
-                <input asp-for="Photoes" class="form-control" type="file" accept="image/*" multiple />
-                <span asp-validation-for="Photoes" class="text-danger"></span>
+                <label class="control-label">Добавить новые фото</label>
+                <input name="photoFiles" class="form-control" type="file" accept="image/*" multiple />
+                <small class="form-text text-muted">Выберите новые фото для добавления</small>
             </div>
             <div class="form-group mt-3">
                 <input type="submit" value="Редактировать" class="btn btn-primary" />

@@ -4,6 +4,8 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace MetalTrade.Business.Services
 {
@@ -11,11 +13,13 @@ namespace MetalTrade.Business.Services
     {
         private readonly AdvertisementRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _env;
 
-        public AdvertisementService(MetalTradeDbContext context, IMapper mapper)
+        public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IWebHostEnvironment env )
         {
             _repository = new AdvertisementRepository(context);
             _mapper = mapper;
+            _env = env;
         }
 
         public async Task<List<AdvertisementDto>> GetAllAsync()
@@ -53,35 +57,50 @@ namespace MetalTrade.Business.Services
 
         public async Task UpdateAsync(AdvertisementDto adsDto)
         {
-            var existingEntity = await _repository.GetAsync(adsDto.Id);
-            if (existingEntity == null)
-                throw new ArgumentException($"Объявление с ID {adsDto.Id} не найдено");
+            var entity = await _repository.GetAsync(adsDto.Id);
+            if (entity == null) throw new ArgumentException("Объявление не найдено");
 
-            var currentPhotoes = existingEntity.Photoes?.ToList() ?? new List<AdvertisementPhoto>();
-
-            adsDto.Photoes = null;
+            // Очищаем связанные сущности
             adsDto.Product = null;
             adsDto.User = null;
-            _mapper.Map(adsDto, existingEntity);
 
-            if (adsDto.Photoes != null && adsDto.Photoes.Any())
+            // Маппим основные поля
+            _mapper.Map(adsDto, entity);
+
+            // Обрабатываем новые фото если есть
+            if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Any())
             {
-                foreach (var photo in currentPhotoes)
+                // Сохраняем новые фото
+                foreach (var photoFile in adsDto.PhotoFiles)
                 {
-                    photo.IsDeleted = true;
-                }
+                    var fileName = $"{Guid.NewGuid()}_{photoFile.FileName}";
+                    var uploads = Path.Combine(_env.WebRootPath, "uploads", "ads");
+                    var filePath = Path.Combine(uploads, fileName);
 
-                existingEntity.Photoes = adsDto.Photoes.Select(photoDto => new AdvertisementPhoto
+                    Directory.CreateDirectory(uploads);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await photoFile.CopyToAsync(stream);
+                    }
+
+                    // Добавляем новое фото
+                    entity.Photoes ??= new List<AdvertisementPhoto>();
+                    entity.Photoes.Add(new AdvertisementPhoto
+                    {
+                        PhotoLink = $"/uploads/ads/{fileName}"
+                    });
+                }
+            }
+            else if (adsDto.Photoes?.Any() ?? false)
+            {
+                entity.Photoes = adsDto.Photoes.Select(p => new AdvertisementPhoto
                 {
-                    PhotoLink = photoDto.PhotoLink
+                    PhotoLink = p.PhotoLink
                 }).ToList();
             }
-            else
-            {
-                existingEntity.Photoes = currentPhotoes;
-            }
 
-            await _repository.UpdateAsync(existingEntity);
+            await _repository.UpdateAsync(entity);
             await _repository.SaveChangesAsync();
         }
 

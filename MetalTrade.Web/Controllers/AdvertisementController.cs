@@ -114,7 +114,7 @@ namespace MetalTrade.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EditViewModel model)
+        public async Task<IActionResult> Edit(EditViewModel model, List<IFormFile>? photoFiles)
         {
             if (!ModelState.IsValid)
             {
@@ -133,10 +133,13 @@ namespace MetalTrade.Web.Controllers
 
             var adsDto = _mapper.Map<AdvertisementDto>(model);
 
+            // Передаем файлы в DTO
+            adsDto.PhotoFiles = photoFiles;
+
             var existingAds = await _adsService.GetAsync(model.Id);
             if (existingAds != null)
             {
-                adsDto.UserId = existingAds.UserId; 
+                adsDto.UserId = existingAds.UserId;
             }
 
             await _adsService.UpdateAsync(adsDto);
