@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public class AdvertisementController : Controller
     {
         private readonly IAdvertisementService _adsService;
@@ -29,7 +29,6 @@ namespace MetalTrade.Web.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "admin, moderator,supplier")]
         public IActionResult Create()
         {
             CreateViewModel model = new()
@@ -42,7 +41,6 @@ namespace MetalTrade.Web.Controllers
             };
             return View(model);
         }
-        [Authorize(Roles = "admin, moderator,supplier")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
@@ -73,6 +71,7 @@ namespace MetalTrade.Web.Controllers
             }
             return View(model);
         }
+
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
@@ -109,7 +108,7 @@ namespace MetalTrade.Web.Controllers
             }
             return View(models);
         }
-        [Authorize(Roles = "admin, moderator,supplier,user")]
+
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
@@ -145,7 +144,7 @@ namespace MetalTrade.Web.Controllers
             }
             return RedirectToAction("Index");
         }
-        [Authorize(Roles = "admin, moderator,supplier")]
+
         public async Task<IActionResult> Edit(int id)
         {
             AdvertisementDto? adsDto = await _adsService.GetAsync(id);
@@ -172,7 +171,7 @@ namespace MetalTrade.Web.Controllers
             }
             return RedirectToAction("Index");
         }
-        [Authorize(Roles = "admin, moderator,supplier")]
+
         [HttpPost]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
@@ -203,7 +202,6 @@ namespace MetalTrade.Web.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "admin, moderator,supplier")]
         public async Task<IActionResult> Delete(int id)
         {
             AdvertisementDto? adsDto = await _adsService.GetAsync(id);
@@ -212,7 +210,7 @@ namespace MetalTrade.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "admin, moderator,supplier")]
+
         [HttpPost]
         public async Task<IActionResult> Delete(DeleteViewModel model)
         {
