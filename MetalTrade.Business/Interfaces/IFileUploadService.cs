@@ -7,7 +7,7 @@ namespace MetalTrade.Business.Interfaces
         Task<string[]> UploadFilesAsync(IEnumerable<IFormFile> file, string folder);
         Task<string> UploadFileAsync(IFormFile file, string folder);
         Task DeleteFileAsync(string filePath);
-        Task<IEnumerable<string>> DeleteFilesAsync(IEnumerable<string> filePaths);
+        Task DeleteFilesAsync(IEnumerable<string> filePaths);
         bool IsValidFileType(IFormFile file, IEnumerable<string> permittedExtensions);
     }
 }
