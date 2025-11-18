@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {
-    public abstract class FileUploadServiceBase : IFileUploadService
+    public abstract class FileUploadServiceBase
     {
         protected abstract string DefaultFolder { get; }
         protected virtual IEnumerable<string> PermittedExtensions => new List<string>
@@ -23,10 +23,6 @@ namespace MetalTrade.Business.Services
         public FileUploadServiceBase(IWebHostEnvironment env, IEnumerable<string> extensions)
         {
             _env = env;
-            if (extensions != null && extensions.Any())
-            {
-                PermittedExtensions = extensions as List<string> ?? PermittedExtensions;
-            }
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
@@ -57,14 +53,14 @@ namespace MetalTrade.Business.Services
             }
         }
 
-        public async Task<string[]> UploadFilesAsync(IEnumerable<IFormFile> files, string folder)
+        public async Task<List<string>> UploadFilesAsync(IEnumerable<IFormFile> files, string folder)
         {
             var uploadedFilePaths = new List<string>();
             var fileList = files?.ToList() ?? new List<IFormFile>();
 
             if(!fileList.Any())
             {
-                return uploadedFilePaths.ToArray();
+                return uploadedFilePaths;
             }
 
             try
@@ -81,7 +77,7 @@ namespace MetalTrade.Business.Services
                 throw new Exception("Не удалось загрузить файлы", ex);
             }
 
-            return uploadedFilePaths.ToArray();
+            return uploadedFilePaths;
         }
 
         public async Task DeleteFileAsync(string filePath)

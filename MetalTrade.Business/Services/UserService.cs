@@ -1,5 +1,6 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Business.Services;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
@@ -13,36 +14,22 @@ public class UserService : IUserService
     private readonly UserManagerRepository _userRepository;
     private readonly IWebHostEnvironment _env;
     private readonly SignInManager<User> _signInManager;
+    private readonly IImageUploadService _imageUploadService;
 
     public UserService(MetalTradeDbContext context, UserManager<User> userManager,
-        SignInManager<User> signInManager, IWebHostEnvironment env)
+        SignInManager<User> signInManager, IWebHostEnvironment env, IImageUploadService imageUploadService)
     {
         _userRepository = new UserManagerRepository(context, userManager);
         _signInManager = signInManager;
         _env = env;
+        _imageUploadService = imageUploadService;
     }
 
     public async Task<IEnumerable<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
 
     public async Task<bool> CreateUserAsync(UserDto model, string role)
     {
-        string avatarPath = "";
-        if (model.Photo != null && model.Photo.Length > 0)
-        {
-            string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "avatars");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await model.Photo.CopyToAsync(stream);
-            }
-
-            avatarPath = "/images/avatars/" + uniqueFileName;
-        }
+        string avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
 
         var user = new User()
         {
@@ -65,22 +52,7 @@ public class UserService : IUserService
     
     public async Task<bool> RegisterUserAsync(UserDto model)
     {
-        string avatarPath = "";
-
-        if (model.Photo != null && model.Photo.Length > 0)
-        {
-            string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "avatars");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await model.Photo.CopyToAsync(stream);
-
-            avatarPath = "/images/avatars/" + uniqueFileName;
-        }
+        string avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
 
         var user = new User
         {
