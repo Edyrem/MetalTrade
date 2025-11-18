@@ -1,0 +1,56 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model MetalTrade.Web.ViewModels.RegisterViewModel
+@inject IViewLocalizer Localizer
+
+<h2>@Localizer["Register"]</h2>
+
+<form asp-action="Register" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div>
+        <label>@Localizer["User Name"]</label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["Email"]</label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["Phone Number"]</label>
+        <input asp-for="PhoneNumber" />
+        <span asp-validation-for="PhoneNumber"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["Photo"]</label>
+        <input asp-for="Photo" type="file" />
+        <span asp-validation-for="Photo"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["Password"]</label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["Confirm Password"]</label>
+        <input asp-for="PasswordConfirm" type="password" />
+        <span asp-validation-for="PasswordConfirm"></span>
+    </div>
+
+    <div>
+        <label>@Localizer["WhatsApp Number"]</label>
+        <input asp-for="WhatsAppNumber" placeholder="https://wa.me/996500500500" />
+        <span asp-validation-for="WhatsAppNumber"></span>
+    </div>
+
+    <div>
+        <button type="submit">@Localizer["Register"]</button>
+    </div>
+</form>

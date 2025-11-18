@@ -1,6 +1,8 @@
+using MetalTrade.DataAccess.Interfaces.Repositories;
+
 namespace MetalTrade.Domain.Entities;
 
-public class Advertisement
+public class Advertisement : ISoftDeletable
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -18,4 +20,6 @@ public class Advertisement
     public int UserId { get; set; }
     public User? User { get; set; }
     public List<AdvertisementPhoto> Photoes { get; set; } = null!;
+    
+    public bool IsDeleted { get; set; }
 }

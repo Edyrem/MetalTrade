@@ -13,11 +13,11 @@ namespace MetalTrade.DataAccess.Repositories
         }
         public async override Task<IEnumerable<Advertisement>> GetAllAsync()
         {
-            return await _dbSet.Include(a => a.Photoes).ToListAsync();
+            return await _dbSet.Include(a => a.Photoes).Include(a => a.Product).ToListAsync();
         }
         public async override Task<Advertisement?> GetAsync(int id)
         {
-            return await _dbSet.Include(a => a.Photoes).FirstOrDefaultAsync(a => a.Id == id);
+            return await _dbSet.Include(a => a.Photoes).Include(a => a.Product).FirstOrDefaultAsync(a => a.Id == id);
         }
         public async override Task<IEnumerable<Advertisement>> FindAsync(Expression<Func<Advertisement, bool>> predicate)
         {

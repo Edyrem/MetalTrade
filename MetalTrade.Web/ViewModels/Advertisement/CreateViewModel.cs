@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
@@ -24,6 +25,10 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
         public string? City { get; set; }
         [Display(Name = "Фото")]
-        public IFormFile[]? Images { get; set; }
+        public IFormFile[]? Photoes { get; set; }
+        [Display(Name = "Продукт")]
+        [Required(ErrorMessage = "Поле Продукт объязательно")]
+        public int ProductId { get; set; }
+        public List<SelectListItem> Products { get; set; } = [];
     }
 }

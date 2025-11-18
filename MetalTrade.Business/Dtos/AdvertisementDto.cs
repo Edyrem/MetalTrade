@@ -1,5 +1,4 @@
-﻿using MetalTrade.Domain.Entities;
-
+﻿
 namespace MetalTrade.Business.Dtos
 {
     public class AdvertisementDto
@@ -12,13 +11,13 @@ namespace MetalTrade.Business.Dtos
         public string? Address { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public int ProductId { get; set; }
-        public Product? Product { get; set; }
+        public ProductDto Product { get; set; } = new();
         public string? City { get; set; }
         public int Status { get; set; }
         public bool IsTop { get; set; }
         public bool IsAd { get; set; }
         public int UserId { get; set; }
-        public User? User { get; set; }
-        public List<AdvertisementPhoto>? Photoes { get; set; }
+        public UserDto? User { get; set; }
+        public List<AdvertisementPhotoDto> Photoes { get; set; } = [];
     }
 }

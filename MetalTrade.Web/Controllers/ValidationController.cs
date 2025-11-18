@@ -35,4 +35,16 @@ public class ValidationController : Controller
     {
         return !_context.Users.Any(u =>  u.WhatsAppNumber == whatsAppNumber );
     }
+    
+    [AcceptVerbs("GET", "POST")]
+    public bool CheckNameOfMetalType(string name)
+    {
+        return !_context.MetalTypes.Any(u => u.Name.ToLower() == name.ToLower() );
+    }
+    
+    [AcceptVerbs("GET", "POST")]
+    public bool CheckNameOfProduct(string name)
+    {
+        return !_context.Products.Any(u => u.Name.ToLower() == name.ToLower() );
+    }
 }
