@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace MetalTrade.Business.Interfaces
 {
     public interface IImageUploadService: IFileUploadService
-    {
-        bool IsImageFile(IFormFile file);
+    {        
     }
 }

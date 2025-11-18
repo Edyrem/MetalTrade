@@ -1,35 +1,21 @@
 ﻿using MetalTrade.Business.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace MetalTrade.Business.Services
 {
-    public class ImageUploadService : IImageUploadService
+    public class ImageUploadService : FileUploadServiceBase, IImageUploadService
     {
-        
-        public async Task<string> UploadFileAsync(IFormFile file, string folder)
+        public ImageUploadService(IWebHostEnvironment env, IEnumerable<string> extensions) : base(env, extensions)
         {
-            throw new NotImplementedException();
+            
         }
 
-        public async Task<string[]> UploadFilesAsync(IEnumerable<IFormFile> file, string folder)
+        protected override string DefaultFolder => "Images";
+        protected override IEnumerable<string> PermittedExtensions => new List<string>
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task DeleteFileAsync(string filePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<string>> DeleteFilesAsync(IEnumerable<string> filePaths)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsImageFile(IFormFile file)
-        {
-            throw new NotImplementedException();
-        }
+            ".jpg", ".jpeg", ".png", ".gif"
+        };
 
     }
 }

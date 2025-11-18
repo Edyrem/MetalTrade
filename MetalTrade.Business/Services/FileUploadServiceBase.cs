@@ -12,7 +12,7 @@ namespace MetalTrade.Business.Services
     public abstract class FileUploadServiceBase : IFileUploadService
     {
         protected abstract string DefaultFolder { get; }
-        protected readonly List<string> _permittedExtensions = new List<string>
+        protected virtual IEnumerable<string> PermittedExtensions => new List<string>
         {
             ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx", ".xls", ".xlsx"
         };
@@ -25,13 +25,13 @@ namespace MetalTrade.Business.Services
             _env = env;
             if (extensions != null && extensions.Any())
             {
-                _permittedExtensions = extensions as List<string> ?? _permittedExtensions;
+                PermittedExtensions = extensions as List<string> ?? PermittedExtensions;
             }
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
         {
-            if (IsValidFileType(file, _permittedExtensions))
+            if (IsValidFileType(file, PermittedExtensions))
             {
                 try
                 {
