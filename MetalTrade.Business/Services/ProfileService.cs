@@ -24,14 +24,6 @@ public class ProfileService : IProfileService
     {
         bool isSupplier = await _userManager.IsInRoleAsync(user, "supplier");
 
-        if (!isSupplier)
-        {
-            bool anyAd = await _context.Advertisements
-                .AnyAsync(a => a.UserId == user.Id && !a.IsDeleted);
-
-            if (anyAd) isSupplier = true;
-        }
-
         var dto = new ProfileWithAdsDto
         {
             UserName = user.UserName,
@@ -93,6 +85,7 @@ public class ProfileService : IProfileService
 
         return dto;
     }
+        
     public async Task<bool> UpdateProfileAsync(User user, ProfileDto dto, IFormFile? photo, IWebHostEnvironment env)
     {
         user.UserName = dto.UserName;
