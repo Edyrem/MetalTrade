@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Patterns\" />
+    <ProjectReference Include="..\MetalTrade.Domain\MetalTrade.Domain.csproj" />
   </ItemGroup>
 
 </Project>
