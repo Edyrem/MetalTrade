@@ -20,6 +20,10 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhotoViewModel>().ReverseMap();
+            CreateMap<CreateViewModel, AdvertisementDto>()
+                .ForMember(dest => dest.PhotoFiles, opt => opt.MapFrom(src => src.Photoes))
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.Product, opt => opt.Ignore());
 
             CreateMap<AdvertisementDto, AdvertisementViewModel>()
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
