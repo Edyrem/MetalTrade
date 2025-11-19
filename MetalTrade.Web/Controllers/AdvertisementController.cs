@@ -2,7 +2,6 @@
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
-using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class AdvertisementController : Controller
     {
         private readonly IAdvertisementService _adsService;
