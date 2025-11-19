@@ -142,7 +142,7 @@ namespace MetalTrade.Business.Services
 
         protected string GetUploadPath(string folder)
         {
-            return Path.Combine(_env.WebRootPath, folder);
+            return Path.Combine(_env.WebRootPath, DefaultFolder, folder);
         }
 
         protected void EnsureDirectoryExists(string path)

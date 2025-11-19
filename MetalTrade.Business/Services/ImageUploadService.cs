@@ -12,7 +12,7 @@ namespace MetalTrade.Business.Services
             
         }
 
-        protected override string DefaultFolder => "Images";
+        protected override string DefaultFolder => "images";
         protected override IEnumerable<string> PermittedExtensions => new List<string>
         {
             ".jpg", ".jpeg", ".png", ".gif"

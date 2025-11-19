@@ -1,10 +1,8 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.Business.Services;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 
 namespace MetalTrade.Business;
@@ -12,16 +10,17 @@ namespace MetalTrade.Business;
 public class UserService : IUserService
 {
     private readonly UserManagerRepository _userRepository;
-    private readonly IWebHostEnvironment _env;
     private readonly SignInManager<User> _signInManager;
     private readonly IImageUploadService _imageUploadService;
 
-    public UserService(MetalTradeDbContext context, UserManager<User> userManager,
-        SignInManager<User> signInManager, IWebHostEnvironment env, IImageUploadService imageUploadService)
+    public UserService(
+        MetalTradeDbContext context, 
+        UserManager<User> userManager,
+        SignInManager<User> signInManager, 
+        IImageUploadService imageUploadService)
     {
         _userRepository = new UserManagerRepository(context, userManager);
         _signInManager = signInManager;
-        _env = env;
         _imageUploadService = imageUploadService;
     }
 
