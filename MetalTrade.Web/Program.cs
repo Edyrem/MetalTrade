@@ -46,14 +46,14 @@ namespace MetalTrade.Web
             
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
-<<<<<<< HEAD
+
             builder.Services.AddAutoMapper(typeof(MetalTrade.Business.Common.Mapping.MappingProfile));
             builder.Services.AddAutoMapper(typeof(MetalTrade.Web.Common.Mapping.MappingProfile));
 
-=======
+
             builder.Services.AddScoped<IMetalService, MetalService>();
             builder.Services.AddScoped<IProductService, ProductService>();
->>>>>>> origin/dev
+
 
             var app = builder.Build();
             

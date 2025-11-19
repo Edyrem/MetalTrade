@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    [Migration("20251118024913_commentMetalId")]
-    partial class commentMetalId
+    [Migration("20251113174242_MakeWhatsAppNullable")]
+    partial class MakeWhatsAppNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -396,7 +396,7 @@ namespace MetalTrade.DataAccess.Migrations
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
                 {
                     b.HasOne("MetalTrade.Domain.Entities.MetalType", "MetalType")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("MetalTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -458,11 +458,6 @@ namespace MetalTrade.DataAccess.Migrations
             modelBuilder.Entity("MetalTrade.Domain.Entities.Advertisement", b =>
                 {
                     b.Navigation("Photoes");
-                });
-
-            modelBuilder.Entity("MetalTrade.Domain.Entities.MetalType", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>

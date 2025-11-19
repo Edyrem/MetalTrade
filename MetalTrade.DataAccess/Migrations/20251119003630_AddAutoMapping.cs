@@ -5,7 +5,7 @@
 namespace MetalTrade.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class commentMetalId4 : Migration
+    public partial class AddAutoMapping : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

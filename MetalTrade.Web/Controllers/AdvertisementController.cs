@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class AdvertisementController : Controller
     {
         private readonly IAdvertisementService _adsService;
@@ -44,7 +44,7 @@ namespace MetalTrade.Web.Controllers
             };
             return View(model);
         }
-        [HttpPost]
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
@@ -60,7 +60,6 @@ namespace MetalTrade.Web.Controllers
                 return View(model);
             }
 
-            // Используем маппер, но потом явно устанавливаем UserId
             var adsDto = _mapper.Map<AdvertisementDto>(model);
             adsDto.UserId = user.Id;
 
@@ -133,7 +132,6 @@ namespace MetalTrade.Web.Controllers
 
             var adsDto = _mapper.Map<AdvertisementDto>(model);
 
-            // Передаем файлы в DTO
             adsDto.PhotoFiles = photoFiles;
 
             var existingAds = await _adsService.GetAsync(model.Id);
