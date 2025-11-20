@@ -69,6 +69,4 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
-
-
 }
