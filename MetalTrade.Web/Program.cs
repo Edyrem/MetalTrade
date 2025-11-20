@@ -43,7 +43,9 @@ namespace MetalTrade.Web
                 })
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
-            
+
+
+            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             builder.Services.AddScoped<IMetalService, MetalService>();

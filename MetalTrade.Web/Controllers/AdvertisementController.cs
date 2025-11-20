@@ -2,7 +2,6 @@
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
-using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using Microsoft.AspNetCore.Authorization;
@@ -17,15 +16,18 @@ namespace MetalTrade.Web.Controllers
     {
         private readonly IAdvertisementService _adsService;
         private readonly UserManager<User> _userManager;
-        private readonly AdvertisementPhotoSaveService _photoSaveService;
+        private readonly IImageUploadService _imageUploadService;
         private readonly MetalTradeDbContext _context;
 
-        public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
-            IWebHostEnvironment env, MetalTradeDbContext context)
+        public AdvertisementController(
+            IAdvertisementService adsService, 
+            UserManager<User> userManager,
+            IImageUploadService imageUploadService,
+            MetalTradeDbContext context)
         {
             _adsService = adsService;
             _userManager = userManager;
-            _photoSaveService = new AdvertisementPhotoSaveService(env);
+            _imageUploadService = imageUploadService;
             _context = context;
         }
         public IActionResult Create()
@@ -59,7 +61,7 @@ namespace MetalTrade.Web.Controllers
                 };
                 if (model.Photoes != null)
                 {
-                    List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
+                    List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
                     foreach (var link in photoLinks)
                     {
                         adsDto.Photoes.Add( new AdvertisementPhotoDto{ PhotoLink = link});
@@ -70,6 +72,7 @@ namespace MetalTrade.Web.Controllers
             }
             return View(model);
         }
+
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
@@ -185,7 +188,7 @@ namespace MetalTrade.Web.Controllers
                 };
                 if (model.Photoes != null)
                 {
-                    List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
+                    List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
                     foreach (var link in photoLinks)
                     {
                         adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
