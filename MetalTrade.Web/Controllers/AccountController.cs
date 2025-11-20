@@ -1,8 +1,10 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModel;
 using MetalTrade.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace MetalTrade.Web.Controllers
 {
@@ -70,6 +72,11 @@ namespace MetalTrade.Web.Controllers
         {
             await _userService.LogoutAsync();
             return RedirectToAction("Login");
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

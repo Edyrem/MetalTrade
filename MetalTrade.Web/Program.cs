@@ -84,7 +84,7 @@ namespace MetalTrade.Web
 
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Account/Error");
                 app.UseHsts();
             }
 
