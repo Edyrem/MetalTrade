@@ -6,9 +6,9 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.Abstraction
 {
     public abstract class AdvertisementStateBase : IAdvertisementState
     {
-        protected readonly Advertisement _ad;
+        protected readonly AdvertisementState _ad;
 
-        protected AdvertisementStateBase(Advertisement ad)
+        protected AdvertisementStateBase(AdvertisementState ad)
         {
             _ad = ad ?? throw new ArgumentNullException(nameof(ad));
         }

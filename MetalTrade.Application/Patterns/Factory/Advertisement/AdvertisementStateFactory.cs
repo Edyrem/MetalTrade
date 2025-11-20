@@ -1,15 +1,12 @@
-﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
-using MetalTrade.Business.Dtos;
+﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement;
+using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
 using MetalTrade.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MetalTrade.Application.Patterns.Factory.Advertisement
 {
     public static class AdvertisementStateFactory
     {
-        public static IAdvertisementState Create(AdvertisementDto ad, AdvertisementStatus status) =>
+        public static IAdvertisementState Create(AdvertisementState ad, AdvertisementStatus status) =>
             status switch
             {
                 AdvertisementStatus.Draft => new DraftState(ad),
