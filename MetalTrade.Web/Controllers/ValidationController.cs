@@ -43,12 +43,6 @@ public class ValidationController : Controller
     }
     
     [AcceptVerbs("GET", "POST")]
-    public bool CheckNameOfProduct(string name)
-    {
-        return !_context.Products.Any(u => u.Name.ToLower() == name.ToLower() );
-    }
-    
-    [AcceptVerbs("GET", "POST")]
     public IActionResult CheckUserNameEdit(string userName, int id)
     {
         bool exists = _context.Users.Any(u =>
@@ -56,7 +50,7 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
-        
+    
     [AcceptVerbs("GET", "POST")]
     public IActionResult CheckEmailEdit(string email, int id)
     {
@@ -65,7 +59,7 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
-        
+    
     [AcceptVerbs("GET", "POST")]
     public IActionResult CheckPhoneNumberEdit(string phoneNumber, int id)
     {
@@ -75,4 +69,6 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
+
+
 }

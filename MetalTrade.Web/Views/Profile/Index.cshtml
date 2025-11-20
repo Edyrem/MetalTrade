@@ -28,6 +28,7 @@
             @if (Model.IsSupplier)
             {
                 <h4 class="mb-3">Мои объявления</h4>
+
                 @if (Model.Advertisements == null || !Model.Advertisements.Any())
                 {
                     <p class="text-muted">У вас пока нет объявлений.</p>
@@ -48,9 +49,8 @@
             {
                 <h4>Сохранённые объявления</h4>
             }
-
-
         </div>
+
     </div>
 </div>
 

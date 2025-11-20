@@ -66,17 +66,25 @@ public class ProfileService : IProfileService
 
         return dto;
     }
-        
+
     public async Task<bool> UpdateProfileAsync(User user, ProfileDto dto, IFormFile? photo, IWebHostEnvironment env)
     {
+        if (dto.PhoneNumber != user.PhoneNumber)
+        {
+            var phoneExists = await _context.Users
+                .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber && u.Id != user.Id);
+
+            if (phoneExists)
+                return false;
+        }
         user.UserName = dto.UserName;
         user.Email = dto.Email;
         user.PhoneNumber = dto.PhoneNumber;
         user.WhatsAppNumber = dto.WhatsAppNumber;
-        
+
         user.NormalizedUserName = _userManager.NormalizeName(user.UserName);
         user.NormalizedEmail = _userManager.NormalizeEmail(user.Email);
-        
+
         if (photo != null && photo.Length > 0)
         {
             string uploadsFolder = Path.Combine(env.WebRootPath, "images", "avatars");
@@ -94,6 +102,7 @@ public class ProfileService : IProfileService
         var result = await _userManager.UpdateAsync(user);
         return result.Succeeded;
     }
+
 
     public Task<ProfileDto> GetProfileEditModelAsync(User user)
     {

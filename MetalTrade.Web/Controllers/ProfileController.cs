@@ -41,7 +41,6 @@ public class ProfileController : Controller
             PhotoPath = dto.PhotoPath,
             IsSupplier = dto.IsSupplier,
             Advertisements = dto.Advertisements,
-            
         };
 
         return View(vm);
@@ -86,29 +85,18 @@ public class ProfileController : Controller
             WhatsAppNumber = model.WhatsAppNumber,
             PhotoPath = model.PhotoPath
         };
-        
+
         bool ok = await _profileService.UpdateProfileAsync(user, dto, model.Photo, _env);
 
         if (!ok)
         {
-            var result = await _userManager.FindByIdAsync(user.Id.ToString()) != null
-                ? await _userManager.UpdateAsync(user)
-                : null;
-
-            if (result != null && !result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
-
-                return View(model);
-            }
-            
-            ModelState.AddModelError("", "Ошибка при сохранении профиля");
+            ModelState.AddModelError("PhoneNumber", "Телефон уже используется");
             return View(model);
         }
 
         return RedirectToAction(nameof(Index));
     }
+
 
 
     [HttpGet]
