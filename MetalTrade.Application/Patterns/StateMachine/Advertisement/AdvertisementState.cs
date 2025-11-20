@@ -8,13 +8,20 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
 {
     public class AdvertisementState
     {
-        private IAdvertisementState _state;
         public AdvertisementStatus Status { get; private set; }
+        
+        private IAdvertisementState _state = null!;
 
-        public AdvertisementState(string title, string description)
+        public AdvertisementState()
         {
             // по умолчанию Draft
             SetState(new DraftState(this));
+        }
+
+        public AdvertisementState(AdvertisementStatus status)
+        {
+            Status = status;
+            LoadStateFromEnum();
         }
 
         public void SetState(IAdvertisementState state)

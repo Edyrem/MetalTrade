@@ -1,8 +1,11 @@
-﻿using MetalTrade.Business.Dtos;
+﻿using MetalTrade.Application.Patterns.Adapter.Advertisement;
+using MetalTrade.Application.Patterns.StateMachine.Advertisement;
+using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
+using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Business.Services
 {
@@ -101,7 +104,7 @@ namespace MetalTrade.Business.Services
                 Address = adsDto.Address,
                 PhoneNumber = adsDto.PhoneNumber,
                 City = adsDto.City,
-                Status = adsDto.Status,
+                Status = (int) new AdvertisementState().Status,
                 IsTop = adsDto.IsTop,
                 IsAd = adsDto.IsAd,
                 ProductId = adsDto.ProductId,
@@ -150,9 +153,32 @@ namespace MetalTrade.Business.Services
 
         public async Task DeleteAsync(int advertisementId)
         {
+            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
+
+            await advertisementAdapter.MoveToDeletedAsync();
             await _repository.DeleteAsync(advertisementId);
             await _repository.SaveChangesAsync();
         }
 
+        public async Task ApproveAsync(int advertisementId)
+        {
+            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
+            await advertisementAdapter.MoveToActiveAsync();
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task RejectAsync(int advertisementId)
+        {
+            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
+            await advertisementAdapter.MoveToRejectedAsync();
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task ArchiveAsync(int advertisementId)
+        {
+            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
+            await advertisementAdapter.MoveToArchivedAsync();
+            await _repository.SaveChangesAsync();
+        }        
     }
 }

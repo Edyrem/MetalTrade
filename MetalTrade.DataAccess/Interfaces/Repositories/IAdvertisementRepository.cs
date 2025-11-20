@@ -6,7 +6,7 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
 {
     public interface IAdvertisementRepository: IRepository<Advertisement>
     {
-        Task<AdvertisementStatus> GetStatus(int Id);
-        Task SetStatus(int Id, AdvertisementStatus status);
+        Task<AdvertisementStatus> GetStatusAsync(int Id);
+        Task SetStatusAsync(int Id, AdvertisementStatus status);
     }
 }

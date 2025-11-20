@@ -25,12 +25,12 @@ namespace MetalTrade.DataAccess.Repositories
             return await _dbSet.Include(a => a.Photoes).Where(predicate).ToListAsync();
         }
 
-        public async Task<AdvertisementStatus> GetStatus(int Id)
+        public async Task<AdvertisementStatus> GetStatusAsync(int Id)
         {
             return (AdvertisementStatus) await _dbSet.Where(x => x.Id == Id).Select(x => x.Status).FirstOrDefaultAsync();
         }
 
-        public async Task SetStatus(int Id, AdvertisementStatus status)
+        public async Task SetStatusAsync(int Id, AdvertisementStatus status)
         {
             var ad = await _dbSet.FirstOrDefaultAsync(x => x.Id == Id);
             ad.Status = (int)status;

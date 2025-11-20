@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MetalTrade.Application\MetalTrade.Application.csproj" />
       <ProjectReference Include="..\MetalTrade.Domain\MetalTrade.Domain.csproj" />
       <ProjectReference Include="..\MetalTrade.DataAccess\MetalTrade.DataAccess.csproj" />
     </ItemGroup>
