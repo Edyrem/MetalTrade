@@ -42,22 +42,27 @@
                     }
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Advertisement" asp-action="Index">Объявления</a>
+                    
+                </ul>
+                <ul class="navbar-nav">
                     <li>
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
                             <form asp-controller="Account" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
-                                <button type="submit">Выход</button>
+                                <button class="nav-link text-dark" type="submit">Выход</button>
                             </form>
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login">Вход </a>
-                            <a asp-controller="Account" asp-action="Register">Регистрация</a>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Вход</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Регистрация</a>
+                            </li>
                         }
                     </li>
-                    
-                    
                 </ul>
             </div>
         </div>

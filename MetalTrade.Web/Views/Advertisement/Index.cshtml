@@ -4,9 +4,14 @@
 @{
 	ViewData["Title"] = "Advertisements";
 }
-<div class="mb-2">
-	<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
-</div>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
+{
+	<div class="mb-2">
+		<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
+	</div>
+}
+
 <div class="container mt-4">
 	<div class="row">
 		@foreach (var ads in Model)

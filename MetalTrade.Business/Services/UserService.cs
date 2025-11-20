@@ -48,30 +48,7 @@ public class UserService : IUserService
 
         return false;
     }
-    
-    public async Task<bool> RegisterUserAsync(UserDto model)
-    {
-        string avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
-
-        var user = new User
-        {
-            Email = model.Email,
-            UserName = model.UserName,
-            PhoneNumber = model.PhoneNumber,
-            WhatsAppNumber = model.WhatsAppNumber,
-            Photo = avatarPath
-        };
-
-        var result = await _userRepository.CreateAsync(user, model.Password);
-        if (result.Succeeded)
-        {
-            await _userRepository.AddToRoleAsync(user, "User");
-            return true;
-        }
-
-        return false;
-    }
-    
+    // удалил RegisterUserAsync по тикету
 
     public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
     {

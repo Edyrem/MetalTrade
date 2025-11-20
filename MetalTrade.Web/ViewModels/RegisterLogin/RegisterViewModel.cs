@@ -1,5 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+using MetalTrade.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels;
 

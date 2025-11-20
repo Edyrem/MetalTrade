@@ -8,7 +8,6 @@ public interface IUserService
 {
     Task<IEnumerable<User>> GetAllUsersAsync();
     Task<bool> CreateUserAsync(UserDto model, string role);
-    Task<bool> RegisterUserAsync(UserDto model);
     Task<SignInResult> LoginAsync(string login, string password, bool rememberMe);
     Task LogoutAsync();
     Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync();
