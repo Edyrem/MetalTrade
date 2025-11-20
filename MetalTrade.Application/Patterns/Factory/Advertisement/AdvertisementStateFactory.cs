@@ -1,5 +1,6 @@
 ﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement;
 using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
+using MetalTrade.Application.Patterns.StateMachine.Advertisement.States;
 using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Application.Patterns.Factory.Advertisement

@@ -1,12 +1,15 @@
-﻿
-using MetalTrade.Application.Patterns.Factory.Advertisement;
+﻿using MetalTrade.Application.Patterns.Factory.Advertisement;
 using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
+using MetalTrade.Application.Patterns.StateMachine.Advertisement.States;
+using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
 {
     public class AdvertisementState
     {
         private IAdvertisementState _state;
+        public AdvertisementStatus Status { get; private set; }
 
         public AdvertisementState(string title, string description)
         {
@@ -14,7 +17,7 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
             SetState(new DraftState(this));
         }
 
-        public void SetState(IAdState state)
+        public void SetState(IAdvertisementState state)
         {
             _state = state;
             Status = state.Status;

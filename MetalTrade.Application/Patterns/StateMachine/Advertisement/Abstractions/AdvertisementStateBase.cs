@@ -1,5 +1,4 @@
 ﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
-using MetalTrade.Business.Dtos;
 using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.Abstractions

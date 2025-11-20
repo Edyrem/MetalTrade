@@ -1,13 +1,12 @@
 ﻿using MetalTrade.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MetalTrade.Domain.Enums;
+
 
 namespace MetalTrade.DataAccess.Interfaces.Repositories
 {
     public interface IAdvertisementRepository: IRepository<Advertisement>
     {
+        Task<AdvertisementStatus> GetStatus(int Id);
+        Task SetStatus(int Id, AdvertisementStatus status);
     }
 }

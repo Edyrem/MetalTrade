@@ -1,6 +1,7 @@
 ﻿using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
+using MetalTrade.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -22,6 +23,18 @@ namespace MetalTrade.DataAccess.Repositories
         public async override Task<IEnumerable<Advertisement>> FindAsync(Expression<Func<Advertisement, bool>> predicate)
         {
             return await _dbSet.Include(a => a.Photoes).Where(predicate).ToListAsync();
+        }
+
+        public async Task<AdvertisementStatus> GetStatus(int Id)
+        {
+            return (AdvertisementStatus) await _dbSet.Where(x => x.Id == Id).Select(x => x.Status).FirstOrDefaultAsync();
+        }
+
+        public async Task SetStatus(int Id, AdvertisementStatus status)
+        {
+            var ad = await _dbSet.FirstOrDefaultAsync(x => x.Id == Id);
+            ad.Status = (int)status;
+            _dbSet.Update(ad);
         }
     }
 }

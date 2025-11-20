@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.States
 {
-    public class DraftState : AdvertisementStateBase
+    public class ArchivedState : AdvertisementStateBase
     {
-        public DraftState(AdvertisementState ad) : base(ad)
+        public ArchivedState(AdvertisementState ad) : base(ad)
         {
         }
 
-        public override AdvertisementStatus Status => AdvertisementStatus.Draft;
+        public override AdvertisementStatus Status => AdvertisementStatus.Archived;
 
         public override void MoveToActive() => _ad.SetState(new ActiveState(_ad));
-        public override void MoveToRejected() => _ad.SetState(new RejectedState(_ad));
+        public override void MoveToDeleted() => _ad.SetState(new DeletedState(_ad));
     }
 }
