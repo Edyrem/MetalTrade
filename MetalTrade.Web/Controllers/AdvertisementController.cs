@@ -1,9 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
-using MetalTrade.Web.Services.Advertisement;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +18,7 @@ namespace MetalTrade.Web.Controllers
     {
         private readonly IAdvertisementService _adsService;
         private readonly UserManager<User> _userManager;
-        private readonly AdvertisementPhotoSaveService _photoSaveService;
+        private readonly IImageUploadService _imageUploadService;
         private readonly MetalTradeDbContext _context;
         private readonly IMapper _mapper;
 
@@ -28,7 +27,7 @@ namespace MetalTrade.Web.Controllers
         {
             _adsService = adsService;
             _userManager = userManager;
-            _photoSaveService = new AdvertisementPhotoSaveService(env);
+            _imageUploadService = imageUploadService;
             _context = context;
             _mapper = mapper;
         }

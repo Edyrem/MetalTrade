@@ -43,7 +43,9 @@ namespace MetalTrade.Web
                 })
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
-            
+
+
+            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
 
@@ -88,7 +90,7 @@ namespace MetalTrade.Web
 
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Account/Error");
                 app.UseHsts();
             }
 
@@ -102,7 +104,7 @@ namespace MetalTrade.Web
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Advertisement}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
