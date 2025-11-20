@@ -1,11 +1,5 @@
-﻿using MetalTrade.Business.Interfaces;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {
@@ -27,6 +21,8 @@ namespace MetalTrade.Business.Services
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
         {
+            if (file == null) return null;
+
             if (IsValidFileType(file, PermittedExtensions))
             {
                 try
