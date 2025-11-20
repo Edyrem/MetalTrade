@@ -18,11 +18,18 @@ namespace MetalTrade.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register() => View();
+        public IActionResult Register()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Advertisement");
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Advertisement");
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -41,7 +48,7 @@ namespace MetalTrade.Web.Controllers
             {
                 var loginResult = await _userService.LoginAsync(model.UserName, model.Password, false);
                 if (loginResult.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Advertisement");
             }
 
             ModelState.AddModelError("", "Ошибка при регистрации пользователя.");
@@ -50,11 +57,18 @@ namespace MetalTrade.Web.Controllers
 
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Advertisement");
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Advertisement");
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -70,6 +84,8 @@ namespace MetalTrade.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            if (User.Identity != null && !User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Advertisement");
             await _userService.LogoutAsync();
             return RedirectToAction("Login");
         }
