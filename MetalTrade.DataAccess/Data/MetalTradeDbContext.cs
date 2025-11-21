@@ -13,6 +13,7 @@ namespace MetalTrade.DataAccess.Data
         public DbSet<Advertisement> Advertisements { get; set; }
         public DbSet<AdvertisementPhoto> AdvertisementPhotos { get; set; }
 
+
         public MetalTradeDbContext(DbContextOptions<MetalTradeDbContext> options) : base(options) { }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

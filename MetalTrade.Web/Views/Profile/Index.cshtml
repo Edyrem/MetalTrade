@@ -1,0 +1,56 @@
+@model MetalTrade.Web.ViewModels.Profile.UserProfileWithAdsViewModel
+
+
+<div class="container mt-4">
+    <h2 class="mb-4">Мой профиль</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center">
+                <img src="@(Model.PhotoPath ?? "/images/default-avatar.png")"
+                     class="rounded-circle mx-auto d-block mb-3"
+                     style="width: 120px; height: 120px; object-fit: cover;" alt="Аватар" />
+                <h5>@Model.UserName</h5>
+                <p>Email: @Model.Email</p>
+                <p>Телефон: @Model.PhoneNumber</p>
+                @if (!string.IsNullOrEmpty(Model.WhatsAppNumber))
+                {
+                    <p>WhatsApp: @Model.WhatsAppNumber</p>
+                }
+
+                <div class="d-grid gap-2">
+                    <a href="/Profile/Edit" class="btn btn-outline-primary btn-sm">Изменить профиль</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            @if (Model.IsSupplier)
+            {
+                <h4 class="mb-3">Мои объявления</h4>
+
+                @if (Model.Advertisements == null || !Model.Advertisements.Any())
+                {
+                    <p class="text-muted">У вас пока нет объявлений.</p>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var ad in Model.Advertisements)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <partial name="_AdCardPartial" model="ad" />
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <h4>Сохранённые объявления</h4>
+            }
+        </div>
+
+    </div>
+</div>
+
