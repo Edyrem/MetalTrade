@@ -23,7 +23,7 @@ namespace MetalTrade.Web.Controllers
         private readonly IMapper _mapper;
 
         public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
-            IWebHostEnvironment env, MetalTradeDbContext context, IMapper mapper)
+            IWebHostEnvironment env, MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
         {
             _adsService = adsService;
             _userManager = userManager;
@@ -64,7 +64,7 @@ namespace MetalTrade.Web.Controllers
 
             if (model.Photoes != null && model.Photoes.Length > 0)
             {
-                List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
+                List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
                 foreach (var link in photoLinks)
                 {
                     adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
