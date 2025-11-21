@@ -15,31 +15,31 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.Abstraction
         public abstract AdvertisementStatus Status { get; }
 
         // поведение по умолчанию — запрещено
-        public virtual void MoveToActive()
+        public virtual IAdvertisementState MoveToActive()
         {
             if (Status == AdvertisementStatus.Active)
-                return;
+                return this;
             throw new InvalidOperationException($"{Status} -> Active: переход не разрешён.");
         }
 
-        public virtual void MoveToArchived()
+        public virtual IAdvertisementState MoveToArchived()
         {
             if (Status == AdvertisementStatus.Archived)
-                return;
+                return this;
             throw new InvalidOperationException($"{Status} -> Archived: переход не разрешён.");
         }
 
-        public virtual void MoveToDeleted()
+        public virtual IAdvertisementState MoveToDeleted()
         {
             if (Status == AdvertisementStatus.Deleted)
-                return;
+                return this;
             throw new InvalidOperationException($"{Status} -> Deleted: переход не разрешён.");
         }
 
-        public virtual void MoveToRejected()
+        public virtual IAdvertisementState MoveToRejected()
         {
             if (Status == AdvertisementStatus.Rejected)
-                return;
+                return this;
             throw new InvalidOperationException($"{Status} -> Rejected: переход не разрешён.");
         }
     }

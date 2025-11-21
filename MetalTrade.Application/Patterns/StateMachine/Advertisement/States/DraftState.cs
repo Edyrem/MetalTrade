@@ -1,4 +1,5 @@
 ﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement.Abstractions;
+using MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces;
 using MetalTrade.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.States
 
         public override AdvertisementStatus Status => AdvertisementStatus.Draft;
 
-        public override void MoveToActive() => _ad.SetState(new ActiveState(_ad));
-        public override void MoveToRejected() => _ad.SetState(new RejectedState(_ad));
+        public override IAdvertisementState MoveToActive() => _ad.SetState(new ActiveState(_ad));
+        public override IAdvertisementState MoveToRejected() => _ad.SetState(new RejectedState(_ad));
     }
 }

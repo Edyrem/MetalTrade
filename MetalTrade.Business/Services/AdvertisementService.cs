@@ -1,20 +1,20 @@
-﻿using MetalTrade.Application.Patterns.Adapter.Advertisement;
-using MetalTrade.Application.Patterns.StateMachine.Advertisement;
+﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
-using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Business.Services
 {
     public class AdvertisementService: IAdvertisementService
     {
         private readonly AdvertisementRepository _repository;
+        private AdvertisementStateContext _stateContext;
         public AdvertisementService(MetalTradeDbContext context)
         {
             _repository = new AdvertisementRepository(context);
+            _stateContext = new AdvertisementStateContext(_repository);
         }
 
         public async Task<List<AdvertisementDto>> GetAllAsync()
@@ -152,32 +152,27 @@ namespace MetalTrade.Business.Services
         }
 
         public async Task DeleteAsync(int advertisementId)
-        {
-            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
-
-            await advertisementAdapter.MoveToDeletedAsync();
+        {            
+            await _stateContext.MoveToDeletedAsync(advertisementId);
             await _repository.DeleteAsync(advertisementId);
             await _repository.SaveChangesAsync();
         }
 
         public async Task ApproveAsync(int advertisementId)
         {
-            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
-            await advertisementAdapter.MoveToActiveAsync();
+            await _stateContext.MoveToActiveAsync(advertisementId);
             await _repository.SaveChangesAsync();
         }
 
         public async Task RejectAsync(int advertisementId)
         {
-            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
-            await advertisementAdapter.MoveToRejectedAsync();
+            await _stateContext.MoveToRejectedAsync(advertisementId);
             await _repository.SaveChangesAsync();
         }
 
         public async Task ArchiveAsync(int advertisementId)
         {
-            var advertisementAdapter = new AdvertisementAdapter(_repository, advertisementId);
-            await advertisementAdapter.MoveToArchivedAsync();
+            await _stateContext.MoveToArchivedAsync(advertisementId);
             await _repository.SaveChangesAsync();
         }        
     }

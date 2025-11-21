@@ -6,9 +6,9 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.Interfaces
     {
         AdvertisementStatus Status { get; }
 
-        void MoveToActive();
-        void MoveToArchived();
-        void MoveToDeleted();
-        void MoveToRejected();
+        IAdvertisementState MoveToActive();
+        IAdvertisementState MoveToArchived();
+        IAdvertisementState MoveToDeleted();
+        IAdvertisementState MoveToRejected();
     }
 }

@@ -24,10 +24,11 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
             LoadStateFromEnum();
         }
 
-        public void SetState(IAdvertisementState state)
+        public IAdvertisementState SetState(IAdvertisementState state)
         {
             _state = state;
             Status = state.Status;
+            return _state;
         }
 
         // восстановление состояния после загрузки из БД
@@ -36,9 +37,9 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
             _state = AdvertisementStateFactory.Create(this, Status);
         }
 
-        public void MoveToActive() => _state.MoveToActive();
-        public void MoveToArchived() => _state.MoveToArchived();
-        public void MoveToDeleted() => _state.MoveToDeleted();
-        public void MoveToRejected() => _state.MoveToRejected();
+        public IAdvertisementState MoveToActive() => _state.MoveToActive();
+        public IAdvertisementState MoveToArchived() => _state.MoveToArchived();
+        public IAdvertisementState MoveToDeleted() => _state.MoveToDeleted();
+        public IAdvertisementState MoveToRejected() => _state.MoveToRejected();
     }
 }
