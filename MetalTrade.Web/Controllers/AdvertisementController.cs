@@ -11,152 +11,153 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace MetalTrade.Web.Controllers
+namespace MetalTrade.Web.Controllers;
+
+[Authorize]
+public class AdvertisementController : Controller
 {
-    [Authorize]
-    public class AdvertisementController : Controller
+    private readonly IAdvertisementService _adsService;
+    private readonly UserManager<User> _userManager;
+    private readonly IImageUploadService _imageUploadService;
+    private readonly MetalTradeDbContext _context;
+    private readonly IMapper _mapper;
+
+    public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
+        IWebHostEnvironment env, MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
     {
-        private readonly IAdvertisementService _adsService;
-        private readonly UserManager<User> _userManager;
-        private readonly IImageUploadService _imageUploadService;
-        private readonly MetalTradeDbContext _context;
-        private readonly IMapper _mapper;
-
-        public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
-            IWebHostEnvironment env, MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
+        _adsService = adsService;
+        _userManager = userManager;
+        _imageUploadService = imageUploadService;
+        _context = context;
+        _mapper = mapper;
+    }
+    public IActionResult Create()
+    {
+        CreateViewModel model = new()
         {
-            _adsService = adsService;
-            _userManager = userManager;
-            _imageUploadService = imageUploadService;
-            _context = context;
-            _mapper = mapper;
-        }
-        public IActionResult Create()
-        {
-            CreateViewModel model = new()
+            Products = [.. _context.Products.Select(p => new SelectListItem
             {
-                Products = [.. _context.Products.Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.Name
-                })]
-            };
+                Value = p.Id.ToString(),
+                Text = p.Name
+            })]
+        };
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateViewModel model)
+    {
+        User? user = await _userManager.GetUserAsync(User);
+
+        if (!ModelState.IsValid || user == null)
+        {
+            model.Products = [.. _context.Products.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            })];
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateViewModel model)
-        {
-            User? user = await _userManager.GetUserAsync(User);
+        var adsDto = _mapper.Map<AdvertisementDto>(model);
+        adsDto.UserId = user.Id;
 
-            if (!ModelState.IsValid || user == null)
+        if (model.Photoes != null && model.Photoes.Length > 0)
+        {
+            List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
+            foreach (var link in photoLinks)
             {
-                model.Products = [.. _context.Products.Select(p => new SelectListItem
-        {
-            Value = p.Id.ToString(),
-            Text = p.Name
-        })];
-                return View(model);
+                adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
             }
+        }
 
-            var adsDto = _mapper.Map<AdvertisementDto>(model);
-            adsDto.UserId = user.Id;
+        await _adsService.CreateAsync(adsDto);
+        return RedirectToAction("Index");
+    }
 
-            if (model.Photoes != null && model.Photoes.Length > 0)
+    [AllowAnonymous]
+    public async Task<IActionResult> Index()
+    {
+        var adsDtos = await _adsService.GetAllAsync();
+        var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
+        return View(models);
+    }
+        
+    [AllowAnonymous]
+    public async Task<IActionResult> Details(int id)
+    {
+        var adsDto = await _adsService.GetAsync(id);
+        if (adsDto == null) return RedirectToAction("Index");
+
+        var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+        return View(model);
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        List<string> ExistingPhotos;
+        var adsDto = await _adsService.GetAsync(id);
+        if (adsDto == null) return RedirectToAction("Index");
+        var model = _mapper.Map<EditViewModel>(adsDto);
+
+        model.Products = _context.Products
+            .Select(p => new SelectListItem
             {
-                List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
-                foreach (var link in photoLinks)
-                {
-                    adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
-                }
-            }
+                Value = p.Id.ToString(),
+                Text = p.Name,
+                Selected = p.Id == model.ProductId
+            })
+            .ToList();
 
-            await _adsService.CreateAsync(adsDto);
-            return RedirectToAction("Index");
-        }
+        return View(model);
+    }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index()
+    [HttpPost]
+    public async Task<IActionResult> Edit(EditViewModel model, List<IFormFile>? photoFiles)
+    {
+        if (!ModelState.IsValid)
         {
-             var adsDtos = await _adsService.GetAllAsync();
-            var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
-            return View(models);
-        }
-        [AllowAnonymous]
-        public async Task<IActionResult> Details(int id)
-        {
-            var adsDto = await _adsService.GetAsync(id);
-            if (adsDto == null) return RedirectToAction("Index");
-
-            var model = _mapper.Map<AdvertisementViewModel>(adsDto);
-            return View(model);
-        }
-
-        public async Task<IActionResult> Edit(int id)
-        {
-            List<string> ExistingPhotos;
-            var adsDto = await _adsService.GetAsync(id);
-            if (adsDto == null) return RedirectToAction("Index");
-            var model = _mapper.Map<EditViewModel>(adsDto);
-
             model.Products = _context.Products
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.Name,
-                    Selected = p.Id == model.ProductId
-                })
+                .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name, Selected = p.Id == model.ProductId })
                 .ToList();
-
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(EditViewModel model, List<IFormFile>? photoFiles)
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
         {
-            if (!ModelState.IsValid)
-            {
-                model.Products = _context.Products
-                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name, Selected = p.Id == model.ProductId })
-                    .ToList();
-                return View(model);
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                ModelState.AddModelError("", "Пользователь не найден");
-                return View(model);
-            }
-
-            var adsDto = _mapper.Map<AdvertisementDto>(model);
-
-            adsDto.PhotoFiles = photoFiles;
-
-            var existingAds = await _adsService.GetAsync(model.Id);
-            if (existingAds != null)
-            {
-                adsDto.UserId = existingAds.UserId;
-            }
-
-            await _adsService.UpdateAsync(adsDto);
-            return RedirectToAction("Details", new { id = model.Id });
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            var adsDto = await _adsService.GetAsync(id);
-            if (adsDto == null) 
-                return RedirectToAction("Index");
-
-            var model = _mapper.Map<DeleteViewModel>(adsDto);
+            ModelState.AddModelError("", "Пользователь не найден");
             return View(model);
         }
-        [HttpPost]
-        public async Task<IActionResult> Delete(DeleteViewModel model)
+
+        var adsDto = _mapper.Map<AdvertisementDto>(model);
+
+        adsDto.PhotoFiles = photoFiles;
+
+        var existingAds = await _adsService.GetAsync(model.Id);
+        if (existingAds != null)
         {
-            await _adsService.DeleteAsync(model.Id);
+            adsDto.UserId = existingAds.UserId;
+        }
+
+        await _adsService.UpdateAsync(adsDto);
+        return RedirectToAction("Details", new { id = model.Id });
+    }
+
+    public async Task<IActionResult> Delete(int id)
+    {
+        var adsDto = await _adsService.GetAsync(id);
+        if (adsDto == null) 
             return RedirectToAction("Index");
-        }
+
+        var model = _mapper.Map<DeleteViewModel>(adsDto);
+        return View(model);
+    }
+        
+    [HttpPost]
+    public async Task<IActionResult> Delete(DeleteViewModel model)
+    {
+        await _adsService.DeleteAsync(model.Id);
+        return RedirectToAction("Index");
     }
 }

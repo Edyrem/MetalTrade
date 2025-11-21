@@ -9,6 +9,7 @@ namespace MetalTrade.Business.Common.Mapping
         public MappingProfile()
         {
             CreateMap<AdvertisementDto, Advertisement>()
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber ?? ""))
