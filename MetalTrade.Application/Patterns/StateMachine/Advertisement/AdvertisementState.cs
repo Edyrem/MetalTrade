@@ -21,7 +21,7 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
         public AdvertisementState(AdvertisementStatus status)
         {
             Status = status;
-            LoadStateFromEnum();
+            _state = LoadStateFromEnum();
         }
 
         public IAdvertisementState SetState(IAdvertisementState state)
@@ -32,9 +32,9 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
         }
 
         // восстановление состояния после загрузки из БД
-        public void LoadStateFromEnum()
+        public IAdvertisementState LoadStateFromEnum()
         {
-            _state = AdvertisementStateFactory.Create(this, Status);
+            return AdvertisementStateFactory.Create(this, Status);
         }
 
         public IAdvertisementState MoveToActive() => _state.MoveToActive();
