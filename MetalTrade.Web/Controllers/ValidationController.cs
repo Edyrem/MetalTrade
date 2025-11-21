@@ -42,6 +42,14 @@ public class ValidationController : Controller
         return !_context.MetalTypes.Any(u => u.Name.ToLower() == name.ToLower() );
     }
     
+    
+    [AcceptVerbs("GET", "POST")]
+    public bool CheckNameOfProduct(string name)
+    {
+        return !_context.Products.Any(u => u.Name.ToLower() == name.ToLower() );
+    }
+    
+    
     [AcceptVerbs("GET", "POST")]
     public IActionResult CheckUserNameEdit(string userName, int id)
     {
