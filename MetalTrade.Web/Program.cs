@@ -43,13 +43,19 @@ namespace MetalTrade.Web
                 })
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
-
-
-            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+            
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+
+            builder.Services.AddAutoMapper(typeof(MetalTrade.Business.Common.Mapping.MappingProfile));
+            builder.Services.AddAutoMapper(typeof(MetalTrade.Web.Common.Mapping.MappingProfile));
+
+
             builder.Services.AddScoped<IMetalService, MetalService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+
 
             var app = builder.Build();
             
@@ -70,7 +76,7 @@ namespace MetalTrade.Web
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
                     await AdminInitializer.SeedAdminUser(roleManager, userManager);
-                    
+
                     var context = services.GetRequiredService<MetalTradeDbContext>();
                     await UserInitializer.SeedUserAsync(userManager);
                     await ProductInitializer.SeedProductAsync(context);
