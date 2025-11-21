@@ -22,8 +22,6 @@ public class ProfileService : IProfileService
 
     public async Task<ProfileWithAdsDto> GetProfileAsync(User user)
     {
-        bool isSupplier = await _userManager.IsInRoleAsync(user, "supplier");
-
         var dto = new ProfileWithAdsDto
         {
             UserName = user.UserName,
@@ -31,41 +29,34 @@ public class ProfileService : IProfileService
             PhoneNumber = user.PhoneNumber,
             WhatsAppNumber = user.WhatsAppNumber,
             PhotoPath = user.Photo,
-            IsSupplier = isSupplier
+            IsSupplier = true
         };
 
-        if (isSupplier)
-        {
-            dto.Advertisements = await _context.Advertisements
-                .Where(a => a.UserId == user.Id && !a.IsDeleted)
-                .Include(a => a.Photoes)
-                .Select(a => new AdvertisementDto
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    Body = a.Body,
-                    Price = a.Price,
-                    CreateDate = a.CreateDate,
-                    Photoes = a.Photoes
-                        .Where(p => !p.IsDeleted)
-                        .Select(p => new AdvertisementPhotoDto
-                        {
-                            Id = p.Id,
-                            PhotoLink = p.PhotoLink,
-                            AdvertisementId = p.AdvertisementId
-                        })
-                        .ToList()
-                })
-                .ToListAsync();
-        }
-        else
-        {
-            dto.Advertisements = new List<AdvertisementDto>();
-        }
-
+        dto.Advertisements = await _context.Advertisements
+            .Where(a => a.UserId == user.Id && !a.IsDeleted)
+            .Include(a => a.Photoes)
+            .Select(a => new AdvertisementDto
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Body = a.Body,
+                Price = a.Price,
+                CreateDate = a.CreateDate,
+                Photoes = a.Photoes
+                    .Where(p => !p.IsDeleted)
+                    .Select(p => new AdvertisementPhotoDto
+                    {
+                        Id = p.Id,
+                        PhotoLink = p.PhotoLink,
+                        AdvertisementId = p.AdvertisementId
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
 
         return dto;
     }
+
 
     public async Task<bool> UpdateProfileAsync(User user, ProfileDto dto, IFormFile? photo, IWebHostEnvironment env)
     {
