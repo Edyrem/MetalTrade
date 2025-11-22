@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+@inject Microsoft.AspNetCore.Identity.UserManager<User> UserManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -13,7 +14,7 @@
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MetalTrade.Web</a>
+            <a class="navbar-brand" asp-area="" asp-controller="Advertisement" asp-action="Index">Объявления</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -40,24 +41,40 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Продукты</a>
                         </li>
                     }
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Advertisement" asp-action="Index">Объявления</a>
-                    <li>
-                        @if (User?.Identity?.IsAuthenticated ?? false)
+                    
+                    <li class="nav-item ms-auto d-flex align-items-center">
+                        @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit">Выход</button>
-                            </form>
+                            var currentUser = await UserManager.GetUserAsync(User);
+                            var avatar = string.IsNullOrEmpty(currentUser?.Photo)
+                                ? "/images/default-avatar.png"
+                                : currentUser.Photo;
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@avatar" alt="Аватар"
+                                         style="width:40px;height:40px;object-fit:cover;border-radius:50%;margin-right:8px;">
+                                    <span>@currentUser?.UserName</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Личный кабинет</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-3">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-link p-0 text-danger">Выйти</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login">Вход </a>
-                            <a asp-controller="Account" asp-action="Register">Регистрация</a>
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary ms-3">Вход </a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-success ms-3">Регистрация</a>
                         }
                     </li>
-                    
-                    
                 </ul>
             </div>
         </div>
@@ -70,9 +87,7 @@
 </div>
 
 <footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - MetalTrade.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </div>
+    <div class="container"> </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

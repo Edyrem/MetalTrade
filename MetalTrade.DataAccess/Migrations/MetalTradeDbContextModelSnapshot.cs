@@ -393,7 +393,7 @@ namespace MetalTrade.DataAccess.Migrations
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
                 {
                     b.HasOne("MetalTrade.Domain.Entities.MetalType", "MetalType")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("MetalTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -455,6 +455,11 @@ namespace MetalTrade.DataAccess.Migrations
             modelBuilder.Entity("MetalTrade.Domain.Entities.Advertisement", b =>
                 {
                     b.Navigation("Photoes");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.MetalType", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>

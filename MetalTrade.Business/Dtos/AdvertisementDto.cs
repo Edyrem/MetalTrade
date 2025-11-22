@@ -1,4 +1,5 @@
-﻿
+using Microsoft.AspNetCore.Http;
+
 namespace MetalTrade.Business.Dtos
 {
     public class AdvertisementDto
@@ -9,7 +10,7 @@ namespace MetalTrade.Business.Dtos
         public decimal Price { get; set; }
         public DateTime CreateDate { get; set; }
         public string? Address { get; set; }
-        public string PhoneNumber { get; set; } = null!;
+        public string PhoneNumber { get; set; } = string.Empty;
         public int ProductId { get; set; }
         public ProductDto Product { get; set; } = new();
         public string? City { get; set; }
@@ -19,5 +20,6 @@ namespace MetalTrade.Business.Dtos
         public int UserId { get; set; }
         public UserDto? User { get; set; }
         public List<AdvertisementPhotoDto> Photoes { get; set; } = [];
+        public List<IFormFile>? PhotoFiles { get; set; } 
     }
 }

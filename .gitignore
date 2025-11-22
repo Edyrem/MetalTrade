@@ -400,3 +400,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/MetalTrade.Web/wwwroot/avatars/
+/MetalTrade.Web/wwwroot/images/
