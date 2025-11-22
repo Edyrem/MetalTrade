@@ -9,5 +9,8 @@ namespace MetalTrade.Business.Interfaces
         Task CreateAsync(AdvertisementDto adsDto);
         Task UpdateAsync(AdvertisementDto adsDto);
         Task DeleteAsync(int advertisementId);
+        Task ApproveAsync(int advertisementId);
+        Task RejectAsync(int advertisementId); 
+        Task ArchiveAsync(int advertisementId);
     }
 }
