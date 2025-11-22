@@ -110,6 +110,7 @@ namespace MetalTrade.Web.Controllers
         }
 
         [AllowAnonymous]
+
         public async Task<IActionResult> Details(int id)
         {
             AdvertisementDto? adsDto = await _adsService.GetAsync(id);
@@ -148,33 +149,48 @@ namespace MetalTrade.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             AdvertisementDto? adsDto = await _adsService.GetAsync(id);
-            if (adsDto != null)
+            var user = await _userManager.GetUserAsync(User);
+
+            if (adsDto == null)
+                return RedirectToAction("Index");
+
+            if (adsDto.UserId != user?.Id)
+                return Forbid();
+
+            EditViewModel model = new()
             {
-                EditViewModel model = new()
+                Id = adsDto.Id,
+                Title = adsDto.Title,
+                Body = adsDto.Body,
+                Price = adsDto.Price,
+                Address = adsDto.Address,
+                PhoneNumber = adsDto.PhoneNumber,
+                City = adsDto.City,
+                ProductId = adsDto.ProductId
+            };
+
+            model.Products = _context.Products
+                .Select(p => new SelectListItem
                 {
-                    Id = adsDto.Id,
-                    Title = adsDto.Title,
-                    Body = adsDto.Body,
-                    Price = adsDto.Price,
-                    Address = adsDto.Address,
-                    PhoneNumber = adsDto.PhoneNumber,
-                    City = adsDto.City,
-                    ProductId = adsDto.ProductId
-                };
-                model.Products = [.. _context.Products.Select(p => new SelectListItem
-                    {
-                        Value = p.Id.ToString(),
-                        Text = p.Name,
-                        Selected = (p.Id == model.ProductId)
-                    })];
-                return View(model);
-            }
-            return RedirectToAction("Index");
+                    Value = p.Id.ToString(),
+                    Text = p.Name,
+                    Selected = p.Id == model.ProductId
+                })
+                .ToList();
+
+            return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
+            User? user = await _userManager.GetUserAsync(User);
+            var existing = await _adsService.GetAsync(model.Id);
+
+            if (existing == null || existing.UserId != user?.Id)
+                return Forbid();
+
             if (ModelState.IsValid)
             {
                 AdvertisementDto adsDto = new()
@@ -187,7 +203,9 @@ namespace MetalTrade.Web.Controllers
                     PhoneNumber = model.PhoneNumber ?? string.Empty,
                     City = model.City,
                     ProductId = model.ProductId,
+                    UserId = user.Id 
                 };
+
                 if (model.Photoes != null)
                 {
                     List<string> photoLinks = await _photoSaveService.SavePhotosAsync(model.Photoes);
@@ -196,17 +214,23 @@ namespace MetalTrade.Web.Controllers
                         adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
                     }
                 }
+
                 await _adsService.UpdateAsync(adsDto);
                 return RedirectToAction("Details", new { id = model.Id });
             }
+
             return View(model);
         }
 
+
         public async Task<IActionResult> Delete(int id)
         {
+            User? user = await _userManager.GetUserAsync(User);
             AdvertisementDto? adsDto = await _adsService.GetAsync(id);
             if (adsDto != null)
                 return View(new DeleteViewModel { Id = adsDto.Id, Title = adsDto.Title });
+            if (adsDto.UserId != user?.Id)
+                return Forbid();
             return RedirectToAction("Index");
         }
 
@@ -214,6 +238,10 @@ namespace MetalTrade.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(DeleteViewModel model)
         {
+            User? user = await _userManager.GetUserAsync(User);
+            var existing = await _adsService.GetAsync(model.Id);
+            if (existing == null || existing.UserId != user?.Id)
+                return Forbid();
             await _adsService.DeleteAsync(model.Id);
             return RedirectToAction("Index");
         }
