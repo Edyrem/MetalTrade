@@ -49,6 +49,11 @@ public class AdvertisementController : Controller
     {
         User? user = await _userManager.GetUserAsync(User);
 
+        if (user == null) return RedirectToAction("Index");
+
+        if (!(User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
+            return Forbid();
+
         if (!ModelState.IsValid || user == null)
         {
             model.Products = [.. _context.Products.Select(p => new SelectListItem
@@ -97,8 +102,15 @@ public class AdvertisementController : Controller
     {
         List<string> ExistingPhotos;
         var adsDto = await _adsService.GetAsync(id);
+
         if (adsDto == null) return RedirectToAction("Index");
         var model = _mapper.Map<EditViewModel>(adsDto);
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction("Index");
+
+        if (adsDto.UserId != user.Id && !(User.IsInRole("admin") || User.IsInRole("moderator")))
+            return Forbid(); 
 
         model.Products = _context.Products
             .Select(p => new SelectListItem
@@ -149,6 +161,12 @@ public class AdvertisementController : Controller
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null) 
             return RedirectToAction("Index");
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction("Index");
+
+        if (adsDto.UserId != user.Id && !(User.IsInRole("admin") || User.IsInRole("moderator")))
+            return Forbid();
 
         var model = _mapper.Map<DeleteViewModel>(adsDto);
         return View(model);

@@ -57,11 +57,24 @@
                         @Html.DisplayFor(model => model.PhoneNumber)
                     </dd>
                 </dl>
+                @{
+                    string currentUserId = null;
+
+                    if (User.Identity?.IsAuthenticated == true)
+                    {
+                        currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    }
+                }
+
                 <div>
-                    <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать</a> |
-                    <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a> |
+                    @if (currentUserId != null && Model.UserId.ToString() == currentUserId || User.IsInRole("moderator") || User.IsInRole("admin"))
+                    {
+                        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model.Id">Редактировать</a>
+                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model.Id">Удалить</a>
+                    }
                     <a asp-action="Index" class="btn btn-outline-primary">Назад к списку</a>
                 </div>
+
             </div>
             <div class="col-md-6">
                 @if (Model != null && Model.Photoes != null && Model.Photoes.Count > 0)
