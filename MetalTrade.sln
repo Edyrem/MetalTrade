@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36429.23 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Web", "MetalTrade.Web\MetalTrade.Web.csproj", "{C7D98652-1C38-48A3-B304-A0C8AD6B9061}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.DataAccess", "MetalTrade.DataAccess\MetalTrade.DataAccess.csproj", "{B10DDFE9-CD8C-41D2-AD03-015B9C97297B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Domain", "MetalTrade.Domain\MetalTrade.Domain.csproj", "{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Application", "MetalTrade.Application\MetalTrade.Application.csproj", "{238B9A8F-DAF0-4510-E2C8-3120FFEC0F19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3B578E7-74FA-43A4-8408-0AD6B4E8E8F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{238B9A8F-DAF0-4510-E2C8-3120FFEC0F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{238B9A8F-DAF0-4510-E2C8-3120FFEC0F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{238B9A8F-DAF0-4510-E2C8-3120FFEC0F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{238B9A8F-DAF0-4510-E2C8-3120FFEC0F19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
