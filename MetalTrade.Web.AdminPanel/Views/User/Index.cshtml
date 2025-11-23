@@ -1,0 +1,57 @@
+@using MetalTrade.Domain.Entities
+@model Dictionary<User, string?>
+@{
+    ViewBag.Title = "Список пользователей";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Все пользователи</h2>
+    @if (!Model.Any())
+    {
+        <h4 class="">Пользователей еще нет </h4>
+    }
+    else
+    {
+        <div class="row text-center">
+            <table class="mt-3 table table-success " style="width: 100%;">
+                <tr>
+                    <th>Аватар</th>
+                    <th>Логин</th>
+                    <th>Email</th>
+                    <th>Номер телефона</th>
+                    <th>Роль</th>
+                </tr>
+                @foreach (var dictionary in Model)
+                {
+                    var user = dictionary.Key;
+                    var role = dictionary.Value;
+                    
+                    <tr>
+                        <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@user.PhoneNumber</td>
+
+                        @switch(role) 
+                        {
+                                case "admin" : 
+                                    <td class="text-danger">Админ</td>; 
+                                    break;
+                                case "moderator" : 
+                                    <td class= "text-info">Модератор</td >; 
+                                    break;
+                                case "supplier" : 
+                                    <td class= "text-info">Поставщик</td>; 
+                                    break;
+                                case "user" : 
+                                    <td class= "text-info">Пользователь</td >; 
+                                    break;
+                            default: break;
+                        }
+
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>
