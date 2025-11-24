@@ -31,7 +31,8 @@ public class UserService : IUserService
         if (user == null)
             return null;
 
-        var userDto = new UserDto { 
+        var userDto = new UserDto {
+            Id = user.Id,
             Email = user.Email,
             UserName = user.UserName,
             PhoneNumber = user.PhoneNumber,
@@ -152,6 +153,7 @@ public class UserService : IUserService
     public async Task DeleteUserAsync(int id)
     {
         await _userRepository.DeleteAsync(id);
+        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<SignInResult> LoginAsync(string login, string password, bool rememberMe)

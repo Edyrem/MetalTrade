@@ -1,10 +1,13 @@
-﻿using MetalTrade.Business.Dtos;
+﻿using AutoMapper;
+using MetalTrade.Business.Common.Mapping;
+using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.AdminPanel.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.AdminPanel.Controllers
 {
@@ -12,25 +15,18 @@ namespace MetalTrade.Web.AdminPanel.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IMapper mapper)
         {
+            _mapper = mapper;
             _userService = userService;
         }
 
         public async Task<IActionResult> Index()
         {
             var users = await _userService.GetAllUsersWithRolesAsync();
-            var usersList = users.Select(u => new IndexUserViewModel
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                Email = u.Email,
-                PhoneNumber = u.PhoneNumber,
-                WhatsAppNumber = u.WhatsAppNumber,
-                Photo = u.PhotoLink,
-                Roles = u.Roles
-            }).ToList();
+            var usersList = _mapper.Map<List<IndexUserViewModel>>(users);
 
             return View(usersList);
         }
@@ -48,16 +44,15 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var dto = new UserDto
+            var dto = _mapper.Map<UserDto>(model);
+
+            bool success = false;
+            if(model.Role == UserRole.Moderator)
             {
-                UserName = model.UserName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                WhatsAppNumber = model.WhatsAppNumber,
-                Photo = model.Photo,
-                Password = model.Password
-            };
-            bool success = await _userService.CreateUserAsync(dto, model.Role.ToString().ToLower());
+                success = await _userService.CreateUserAsync(dto, "user");
+                success = false;
+            }
+            success = await _userService.CreateUserAsync(dto, model.Role.ToString().ToLower());
             if (success)
                 return RedirectToAction("Index", "User");
 
@@ -73,15 +68,13 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             try
             {
-                if(await _userService.AddToRoleAsync(user, "moderator"))
-                    return RedirectToAction("Index", "User");
+                await _userService.AddToRoleAsync(user, "moderator");
             }
             catch (Exception)
             {
-                
+                ModelState.AddModelError("", "Ошибка при добавлении роли");
             }
-            ModelState.AddModelError("", "Ошибка при добавлении роли");
-            return View();
+            return RedirectToAction("Index", "User");
         }
 
         public async Task<IActionResult> RemoveRole(int id)
@@ -115,7 +108,24 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
                 return NotFound();
-            return View(user);
+            var userViewModel = _mapper.Map<DeleteUserViewModel>(user);
+            return View(userViewModel);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                await _userService.DeleteUserAsync(id);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ошибка при удалении пользователя: " + ex.Message);
+                RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

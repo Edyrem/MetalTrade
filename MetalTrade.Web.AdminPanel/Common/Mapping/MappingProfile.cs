@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Web.AdminPanel.ViewModels;
+using MetalTrade.Web.AdminPanel.ViewModels.User;
 //using MetalTrade.Web.AdminPanel.ViewModels.Advertisement;
 //using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 //using MetalTrade.Web.ViewModels.MetalType;
@@ -14,11 +15,20 @@ namespace MetalTrade.Web.AdminPanel.Common.Mapping
         {
             //CreateMap<MetalTypeDto, MetalTypeViewModel>().ReverseMap();
             //CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+            CreateMap<UserDto, IndexUserViewModel>()                
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
+                .ReverseMap()
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));
 
-            //CreateMap<UserDto, UserViewModel>()
-            //    .ForMember(dest => dest.Photo, opt => opt.Ignore()) 
-            //    .ReverseMap()
-            //    .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
+            CreateMap<UserDto, UserViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore());
+
+            CreateMap<UserDto, DeleteUserViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
+                .ReverseMap()
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));
 
             //CreateMap<AdvertisementPhotoDto, AdvertisementPhotoViewModel>().ReverseMap();
             //CreateMap<CreateViewModel, AdvertisementDto>()
