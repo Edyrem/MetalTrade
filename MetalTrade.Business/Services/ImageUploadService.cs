@@ -1,7 +1,6 @@
 ﻿using MetalTrade.Business.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {

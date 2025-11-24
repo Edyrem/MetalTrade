@@ -1,158 +1,120 @@
-﻿using MetalTrade.Business.Dtos;
+using AutoMapper;
+﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement;
+using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
+using MetalTrade.Domain.Enums;
 
-namespace MetalTrade.Business.Services
+namespace MetalTrade.Business.Services;
+
+public class AdvertisementService : IAdvertisementService
 {
-    public class AdvertisementService: IAdvertisementService
+    private readonly AdvertisementRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly IImageUploadService _imageUploadService;
+    private AdvertisementStateContext _stateContext;
+
+    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
     {
-        private readonly AdvertisementRepository _repository;
-        public AdvertisementService(MetalTradeDbContext context)
+        _repository = new AdvertisementRepository(context);
+        _mapper = mapper;
+        _imageUploadService = imageUploadService;
+        _stateContext = new AdvertisementStateContext(_repository);
+    }
+
+    public async Task<List<AdvertisementDto>> GetAllAsync()
+    {
+        var ads = await _repository.GetAllAsync();
+        return _mapper.Map<List<AdvertisementDto>>(ads);
+    }
+
+    public async Task<AdvertisementDto?> GetAsync(int advertisementId)
+    {
+        var ads = await _repository.GetAsync(advertisementId);
+        return _mapper.Map<AdvertisementDto>(ads);
+    }
+
+    public async Task CreateAsync(AdvertisementDto adsDto)
+    {
+        //adsDto.Product = null;
+        //adsDto.User = null;
+        adsDto.Status = (int)AdvertisementStatus.Draft;
+
+        var entity = _mapper.Map<Advertisement>(adsDto);
+
+        entity.CreateDate = DateTime.UtcNow;
+
+        if (adsDto.Photoes != null && adsDto.Photoes.Any())
         {
-            _repository = new AdvertisementRepository(context);
+            entity.Photoes = adsDto.Photoes.Select(photoDto => new AdvertisementPhoto
+            {
+                PhotoLink = photoDto.PhotoLink,
+            }).ToList();
         }
 
-        public async Task<List<AdvertisementDto>> GetAllAsync()
-        {
-            IEnumerable<Advertisement> ads = await _repository.GetAllAsync();
-            List<AdvertisementDto> adsDtos = [];
-            foreach (var ad in ads)
-            {
-                AdvertisementDto adsDto = new()
-                {
-                    Id = ad.Id,
-                    Title = ad.Title,
-                    Body = ad.Body,
-                    Price = ad.Price,
-                    CreateDate = ad.CreateDate,
-                    Address = ad.Address,
-                    PhoneNumber = ad.PhoneNumber,
-                    City = ad.City,
-                    Status = ad.Status,
-                    IsTop = ad.IsTop,
-                    IsAd = ad.IsAd,
-                    ProductId = ad.ProductId,
-                    Product = new()
-                    {
-                        Id = ad.ProductId,
-                        Name = ad.Product?.Name ?? string.Empty
-                    }
-                };
-                foreach (var photo in ad.Photoes)
-                {
-                    adsDto.Photoes.Add(new AdvertisementPhotoDto
-                    {
-                        Id = photo.Id,
-                        PhotoLink = photo.PhotoLink,
-                        AdvertisementId = photo.AdvertisementId
-                    });
-                }
-                adsDtos.Add(adsDto);
-            }
-            return adsDtos;
-        }
+        await _repository.CreateAsync(entity);
+        await _repository.SaveChangesAsync();
+    }
 
-        public async Task<AdvertisementDto?> GetAsync(int advertisementId)
+    public async Task UpdateAsync(AdvertisementDto adsDto)
+    {
+        var entity = await _repository.GetAsync(adsDto.Id);
+        if (entity == null) throw new ArgumentException("Объявление не найдено");
+
+        //adsDto.Product = null;
+        //adsDto.User = null;
+
+        _mapper.Map(adsDto, entity);
+
+        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Any())
         {
-            Advertisement? ads = await _repository.GetAsync(advertisementId);
-            if (ads == null)
-                return null;
-            AdvertisementDto adsDto = new()
+            foreach (var photoFile in adsDto.PhotoFiles)
             {
-                Id = ads.Id,
-                Title = ads.Title,
-                Body = ads.Body,
-                Price = ads.Price,
-                CreateDate = ads.CreateDate,
-                Address = ads.Address,
-                PhoneNumber = ads.PhoneNumber,
-                City = ads.City,
-                Status = ads.Status,
-                IsTop = ads.IsTop,
-                IsAd = ads.IsAd,
-                ProductId = ads.ProductId,
-                Product = new ProductDto
+                var defaultFolder = Path.Combine("uploads", "ads");
+                var photoLink = await _imageUploadService.UploadImageAsync(photoFile, defaultFolder);
+                entity.Photoes.Add(new AdvertisementPhoto
                 {
-                    Id = ads.ProductId,
-                    Name = ads.Product?.Name ?? string.Empty
-                }
-            };
-            foreach (var photo in ads.Photoes)
-            {
-                adsDto.Photoes.Add( new AdvertisementPhotoDto
-                {
-                    Id = photo.Id,
-                    PhotoLink = photo.PhotoLink,
-                    AdvertisementId = photo.AdvertisementId
+                    PhotoLink = photoLink
                 });
             }
-            return adsDto;
+        }
+        else if (adsDto.Photoes?.Any() ?? false)
+        {
+            entity.Photoes = adsDto.Photoes.Select(p => new AdvertisementPhoto
+            {
+                PhotoLink = p.PhotoLink
+            }).ToList();
         }
 
-        public async Task CreateAsync(AdvertisementDto adsDto)
-        {
-            Advertisement ads = new()
-            {
-                Title = adsDto.Title,
-                Body = adsDto.Body,
-                Price = adsDto.Price,
-                Address = adsDto.Address,
-                PhoneNumber = adsDto.PhoneNumber,
-                City = adsDto.City,
-                Status = adsDto.Status,
-                IsTop = adsDto.IsTop,
-                IsAd = adsDto.IsAd,
-                ProductId = adsDto.ProductId,
-                UserId = adsDto.UserId,
-                Photoes = []
-            };
-            if (adsDto.Photoes.Count > 0)
-            {
-                foreach (var photoDto in adsDto.Photoes)
-                {
-                    ads.Photoes.Add(new AdvertisementPhoto
-                    {
-                        PhotoLink = photoDto.PhotoLink,
-                        Advertisement = ads
-                    });
-                }
-            }
-            await _repository.CreateAsync(ads);
-            await _repository.SaveChangesAsync();
-        }
-        public async Task UpdateAsync(AdvertisementDto adsDto)
-        {
-            Advertisement? ads = await _repository.GetAsync(adsDto.Id);
-            if (ads != null)
-            {
-                ads.Title = adsDto.Title;
-                ads.Body = adsDto.Body;
-                ads.Price = adsDto.Price;
-                ads.Address = adsDto.Address;
-                ads.PhoneNumber = adsDto.PhoneNumber;
-                ads.City = adsDto.City;
-                ads.ProductId = adsDto.ProductId;
-                if (ads.Photoes != null && adsDto.Photoes.Count > 0)
-                {
-                    var adsPhotoIds = ads.Photoes.Select(x => x.Id).ToHashSet();
-                    foreach (var photoDto in adsDto.Photoes)
-                    {
-                        if (!adsPhotoIds.Contains(photoDto.Id))
-                            ads.Photoes.Add(new AdvertisementPhoto { PhotoLink = photoDto.PhotoLink });
-                    }
-                }
-                await _repository.UpdateAsync(ads);
-                await _repository.SaveChangesAsync();
-            }
-        }
-
-        public async Task DeleteAsync(int advertisementId)
-        {
-            await _repository.DeleteAsync(advertisementId);
-            await _repository.SaveChangesAsync();
-        }
-
+        await _repository.UpdateAsync(entity);
+        await _repository.SaveChangesAsync();
     }
+
+    public async Task DeleteAsync(int advertisementId)
+    {
+        await _stateContext.MoveToDeletedAsync(advertisementId);
+        await _repository.DeleteAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task ApproveAsync(int advertisementId)
+    {
+        await _stateContext.MoveToActiveAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task RejectAsync(int advertisementId)
+    {
+        await _stateContext.MoveToRejectedAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task ArchiveAsync(int advertisementId)
+    {
+        await _stateContext.MoveToArchivedAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
 }

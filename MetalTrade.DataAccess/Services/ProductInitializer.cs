@@ -26,6 +26,7 @@ public class ProductInitializer
             var iron = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "железо");
             var aluminum = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "алюминий");
             var steel = context.MetalTypes.FirstOrDefault(p => p.Name.ToLower() == "сталь");
+
             var products = new[]
             {
                 new Product { Name = "труба", MetalTypeId = iron.Id },
@@ -36,6 +37,5 @@ public class ProductInitializer
             context.Products.AddRange(products);
             await context.SaveChangesAsync();
         }
-        
     }
 }

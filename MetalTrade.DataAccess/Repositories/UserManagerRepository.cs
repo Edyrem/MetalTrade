@@ -43,7 +43,6 @@ namespace MetalTrade.DataAccess.Repositories
         {
             var roles = await _userManager.GetRolesAsync(user);
             return roles.FirstOrDefault();
-        }
-        
+        }        
     }
 }
