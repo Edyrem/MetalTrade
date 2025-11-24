@@ -7,9 +7,9 @@
 
 <form asp-action="Register" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="row">
-
         <div class="col-md-6">
             <div class="form-group">
                 <label asp-for="UserName" class="control-label">@Localizer["User Name"]</label>

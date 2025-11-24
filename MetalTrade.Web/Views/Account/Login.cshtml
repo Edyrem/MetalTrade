@@ -10,7 +10,7 @@
 
 <form asp-action="Login" method="post">
     @Html.AntiForgeryToken()
-
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div>
         <label>@Localizer["Username or Email"]</label>
         <input asp-for="Login" />

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;
 
-//[Authorize(Roles = "admin")]
+[Authorize(Roles = "admin")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
