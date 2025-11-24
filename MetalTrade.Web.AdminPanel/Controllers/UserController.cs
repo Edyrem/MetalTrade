@@ -1,8 +1,10 @@
 ﻿using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Enums;
 using MetalTrade.Web.AdminPanel.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.AdminPanel.Controllers
 {
@@ -35,6 +37,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
         public async Task<IActionResult> CreateUser()
         {
+            ViewData["Roles"] = new SelectListItem(UserRole.Admin.ToString(), UserRole.Admin.ToString());
             return View();
         }
 
