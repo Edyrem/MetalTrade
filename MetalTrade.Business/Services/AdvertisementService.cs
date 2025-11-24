@@ -1,10 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
+﻿using MetalTrade.Application.Patterns.StateMachine.Advertisement;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
-using Microsoft.AspNetCore.Hosting;
+using MetalTrade.Domain.Enums;
 
 namespace MetalTrade.Business.Services;
 
@@ -12,15 +13,15 @@ public class AdvertisementService : IAdvertisementService
 {
     private readonly AdvertisementRepository _repository;
     private readonly IMapper _mapper;
-    private readonly IWebHostEnvironment _env;
     private readonly IImageUploadService _imageUploadService;
+    private AdvertisementStateContext _stateContext;
 
-    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IWebHostEnvironment env, IImageUploadService imageUploadService)
+    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
     {
         _repository = new AdvertisementRepository(context);
         _mapper = mapper;
-        _env = env;
         _imageUploadService = imageUploadService;
+        _stateContext = new AdvertisementStateContext(_repository);
     }
 
     public async Task<List<AdvertisementDto>> GetAllAsync()
@@ -37,8 +38,9 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task CreateAsync(AdvertisementDto adsDto)
     {
-        adsDto.Product = null;
-        adsDto.User = null;
+        //adsDto.Product = null;
+        //adsDto.User = null;
+        adsDto.Status = (int)AdvertisementStatus.Draft;
 
         var entity = _mapper.Map<Advertisement>(adsDto);
 
@@ -61,8 +63,8 @@ public class AdvertisementService : IAdvertisementService
         var entity = await _repository.GetAsync(adsDto.Id);
         if (entity == null) throw new ArgumentException("Объявление не найдено");
 
-        adsDto.Product = null;
-        adsDto.User = null;
+        //adsDto.Product = null;
+        //adsDto.User = null;
 
         _mapper.Map(adsDto, entity);
 
@@ -92,7 +94,26 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task DeleteAsync(int advertisementId)
     {
+        await _stateContext.MoveToDeletedAsync(advertisementId);
         await _repository.DeleteAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task ApproveAsync(int advertisementId)
+    {
+        await _stateContext.MoveToActiveAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task RejectAsync(int advertisementId)
+    {
+        await _stateContext.MoveToRejectedAsync(advertisementId);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task ArchiveAsync(int advertisementId)
+    {
+        await _stateContext.MoveToArchivedAsync(advertisementId);
         await _repository.SaveChangesAsync();
     }
 
