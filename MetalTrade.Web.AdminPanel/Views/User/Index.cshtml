@@ -1,5 +1,5 @@
-@using MetalTrade.Domain.Entities
-@model Dictionary<User, string?>
+@using MetalTrade.Web.AdminPanel.ViewModels.User
+@model IEnumerable<IndexUserViewModel>
 @{
     ViewBag.Title = "Список пользователей";
 }
@@ -20,34 +20,49 @@
                     <th>Email</th>
                     <th>Номер телефона</th>
                     <th>Роль</th>
+                    <th></th>
+                    <th></th>
                 </tr>
-                @foreach (var dictionary in Model)
+                @foreach (var user in Model)
                 {
-                    var user = dictionary.Key;
-                    var role = dictionary.Value;
-                    
                     <tr>
-                        <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                        @if (user.Photo.StartsWith("http"))
+                        {
+                            <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                        } else
+                        {
+                            user.Photo = user.Photo.Substring(1);
+                            <td><img src="~/@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                        }
+                        
                         <td>@user.UserName</td>
                         <td>@user.Email</td>
                         <td>@user.PhoneNumber</td>
 
-                        @switch(role) 
+                        @foreach(var role in user.Roles)
                         {
-                                case "admin" : 
-                                    <td class="text-danger">Админ</td>; 
+                            @switch (role)
+                            {
+                                case "admin":
+                                    <td class="text-danger">Админ</td>
+                                    ;
                                     break;
-                                case "moderator" : 
-                                    <td class= "text-info">Модератор</td >; 
+                                case "moderator":
+                                    <td><div class="text-info">Модератор</div></td>
+                                    <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Удалить из модераторов</a></td>
                                     break;
-                                case "supplier" : 
-                                    <td class= "text-info">Поставщик</td>; 
+                                case "supplier":
+                                    <td><div class="text-info">Поставщик</div></td>
+                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
                                     break;
-                                case "user" : 
-                                    <td class= "text-info">Пользователь</td >; 
+                                case "user":
+                                    <td class="text-info">Пользователь</td>
+                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
                                     break;
-                            default: break;
+                                default: break;
+                            }
                         }
+                        <td><a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Удалить</a></td>
 
                     </tr>
                 }

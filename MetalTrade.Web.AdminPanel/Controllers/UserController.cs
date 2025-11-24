@@ -19,7 +19,18 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userService.GetAllUsersWithRolesAsync();
-            return View(users);
+            var usersList = users.Select(u => new IndexUserViewModel
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                WhatsAppNumber = u.WhatsAppNumber,
+                Photo = u.PhotoLink,
+                Roles = u.Roles
+            }).ToList();
+
+            return View(usersList);
         }
 
         public async Task<IActionResult> CreateUser()
@@ -49,6 +60,59 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             ModelState.AddModelError("", "Ошибка при создании пользователя");
             return View(model);
+        }
+
+        public async Task<IActionResult> AddRole(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            try
+            {
+                if(await _userService.AddToRoleAsync(user, "moderator"))
+                    return RedirectToAction("Index", "User");
+            }
+            catch (Exception)
+            {
+                
+            }
+            ModelState.AddModelError("", "Ошибка при добавлении роли");
+            return View();
+        }
+
+        public async Task<IActionResult> RemoveRole(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            try
+            {
+                if(await _userService.RemoveFromRoleAsync(user, "moderator"))
+                    return RedirectToAction("Index", "User");
+            }
+            catch (Exception)
+            {
+                
+            }
+            ModelState.AddModelError("", "Ошибка при удалении роли");
+            return View();
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            return View(user);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            return View(user);
         }
     }
 }
