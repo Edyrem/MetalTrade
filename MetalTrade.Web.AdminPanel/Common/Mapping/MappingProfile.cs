@@ -20,7 +20,7 @@ namespace MetalTrade.Web.AdminPanel.Common.Mapping
                 .ReverseMap()
                 .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));
 
-            CreateMap<UserDto, UserViewModel>()
+            CreateMap<UserDto, CreateUserViewModel>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore());

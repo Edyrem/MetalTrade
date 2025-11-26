@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.AdminPanel.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,moderator")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -39,7 +39,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(UserViewModel model)
+        public async Task<IActionResult> CreateUser(CreateUserViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -60,6 +60,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> AddRole(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -77,6 +78,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             return RedirectToAction("Index", "User");
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> RemoveRole(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
