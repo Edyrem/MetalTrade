@@ -1,4 +1,5 @@
 ﻿using MetalTrade.Business.Dtos;
+using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -31,6 +32,6 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Продукт")]
         [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }
-        public List<SelectListItem> Products { get; set; } = [];
+        public List<ProductViewModel> Products { get; set; } = [];
     }
 }

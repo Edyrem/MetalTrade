@@ -5,6 +5,7 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
+using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,26 +20,27 @@ public class AdvertisementController : Controller
     private readonly IAdvertisementService _adsService;
     private readonly UserManager<User> _userManager;
     private readonly IImageUploadService _imageUploadService;
-    private readonly MetalTradeDbContext _context;
+    private readonly IProductService _productService;
     private readonly IMapper _mapper;
 
     public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
-        IWebHostEnvironment env, MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
+        IWebHostEnvironment env, IProductService productService, IMapper mapper, IImageUploadService imageUploadService)
     {
         _adsService = adsService;
         _userManager = userManager;
         _imageUploadService = imageUploadService;
-        _context = context;
+        _productService = productService;
         _mapper = mapper;
     }
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
+        var productDtos = await _productService.GetAllAsync();
         CreateViewModel model = new()
         {
-            Products = [.. _context.Products.Select(p => new SelectListItem
+            Products = [.. productDtos.Select(p => new ProductViewModel
             {
-                Value = p.Id.ToString(),
-                Text = p.Name
+                Id = p.Id,
+                Name = p.Name
             })]
         };
         return View(model);
@@ -51,10 +53,11 @@ public class AdvertisementController : Controller
 
         if (!ModelState.IsValid || user == null)
         {
-            model.Products = [.. _context.Products.Select(p => new SelectListItem
+            var productDtos = await _productService.GetAllAsync();
+            model.Products = [.. productDtos.Select(p => new ProductViewModel
             {
-                Value = p.Id.ToString(),
-                Text = p.Name
+                Id = p.Id,
+                Name = p.Name
             })];
             return View(model);
         }
@@ -95,19 +98,17 @@ public class AdvertisementController : Controller
 
     public async Task<IActionResult> Edit(int id)
     {
+        var productDtos = await _productService.GetAllAsync();
         List<string> ExistingPhotos;
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null) return RedirectToAction("Index");
         var model = _mapper.Map<EditViewModel>(adsDto);
 
-        model.Products = _context.Products
-            .Select(p => new SelectListItem
+        model.Products = [.. productDtos.Select(p => new ProductViewModel
             {
-                Value = p.Id.ToString(),
-                Text = p.Name,
-                Selected = p.Id == model.ProductId
-            })
-            .ToList();
+                Id = p.Id,
+                Name = p.Name
+            })];
 
         return View(model);
     }
