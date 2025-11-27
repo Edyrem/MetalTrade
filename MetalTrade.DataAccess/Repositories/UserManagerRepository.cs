@@ -14,6 +14,11 @@ namespace MetalTrade.DataAccess.Repositories
             _userManager = userManager;
         }
 
+        public async Task<User?> GetByIdAsync(int id)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
@@ -39,10 +44,20 @@ namespace MetalTrade.DataAccess.Repositories
             return await _userManager.AddToRoleAsync(user, role);
         }
 
-        public async Task<string?> GetUserRoleAsync(User user)
+        public async Task<IdentityResult> RemoveFromRoleAsync(User user, string role)
+        {
+            return await _userManager.RemoveFromRoleAsync(user, role);
+        }
+
+        public async Task<IEnumerable<string>?> GetUserRolesAsync(User user)
         {
             var roles = await _userManager.GetRolesAsync(user);
-            return roles.FirstOrDefault();
-        }        
+            return roles;
+        }
+
+        public async Task<bool> IsInRoleAsync(User user, string role)
+        {
+            return await _userManager.IsInRoleAsync(user, role);
+        }
     }
 }

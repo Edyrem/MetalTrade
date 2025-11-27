@@ -21,16 +21,7 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="CreateUser">Создать поставщика</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Список пользователей</a>
-                        </li>
-                    }
+                    
                     @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator")))
                     {
                         
