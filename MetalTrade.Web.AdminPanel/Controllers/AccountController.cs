@@ -1,4 +1,3 @@
-using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Web.AdminPanel.ViewModels;
