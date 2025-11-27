@@ -60,6 +60,6 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _userManager.IsInRoleAsync(user, role);
         }
-        public async Task<User?> GetCurrentUser(HttpContext context) => await _userManager.GetUserAsync(context.User);
+        public async Task<User?> GetCurrentUserAsync(HttpContext context) => await _userManager.GetUserAsync(context.User);
     }
 }
