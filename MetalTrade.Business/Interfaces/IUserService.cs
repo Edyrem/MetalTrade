@@ -16,5 +16,6 @@ public interface IUserService
     Task<SignInResult> LoginAsync(string login, string password, bool rememberMe);
     Task LogoutAsync();
     Task<List<UserDto>> GetAllUsersWithRolesAsync();
+    Task UpdateUserAsync(UserDto model);
     Task DeleteUserAsync(int id);
 }

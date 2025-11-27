@@ -15,7 +15,7 @@ namespace MetalTrade.Web.AdminPanel.Common.Mapping
         {
             //CreateMap<MetalTypeDto, MetalTypeViewModel>().ReverseMap();
             //CreateMap<ProductDto, ProductViewModel>().ReverseMap();
-            CreateMap<UserDto, IndexUserViewModel>()                
+            CreateMap<UserDto, UserViewModel>()                
                 .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
                 .ReverseMap()
                 .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));

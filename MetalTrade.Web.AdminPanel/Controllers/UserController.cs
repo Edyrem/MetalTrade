@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MetalTrade.Business.Common.Mapping;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Enums;
@@ -26,9 +25,22 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userService.GetAllUsersWithRolesAsync();
-            var usersList = _mapper.Map<List<IndexUserViewModel>>(users);
+            var usersList = _mapper.Map<List<UserViewModel>>(users);
 
             return View(usersList);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id == 0)
+                return NotFound();
+            var user = await _userService.GetUserByIdAsync(id);
+
+            if (user == null)
+                return NotFound();
+
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            return View(userViewModel);
         }
 
         public async Task<IActionResult> CreateUser()
@@ -58,6 +70,39 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             ModelState.AddModelError("", "Ошибка при создании пользователя");
             return View(model);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            var userViewModel = _mapper.Map<EditUserViewModel>(user);
+            return View(userViewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, EditUserViewModel model)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var dto = _mapper.Map<UserDto>(model);
+            try
+            {
+                await _userService.UpdateUserAsync(dto);
+                return RedirectToAction("Index", "User");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                ModelState.AddModelError("", "Ошибка при обновлении пользователя");
+                return View(model);
+            }
         }
 
         [Authorize(Roles = "admin")]
@@ -95,15 +140,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             }
             ModelState.AddModelError("", "Ошибка при удалении роли");
             return View();
-        }
-
-        public async Task<IActionResult> Details(int id)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound();
-            return View(user);
-        }
+        }        
 
         public async Task<IActionResult> Delete(int id)
         {

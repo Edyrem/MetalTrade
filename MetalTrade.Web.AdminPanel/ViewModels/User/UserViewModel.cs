@@ -1,6 +1,6 @@
 ﻿namespace MetalTrade.Web.AdminPanel.ViewModels.User
 {
-    public class IndexUserViewModel
+    public class UserViewModel
     {
         public int Id { get; set; }
         public string UserName { get; set; }

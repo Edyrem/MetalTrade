@@ -150,6 +150,26 @@ public class UserService : IUserService
         return result;
     }
 
+    public async Task UpdateUserAsync(UserDto model)
+    {
+        var user = await _userRepository.GetAsync(model.Id);
+        if (user == null) return;
+        user.Email = model.Email;
+        user.UserName = model.UserName;
+        user.PhoneNumber = model.PhoneNumber;
+        user.WhatsAppNumber = model.WhatsAppNumber;
+        if (model.Photo != null)
+        {
+            var avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
+            if (!string.IsNullOrEmpty(avatarPath))
+            {
+                user.Photo = avatarPath;
+            }
+        }
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
+    }
+
     public async Task DeleteUserAsync(int id)
     {
         await _userRepository.DeleteAsync(id);

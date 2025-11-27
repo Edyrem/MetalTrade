@@ -1,4 +1,4 @@
-using MetalTrade.Web.AdminPanel.Models;
+using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
