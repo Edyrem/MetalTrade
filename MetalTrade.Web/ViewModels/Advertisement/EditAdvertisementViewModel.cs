@@ -1,11 +1,13 @@
-﻿using MetalTrade.Web.ViewModels.Product;
+﻿using MetalTrade.Business.Dtos;
+using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
-    public class CreateViewModel
+    public class EditAdvertisementViewModel
     {
+        public int Id { get; set; }
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле Название объязательно")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
@@ -25,8 +27,8 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Город")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
         public string? City { get; set; }
-        [Display(Name = "Фото")]
-        public IFormFile[]? Photoes { get; set; }
+        //[Display(Name = "Фото")]
+        //public IFormFile[]? Photoes { get; set; }
         [Display(Name = "Продукт")]
         [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }

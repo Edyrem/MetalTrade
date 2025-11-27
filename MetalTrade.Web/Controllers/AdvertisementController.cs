@@ -35,7 +35,7 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
-        CreateViewModel model = new()
+        CreateAdvertisementViewModel model = new()
         {
             Products = [.. productDtos.Select(p => new ProductViewModel
             {
@@ -47,7 +47,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateViewModel model)
+    public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
         User? user = await _userManager.GetUserAsync(User);
 
@@ -102,7 +102,7 @@ public class AdvertisementController : Controller
         List<string> ExistingPhotos;
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null) return RedirectToAction("Index");
-        var model = _mapper.Map<EditViewModel>(adsDto);
+        var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
 
         model.Products = [.. productDtos.Select(p => new ProductViewModel
             {
@@ -114,13 +114,16 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(EditViewModel model, List<IFormFile>? photoFiles)
+    public async Task<IActionResult> Edit(EditAdvertisementViewModel model, List<IFormFile>? photoFiles)
     {
         if (!ModelState.IsValid)
         {
-            model.Products = _context.Products
-                .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name, Selected = p.Id == model.ProductId })
-                .ToList();
+            var productDtos = await _productService.GetAllAsync();
+            model.Products = [.. productDtos.Select(p => new ProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name
+            })];
             return View(model);
         }
 
@@ -151,12 +154,12 @@ public class AdvertisementController : Controller
         if (adsDto == null) 
             return RedirectToAction("Index");
 
-        var model = _mapper.Map<DeleteViewModel>(adsDto);
+        var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
         return View(model);
     }
         
     [HttpPost]
-    public async Task<IActionResult> Delete(DeleteViewModel model)
+    public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");

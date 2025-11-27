@@ -2,7 +2,7 @@
 
 namespace MetalTrade.Web.ViewModels.Advertisement
 {
-    public class DeleteViewModel
+    public class DeleteAdvertisementViewModel
     {
         public int Id { get; set; }
         [Display(Name = "Название")]
