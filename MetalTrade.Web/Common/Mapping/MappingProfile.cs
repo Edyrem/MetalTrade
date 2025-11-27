@@ -35,9 +35,10 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product));
 
             CreateMap<AdvertisementDto, EditViewModel>()
-                .ReverseMap()
-                .ForMember(dest => dest.Product, opt => opt.Ignore())
-                .ForMember(dest => dest.User, opt => opt.Ignore());
+                .ForMember(dest => dest.Photoes, opt => opt.Ignore());
+
+            CreateMap<EditViewModel, AdvertisementDto>()
+                .ForMember(dest => dest.Photoes, opt => opt.Ignore());
 
             CreateMap<AdvertisementDto, DeleteViewModel>().ReverseMap();
 
@@ -46,6 +47,7 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore()) 
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore());
+
         }
     }
 }
