@@ -1,5 +1,6 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace MetalTrade.Business.Interfaces;
@@ -17,4 +18,5 @@ public interface IUserService
     Task LogoutAsync();
     Task<List<UserDto>> GetAllUsersWithRolesAsync();
     Task DeleteUserAsync(int id);
+    Task<UserDto?> GetCurrentUserAsync(HttpContext context);
 }

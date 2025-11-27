@@ -18,16 +18,17 @@ namespace MetalTrade.Web.Controllers;
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
-    private readonly UserManager<User> _userManager;
     private readonly IImageUploadService _imageUploadService;
     private readonly IProductService _productService;
     private readonly IMapper _mapper;
+    private readonly IUserService _userService;
 
-    public AdvertisementController(IAdvertisementService adsService, UserManager<User> userManager,
-        IWebHostEnvironment env, IProductService productService, IMapper mapper, IImageUploadService imageUploadService)
+    public AdvertisementController(IAdvertisementService adsService, IUserService userService,
+        IWebHostEnvironment env, IProductService productService,
+        IMapper mapper, IImageUploadService imageUploadService)
     {
         _adsService = adsService;
-        _userManager = userManager;
+        _userService = userService;
         _imageUploadService = imageUploadService;
         _productService = productService;
         _mapper = mapper;
@@ -49,7 +50,7 @@ public class AdvertisementController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
-        User? user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
 
         if (!ModelState.IsValid || user == null)
         {
@@ -59,6 +60,8 @@ public class AdvertisementController : Controller
                 Id = p.Id,
                 Name = p.Name
             })];
+            if (user == null)
+                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
             return View(model);
         }
 
@@ -98,25 +101,29 @@ public class AdvertisementController : Controller
 
     public async Task<IActionResult> Edit(int id)
     {
-        var productDtos = await _productService.GetAllAsync();
         List<string> ExistingPhotos;
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null) return RedirectToAction("Index");
         var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
-
+        var productDtos = await _productService.GetAllAsync();
         model.Products = [.. productDtos.Select(p => new ProductViewModel
             {
                 Id = p.Id,
                 Name = p.Name
             })];
-
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        if (user != null && user.Id != adsDto.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
         return View(model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model, List<IFormFile>? photoFiles)
     {
-        if (!ModelState.IsValid)
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (!ModelState.IsValid || user == null || (user != null && user.Id != model.UserId))
         {
             var productDtos = await _productService.GetAllAsync();
             model.Products = [.. productDtos.Select(p => new ProductViewModel
@@ -124,16 +131,12 @@ public class AdvertisementController : Controller
                 Id = p.Id,
                 Name = p.Name
             })];
+            if (user == null)
+                ModelState.AddModelError(string.Empty, "Пользователь не найден");
+            if (user != null && user.Id != model.UserId)
+                ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
             return View(model);
         }
-
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            ModelState.AddModelError("", "Пользователь не найден");
-            return View(model);
-        }
-
         var adsDto = _mapper.Map<AdvertisementDto>(model);
 
         adsDto.PhotoFiles = photoFiles;
