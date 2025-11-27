@@ -24,11 +24,67 @@ public class UserService : IUserService
         _imageUploadService = imageUploadService;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
+    public async Task<UserDto?> GetUserByIdAsync(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        
+        if (user == null)
+            return null;
+
+        var userDto = new UserDto {
+            Id = user.Id,
+            Email = user.Email,
+            UserName = user.UserName,
+            PhoneNumber = user.PhoneNumber,
+            WhatsAppNumber = user.WhatsAppNumber,
+            PhotoLink = user.Photo
+        };
+        return userDto;
+    }
+
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+        var userDtos = users.Select(user => new UserDto
+        {
+            Email = user.Email,
+            UserName = user.UserName,
+            PhoneNumber = user.PhoneNumber,
+            WhatsAppNumber = user.WhatsAppNumber,
+            PhotoLink = user.Photo
+        });
+        return userDtos;
+    }
+
+    public async Task<bool> AddToRoleAsync(UserDto userDto, string role)
+    {
+        if (userDto == null) return false;
+        var user = await _userRepository.GetAsync(userDto.Id);
+        if (user == null) return false;
+        var result =  await _userRepository.AddToRoleAsync(user, role);
+        return result.Succeeded;
+    }
+
+    public async Task<bool> RemoveFromRoleAsync(UserDto userDto, string role)
+    {
+        if (userDto == null) return false;
+        var user = await _userRepository.GetAsync(userDto.Id);
+        if (user == null) return false;
+        var result = await _userRepository.RemoveFromRoleAsync(user, role);
+        return result.Succeeded;
+    }
+
+    public async Task<bool> IsInRoleAsync(UserDto userDto, string role)
+    {
+        if (userDto == null) return false;
+        var user = await _userRepository.GetAsync(userDto.Id);
+        if (user == null) return false;
+        return await _userRepository.IsInRoleAsync(user, role);
+    }
 
     public async Task<bool> CreateUserAsync(UserDto model, string role)
     {
-        string avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
+        var avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars") ?? "";
 
         var user = new User()
         {
@@ -70,22 +126,36 @@ public class UserService : IUserService
         }
 
         return false;
-    }
-    
+    }    
 
-    public async Task<Dictionary<User, string?>> GetAllUsersWithRolesAsync()
+    public async Task<List<UserDto>> GetAllUsersWithRolesAsync()
     {
         var users = await _userRepository.GetAllAsync();
-        var result = new Dictionary<User, string?>();
+        var result = new List<UserDto>();
         foreach (var user in users)
         {
-            var role = await _userRepository.GetUserRoleAsync(user);
-            result[user] = role;
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber,
+                WhatsAppNumber = user.WhatsAppNumber,
+                PhotoLink = user.Photo                
+            };
+            var role = await _userRepository.GetUserRolesAsync(user);
+            userDto.Roles = role.ToList() ?? new List<string>();
+            result.Add(userDto);
         }
-
         return result;
     }
-    
+
+    public async Task DeleteUserAsync(int id)
+    {
+        await _userRepository.DeleteAsync(id);
+        await _userRepository.SaveChangesAsync();
+    }
+
     public async Task<SignInResult> LoginAsync(string login, string password, bool rememberMe)
     {
         var user = login.Contains('@')
@@ -101,7 +171,6 @@ public class UserService : IUserService
             rememberMe,
             lockoutOnFailure: false);
     }
-
 
     public async Task LogoutAsync() => await _signInManager.SignOutAsync();
     
