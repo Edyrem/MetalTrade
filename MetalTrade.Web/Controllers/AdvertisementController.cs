@@ -1,16 +1,10 @@
 using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.DataAccess.Data;
-using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModels.Advertisement;
-using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -96,6 +90,9 @@ public class AdvertisementController : Controller
         if (adsDto == null) return RedirectToAction("Index");
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user != null)
+            ViewBag.CurrentUserId = user.Id;
         return View(model);
     }
 
@@ -153,10 +150,19 @@ public class AdvertisementController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         var adsDto = await _adsService.GetAsync(id);
-        if (adsDto == null) 
+        bool isInvalidRequest = adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId);
+        if (isInvalidRequest)
+        {
+            if (adsDto == null)
+                ModelState.AddModelError(string.Empty, "Объявление не найдено");
+            if (user == null)
+                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+            if (user != null && adsDto != null && user.Id != adsDto.UserId)
+                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
             return RedirectToAction("Index");
-
+        }
         var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
         return View(model);
     }
@@ -164,6 +170,15 @@ public class AdvertisementController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null || (user != null && user.Id != model.UserId))
+        {
+            if (user == null)
+                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+            if (user != null && user.Id != model.UserId)
+                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+            return RedirectToAction("Index");
+        }
         await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");
     }

@@ -5,7 +5,7 @@
 }
 
 <h1>Детали</h1>
-
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div>
     <h4>Объявление</h4>
     <hr />
@@ -58,8 +58,11 @@
                     </dd>
                 </dl>
                 <div>
-                    <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать</a> |
-                    <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a> |
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && Model.UserId == ViewBag.CurrentUserId)
+                    {
+                        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать | </a>
+                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить | </a>
+                    }
                     <a asp-action="Index" class="btn btn-outline-primary">Назад к списку</a>
                 </div>
             </div>

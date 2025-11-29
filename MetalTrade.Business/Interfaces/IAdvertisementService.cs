@@ -1,4 +1,6 @@
 ﻿using MetalTrade.Business.Dtos;
+using MetalTrade.Domain.Entities;
+using System.Linq.Expressions;
 
 namespace MetalTrade.Business.Interfaces
 {
@@ -6,6 +8,7 @@ namespace MetalTrade.Business.Interfaces
     {
         Task<AdvertisementDto?> GetAsync(int advertisementId);
         Task<List<AdvertisementDto>> GetAllAsync();
+        Task<IEnumerable<AdvertisementDto>> FindAsync(Expression<Func<Advertisement, bool>> predicate);
         Task CreateAsync(AdvertisementDto adsDto);
         Task UpdateAsync(AdvertisementDto adsDto);
         Task DeleteAsync(int advertisementId);

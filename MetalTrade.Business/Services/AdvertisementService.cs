@@ -6,6 +6,7 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
+using System.Linq.Expressions;
 
 namespace MetalTrade.Business.Services;
 
@@ -117,4 +118,8 @@ public class AdvertisementService : IAdvertisementService
         await _repository.SaveChangesAsync();
     }
 
+    public async Task<IEnumerable<AdvertisementDto>> FindAsync(Expression<Func<Advertisement, bool>> predicate)
+    {
+        return _mapper.Map<List<AdvertisementDto>>(await _repository.FindAsync(predicate));
+    }
 }
