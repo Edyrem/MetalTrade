@@ -62,15 +62,6 @@ public class AdvertisementController : Controller
         var adsDto = _mapper.Map<AdvertisementDto>(model);
         adsDto.UserId = user.Id;
 
-        if (model.Photoes != null && model.Photoes.Length > 0)
-        {
-            List<string> photoLinks = await _imageUploadService.UploadImagesAsync(model.Photoes, "advertisement");
-            foreach (var link in photoLinks)
-            {
-                adsDto.Photoes.Add(new AdvertisementPhotoDto { PhotoLink = link });
-            }
-        }
-
         await _adsService.CreateAsync(adsDto);
         return RedirectToAction("Index");
     }

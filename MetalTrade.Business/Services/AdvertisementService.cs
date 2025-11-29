@@ -39,20 +39,19 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task CreateAsync(AdvertisementDto adsDto)
     {
-        //adsDto.Product = null;
-        //adsDto.User = null;
         adsDto.Status = (int)AdvertisementStatus.Draft;
 
         var entity = _mapper.Map<Advertisement>(adsDto);
 
         entity.CreateDate = DateTime.UtcNow;
 
-        if (adsDto.Photoes != null && adsDto.Photoes.Any())
+        if (adsDto.Photoes != null && adsDto.Photoes.Count > 0)
         {
-            entity.Photoes = adsDto.Photoes.Select(photoDto => new AdvertisementPhoto
+            var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
+            foreach (var link in photoLinks)
             {
-                PhotoLink = photoDto.PhotoLink,
-            }).ToList();
+                entity.Photoes.Add(new AdvertisementPhoto { PhotoLink = link });
+            }
         }
 
         await _repository.CreateAsync(entity);
