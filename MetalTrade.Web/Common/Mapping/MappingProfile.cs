@@ -5,6 +5,7 @@ using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.User;
 namespace MetalTrade.Web.Common.Mapping
 {
     public class MappingProfile : Profile
@@ -14,7 +15,22 @@ namespace MetalTrade.Web.Common.Mapping
             CreateMap<MetalTypeDto, MetalTypeViewModel>().ReverseMap();
             CreateMap<ProductDto, ProductViewModel>().ReverseMap();
 
-            CreateMap<UserDto, UserViewModel>()
+            CreateMap<UserDto, MetalTrade.Web.ViewModels.User.UserViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
+                .ReverseMap()
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));
+
+            CreateMap<UserDto, CreateUserViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore());
+
+            CreateMap<UserDto, DeleteUserViewModel>()
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
+                .ReverseMap()
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo));
+
+            CreateMap<UserDto, MetalTrade.Web.ViewModels.UserViewModel>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()) 
                 .ReverseMap()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
