@@ -6,6 +6,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Все пользователи</h2>
+    <a asp-action="CreateUser" class="btn btn-success">Добавить нового пользователя</a>
     @if (!Model.Any())
     {
         <h4 class="">Пользователей еще нет </h4>
@@ -20,6 +21,8 @@
                     <th>Email</th>
                     <th>Номер телефона</th>
                     <th>Роль</th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -52,20 +55,26 @@
                             {
                                 <td class="text-danger">Админ</td>
                                 <td></td>
-                            }
-                            else if (user.Roles.Contains("moderator"))
-                            {
-                                <td><div class="text-info">Модератор</div></td>
-                                <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Удалить из модераторов</a></td>
-                            }
-                            else if (user.Roles.Contains("supplier"))
+                            }                           
+
+                            if (user.Roles.Contains("supplier"))
                             {
                                 <td><div class="text-info">Поставщик</div></td>
-                                <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
+                                <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Удалить из поставщиков</a></td>
                             }
                             else
                             {
                                 <td><div class="text-info">Пользователь</div></td>
+                                <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Сделать поставщиком</a></td>
+                            }
+                            if (user.Roles.Contains("moderator"))
+                            {
+                                <td><div class="text-primary">Модератор</div></td>
+                                <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Удалить из модераторов</a></td>
+                            }
+                            else
+                            {
+                                <td><div class="text-info"></div></td>
                                 <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
                             }
                         }

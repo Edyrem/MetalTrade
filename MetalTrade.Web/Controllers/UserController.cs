@@ -58,15 +58,12 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             var dto = _mapper.Map<UserDto>(model);
 
-            bool success = false;
-            if(model.Role == UserRole.Moderator)
-            {
-                success = await _userService.CreateUserAsync(dto, "user");
-                success = false;
-            }
-            success = await _userService.CreateUserAsync(dto, model.Role.ToString().ToLower());
+            var success = await _userService.CreateUserAsync(dto, model.Role.ToString().ToLower());
+
             if (success)
+            {
                 return RedirectToAction("Index", "User");
+            }
 
             ModelState.AddModelError("", "Ошибка при создании пользователя");
             return View(model);
@@ -106,7 +103,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> AddRole(int id)
+        public async Task<IActionResult> AddRole(int id, string role)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
@@ -114,7 +111,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             try
             {
-                await _userService.AddToRoleAsync(user, "moderator");
+                await _userService.AddToRoleAsync(user, role);
             }
             catch (Exception)
             {
@@ -124,14 +121,14 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> RemoveRole(int id)
+        public async Task<IActionResult> RemoveRole(int id, string role)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
                 return NotFound();
             try
             {
-                if(await _userService.RemoveFromRoleAsync(user, "moderator"))
+                if(await _userService.RemoveFromRoleAsync(user, role))
                     return RedirectToAction("Index", "User");
             }
             catch (Exception)

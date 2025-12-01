@@ -95,9 +95,21 @@ public class UserService : IUserService
             Photo = avatarPath
         };
 
-        var result = await _userRepository.CreateAsync(user, model.Password);
+        var result = await _userRepository.CreateAsync(user, model.Password);        
         if (result.Succeeded)
         {
+            if(!string.IsNullOrEmpty(role))
+            {
+                role = role.ToLower();
+                if (role != "user")
+                {
+                    await _userRepository.AddToRoleAsync(user, "user");
+                }
+            }
+            else 
+            {
+                role = "user";
+            }
             await _userRepository.AddToRoleAsync(user, role);
             return true;
         }
