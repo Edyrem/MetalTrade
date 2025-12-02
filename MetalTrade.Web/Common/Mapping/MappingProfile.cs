@@ -20,8 +20,8 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhotoViewModel>().ReverseMap();
-            CreateMap<CreateViewModel, AdvertisementDto>()
-                .ForMember(dest => dest.PhotoFiles, opt => opt.MapFrom(src => src.Photoes))
+            CreateMap<CreateAdvertisementViewModel, AdvertisementDto>()
+                .ForMember(dest => dest.PhotoFiles, opt => opt.MapFrom(src => src.PhotoFiles))
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
                 .ForMember(dest => dest.Product, opt => opt.Ignore());
 
@@ -34,14 +34,14 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes))
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product));
 
-            CreateMap<AdvertisementDto, EditViewModel>()
+            CreateMap<AdvertisementDto, EditAdvertisementViewModel>()
                 .ReverseMap()
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore());
 
-            CreateMap<AdvertisementDto, DeleteViewModel>().ReverseMap();
+            CreateMap<AdvertisementDto, DeleteAdvertisementViewModel>().ReverseMap();
 
-            CreateMap<CreateViewModel, AdvertisementDto>()
+            CreateMap<CreateAdvertisementViewModel, AdvertisementDto>()
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore()) 
                 .ForMember(dest => dest.Product, opt => opt.Ignore())

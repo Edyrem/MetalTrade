@@ -4,14 +4,13 @@
 @{
 	ViewData["Title"] = "Advertisements";
 }
-
 @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
 {
 	<div class="mb-2">
 		<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
 	</div>
 }
-
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div class="container mt-4">
 	<div class="row">
 		@foreach (var ads in Model)
