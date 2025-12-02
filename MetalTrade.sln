@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Application", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Web.AdminPanel", "MetalTrade.Web.AdminPanel\MetalTrade.Web.AdminPanel.csproj", "{D1B7EBCD-2F32-4649-81B0-D0E99A626A17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalTrade.Tests", "MetalTrade.Tests\MetalTrade.Tests.csproj", "{870DB9D4-66E7-49CC-94F4-208DC4B3B6A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{D1B7EBCD-2F32-4649-81B0-D0E99A626A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1B7EBCD-2F32-4649-81B0-D0E99A626A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1B7EBCD-2F32-4649-81B0-D0E99A626A17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{870DB9D4-66E7-49CC-94F4-208DC4B3B6A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{870DB9D4-66E7-49CC-94F4-208DC4B3B6A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{870DB9D4-66E7-49CC-94F4-208DC4B3B6A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{870DB9D4-66E7-49CC-94F4-208DC4B3B6A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
