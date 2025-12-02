@@ -10,6 +10,7 @@ public interface IUserService
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<bool> AddToRoleAsync(UserDto user, string role);
     Task<bool> IsInRoleAsync(UserDto user, string role);
+    Task<IEnumerable<string>> GetUserRolesAsync(UserDto user);
     Task<bool> RemoveFromRoleAsync(UserDto user, string role);
     Task<bool> CreateUserAsync(UserDto model, string role);
     Task<bool> RegisterUserAsync(UserDto model);

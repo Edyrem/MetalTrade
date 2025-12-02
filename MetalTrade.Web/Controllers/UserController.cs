@@ -40,6 +40,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
                 return NotFound();
 
             var userViewModel = _mapper.Map<UserViewModel>(user);
+            userViewModel.Roles = (List<string>)await _userService.GetUserRolesAsync(user);
             return View(userViewModel);
         }
 
@@ -77,6 +78,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             var userViewModel = _mapper.Map<EditUserViewModel>(user);
             return View(userViewModel);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, EditUserViewModel model)
@@ -103,7 +105,7 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> AddRole(int id, string role)
+        public async Task<IActionResult> AddRole(int id, string role, string? page)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
@@ -117,26 +119,31 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             {
                 ModelState.AddModelError("", "Ошибка при добавлении роли");
             }
-            return RedirectToAction("Index", "User");
+            if (page == null)
+                return RedirectToAction("Index", "User");
+            else
+                return RedirectToAction(page, "User", new { id });
         }
 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> RemoveRole(int id, string role)
+        public async Task<IActionResult> RemoveRole(int id, string role, string? page)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
                 return NotFound();
             try
             {
-                if(await _userService.RemoveFromRoleAsync(user, role))
-                    return RedirectToAction("Index", "User");
+                await _userService.RemoveFromRoleAsync(user, role);                
+
             }
             catch (Exception)
             {
                 
             }
-            ModelState.AddModelError("", "Ошибка при удалении роли");
-            return View();
+            if (page == null)
+                return RedirectToAction("Index", "User");
+            else
+                return RedirectToAction(page, "User", new { id });
         }        
 
         public async Task<IActionResult> Delete(int id)

@@ -5,17 +5,29 @@
     ViewData["Title"] = "View";
 }
 
-<h1>View</h1>
+<h1>Пользователь</h1>
 
 <div>
-    <h4>User</h4>
+    <h4>@Model.UserName</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Photo)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Photo)
+            @if (!string.IsNullOrWhiteSpace(Model.Photo))
+            {
+                if (Model.Photo.StartsWith("http"))
+                {
+                    <img src="@Model.Photo" style="width:auto;height:100px;" />
+                }
+                else
+                {
+                    Model.Photo = Model.Photo.Substring(1);
+                    <img src="~/@Model.Photo" style="width:auto;height:100px;" />
+                }
+            }
+            
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.WhatsAppNumber)
@@ -39,17 +51,57 @@
             @Html.DisplayNameFor(model => model.PhoneNumber)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
+            @Html.DisplayFor(model => model.PhoneNumber)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayFor(model => model.PhoneNumber)
+            @Html.DisplayNameFor(model => model.Roles)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayNameFor(model => model.Roles)
+            @foreach(var role in Model.Roles)
+            {
+                switch(role)
+                {
+                    case "admin": 
+                        <span>Админ,</span> 
+                        break;
+                    case "moderator":
+                        <span>Модератор,</span>
+                        break;
+                    case "supplier":
+                        <span>Поставщик,</span>
+                        break;
+                    case "user":
+                        <span>Пользователь</span>
+                        break;
+                }
+            }
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (Model.Roles.Contains("supplier"))
+    {
+        <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Удалить из поставщиков</a>
+    }
+    else
+    {
+        <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Сделать поставщиком</a>
+    }
+    @if (Model.Roles.Contains("moderator"))
+    {
+        <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Удалить из модераторов</a>
+    }
+    else
+    {
+        <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Сделать модератором</a>
+    }
+</div>
+<br />
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-success">Редактировать</a>
+    <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">Удалить</a>
+</div>
+<br />
+<div>
+    <a asp-action="Index">Назад к списку</a>
 </div>

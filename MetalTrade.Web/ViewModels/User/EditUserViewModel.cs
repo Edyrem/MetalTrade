@@ -7,20 +7,26 @@ namespace MetalTrade.Web.ViewModels.User;
 public class EditUserViewModel
 {
     public int Id { get; set; }
-    [Remote(action:"CheckEmail", controller:"Validation", ErrorMessage = "Аккаунт с таким Email уже существует!")]
+
+    [Remote("CheckUserNameEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Логин уже используется")]
+    [Required(ErrorMessage = "Укажите логин")]
+    [Display(Name = "Логин")]
+    public string UserName { get; set; } = string.Empty;
+
+    [Remote("CheckEmailEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Email уже используется")]
     [Required(ErrorMessage = "Укажите email")]
     [EmailAddress(ErrorMessage = "Введите корректный email")]
     [Display(Name = "Почта")]
     public string Email { get; set; }
-    
-    [Remote(action:"CheckPhoneNumber", controller:"Validation", ErrorMessage = "Аккаунт с таким номером телефона уже существует!")]
+
+    [Remote("CheckPhoneNumberEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Телефон уже используется")]
     [Required(ErrorMessage = "Укажите ваш номер телефона")]
     [Display(Name = "Номер телефона")]
     [DataType(DataType.PhoneNumber)]
     [RegularExpression(@"^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$", ErrorMessage = "Некорректный ввод номера телефона. Необходимо 10 цифр")]
     public string PhoneNumber { get; set; }
     
-    [Remote(action:"CheckWhatsAppNumber", controller:"Validation", ErrorMessage = "Аккаунт с таким номером WhatsApp уже существует!")]
+    [Remote(action: "CheckWhatsappNumberEdit", controller:"Validation", AdditionalFields = "Id", ErrorMessage = "Аккаунт с таким номером WhatsApp уже существует!")]
     [Required(ErrorMessage = "Укажите номер WhatsApp")]
     [Display(Name = "Номер WhatsApp")]
     [DataType(DataType.PhoneNumber)]

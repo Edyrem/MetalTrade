@@ -77,4 +77,14 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
+
+    [AcceptVerbs("GET", "POST")]
+    public IActionResult CheckWhatsappNumberEdit(string phoneNumber, int id)
+    {
+        var normalized = new string((phoneNumber ?? "").Where(char.IsDigit).ToArray());
+        bool exists = _context.Users.Any(u =>
+            u.WhatsAppNumber == normalized &&
+            u.Id != id);
+        return Json(!exists);
+    }
 }

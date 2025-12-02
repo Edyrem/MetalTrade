@@ -46,7 +46,7 @@
                             <td></td>    
                         }
 
-                        <td>@user.UserName</td>
+                        <td><a asp-action="Details" asp-route-id="@user.Id" class="link-underline-light"><strong>@user.UserName</strong></a></td>
                         <td>@user.Email</td>
                         <td>@user.PhoneNumber</td>
                         @if(user.Roles!=null && user.Roles.Any())
