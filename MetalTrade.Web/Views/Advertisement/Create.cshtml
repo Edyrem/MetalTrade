@@ -1,4 +1,4 @@
-﻿@model MetalTrade.Web.ViewModels.Advertisement.CreateViewModel
+﻿@model MetalTrade.Web.ViewModels.Advertisement.CreateAdvertisementViewModel
 @{
     ViewData["Title"] = "Create";
 }
@@ -16,9 +16,9 @@
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group mt-2">
+            <div class="form-group">
                 <label asp-for="Body" class="control-label"></label>
-                <input asp-for="Body" class="form-control" type="text"/>
+                <textarea asp-for="Body" class="form-control" rows="5"></textarea>
                 <span asp-validation-for="Body" class="text-danger"></span>
             </div>
             <div class="form-group mt-2">
@@ -43,15 +43,19 @@
             </div>
             <div class="form-group mt-2">
                 <label asp-for="ProductId" class="control-label"></label>
-                <select asp-for="ProductId" class="form-control" asp-items="@Model.Products">
+                <select asp-for="ProductId" class="form-control">
                     <option value="">-- Выберите продукт --</option>
+                    @foreach (var product in Model.Products)
+                    {
+                        <option value="@product.Id">@product.Name</option>
+                    }
                 </select>
                 <span asp-validation-for="ProductId" class="text-danger"></span>
             </div>
             <div class="form-group mt-2">
-                <label asp-for="Photoes" class="control-label"></label>
-                <input asp-for="Photoes" class="form-control" type="file" accept="image/*" multiple/>
-                <span asp-validation-for="Photoes" class="text-danger"></span>
+                <label asp-for="PhotoFiles" class="control-label"></label>
+                <input asp-for="PhotoFiles" class="form-control" type="file" accept="image/*" multiple/>
+                <span asp-validation-for="PhotoFiles" class="text-danger"></span>
             </div>
             <div class="form-group mt-3">
                 <input type="submit" value="Создать" class="btn btn-primary" />

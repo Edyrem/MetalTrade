@@ -1,6 +1,7 @@
 ﻿using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,5 +60,6 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _userManager.IsInRoleAsync(user, role);
         }
+        public async Task<User?> GetCurrentUserAsync(HttpContext context) => await _userManager.GetUserAsync(context.User);
     }
 }

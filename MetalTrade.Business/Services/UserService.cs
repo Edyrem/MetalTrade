@@ -1,8 +1,10 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace MetalTrade.Business;
@@ -12,16 +14,19 @@ public class UserService : IUserService
     private readonly UserManagerRepository _userRepository;
     private readonly SignInManager<User> _signInManager;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IMapper _mapper;
 
     public UserService(
         MetalTradeDbContext context, 
         UserManager<User> userManager,
         SignInManager<User> signInManager, 
-        IImageUploadService imageUploadService)
+        IImageUploadService imageUploadService,
+        IMapper mapper)
     {
         _userRepository = new UserManagerRepository(context, userManager);
         _signInManager = signInManager;
         _imageUploadService = imageUploadService;
+        _mapper = mapper;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id)
@@ -124,29 +129,6 @@ public class UserService : IUserService
 
         return false;
     }
-    
-    public async Task<bool> RegisterUserAsync(UserDto model)
-    {
-        string avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars");
-
-        var user = new User
-        {
-            Email = model.Email,
-            UserName = model.UserName,
-            PhoneNumber = model.PhoneNumber,
-            WhatsAppNumber = model.WhatsAppNumber,
-            Photo = avatarPath
-        };
-
-        var result = await _userRepository.CreateAsync(user, model.Password);
-        if (result.Succeeded)
-        {
-            await _userRepository.AddToRoleAsync(user, "User");
-            return true;
-        }
-
-        return false;
-    }    
 
     public async Task<List<UserDto>> GetAllUsersWithRolesAsync()
     {
@@ -213,6 +195,8 @@ public class UserService : IUserService
     }
 
     public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+    public async Task<UserDto?> GetCurrentUserAsync(HttpContext context) =>
+        _mapper.Map<UserDto?>(await _userRepository.GetCurrentUserAsync(context));
     
     
 }
