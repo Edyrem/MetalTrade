@@ -13,7 +13,6 @@ public interface IUserService
     Task<bool> IsInRoleAsync(UserDto user, string role);
     Task<bool> RemoveFromRoleAsync(UserDto user, string role);
     Task<bool> CreateUserAsync(UserDto model, string role);
-    Task<bool> RegisterUserAsync(UserDto model);
     Task<SignInResult> LoginAsync(string login, string password, bool rememberMe);
     Task LogoutAsync();
     Task<List<UserDto>> GetAllUsersWithRolesAsync();

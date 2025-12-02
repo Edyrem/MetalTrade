@@ -43,7 +43,7 @@ namespace MetalTrade.Web.Controllers
                 Photo = model.Photo
             };
 
-            var success = await _userService.RegisterUserAsync(dto);
+            var success = await _userService.CreateUserAsync(dto, "user");
             if (success)
             {
                 var loginResult = await _userService.LoginAsync(model.UserName, model.Password, false);
