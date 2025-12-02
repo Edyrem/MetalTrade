@@ -43,9 +43,7 @@ public class AdvertisementService : IAdvertisementService
 
         var entity = _mapper.Map<Advertisement>(adsDto);
 
-        entity.CreateDate = DateTime.UtcNow;
-
-        if (adsDto.Photoes != null && adsDto.Photoes.Count > 0)
+        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Count > 0)
         {
             var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
             foreach (var link in photoLinks)
@@ -60,32 +58,17 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task UpdateAsync(AdvertisementDto adsDto)
     {
-        var entity = await _repository.GetAsync(adsDto.Id);
-        if (entity == null) throw new ArgumentException("Объявление не найдено");
-
-        //adsDto.Product = null;
-        //adsDto.User = null;
+        var entity = await _repository.GetAsync(adsDto.Id) ?? throw new ArgumentException("Объявление не найдено");
 
         _mapper.Map(adsDto, entity);
 
-        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Any())
+        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Count > 0)
         {
-            foreach (var photoFile in adsDto.PhotoFiles)
+            var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
+            foreach (var link in photoLinks)
             {
-                var defaultFolder = Path.Combine("uploads", "ads");
-                var photoLink = await _imageUploadService.UploadImageAsync(photoFile, defaultFolder);
-                entity.Photoes.Add(new AdvertisementPhoto
-                {
-                    PhotoLink = photoLink
-                });
+                entity.Photoes.Add( new AdvertisementPhoto { PhotoLink = link });
             }
-        }
-        else if (adsDto.Photoes?.Any() ?? false)
-        {
-            entity.Photoes = adsDto.Photoes.Select(p => new AdvertisementPhoto
-            {
-                PhotoLink = p.PhotoLink
-            }).ToList();
         }
 
         await _repository.UpdateAsync(entity);
@@ -97,6 +80,14 @@ public class AdvertisementService : IAdvertisementService
         await _stateContext.MoveToDeletedAsync(advertisementId);
         await _repository.DeleteAsync(advertisementId);
         await _repository.SaveChangesAsync();
+        var entity = await _repository.GetAsync(advertisementId);
+        if (entity != null)
+        {
+            foreach (var photo in entity.Photoes)
+            {
+                await _imageUploadService.DeleteImageAsync(photo.PhotoLink);
+            }
+        }
     }
 
     public async Task ApproveAsync(int advertisementId)
@@ -120,5 +111,12 @@ public class AdvertisementService : IAdvertisementService
     public async Task<IEnumerable<AdvertisementDto>> FindAsync(Expression<Func<Advertisement, bool>> predicate)
     {
         return _mapper.Map<List<AdvertisementDto>>(await _repository.FindAsync(predicate));
+    }
+
+    public async Task DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhoto)
+    {
+        await _imageUploadService.DeleteImageAsync(advertisementPhoto.PhotoLink);
+        await _repository.DeleteAdvertisementPhotoAsync(advertisementPhoto.Id);
+        await _repository.SaveChangesAsync();
     }
 }

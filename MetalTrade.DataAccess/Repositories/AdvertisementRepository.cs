@@ -49,5 +49,13 @@ namespace MetalTrade.DataAccess.Repositories
             ad.Status = (int)status;
             _dbSet.Update(ad);
         }
+
+        public async Task DeleteAdvertisementPhotoAsync(int advertisementPhotoId)
+        {
+            var advertisementPhoto = await _context.AdvertisementPhotos.FirstOrDefaultAsync(a => a.Id == advertisementPhotoId);
+            if (advertisementPhoto != null)
+                _context.Remove(advertisementPhoto);
+
+        }
     }
 }

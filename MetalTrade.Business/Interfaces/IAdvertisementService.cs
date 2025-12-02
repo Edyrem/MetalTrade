@@ -15,5 +15,6 @@ namespace MetalTrade.Business.Interfaces
         Task ApproveAsync(int advertisementId);
         Task RejectAsync(int advertisementId); 
         Task ArchiveAsync(int advertisementId);
+        Task DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhotoDto);
     }
 }

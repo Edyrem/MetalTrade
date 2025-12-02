@@ -6,8 +6,8 @@ namespace MetalTrade.Business.Dtos
     public class AdvertisementDto
     {
         public int Id { get; set; }
-        public string Title { get; set; } = string.Empty; 
-        public string Body { get; set; } 
+        public string Title { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public DateTime CreateDate { get; set; }
         public string? Address { get; set; }

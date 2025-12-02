@@ -8,10 +8,11 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле Название объязательно")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
-        public string? Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         [Display(Name = "Описание")]
         [StringLength(2000, ErrorMessage = "Можно вводить не более 2000 символов")]
-        public string? Body { get; set; }
+        [Required(ErrorMessage = "Поле Описание объязательно")]
+        public string? Body { get; set; } = string.Empty;
         [Display(Name = "Цена")]
         [Required(ErrorMessage = "Поле Цена объязательно")]
         public decimal Price { get; set; }
@@ -20,12 +21,13 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         public string? Address { get; set; }
         [Display(Name = "Номер телефона")]
         [StringLength(100, ErrorMessage = "Можно вводить не более 100 символов")]
-        public string? PhoneNumber { get; set; }
+        [Required(ErrorMessage = "Поле Номер телефона объязательно")]
+        public string? PhoneNumber { get; set; } = string.Empty;
         [Display(Name = "Город")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
         public string? City { get; set; }
         [Display(Name = "Фото")]
-        public List<IFormFile> PhotoFiles { get; set; } = [];
+        public List<IFormFile>? PhotoFiles { get; set; } = [];
         [Display(Name = "Продукт")]
         [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }

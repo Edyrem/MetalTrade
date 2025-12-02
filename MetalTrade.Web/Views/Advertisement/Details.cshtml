@@ -60,8 +60,10 @@
                 <div>
                     @if (User.Identity != null && User.Identity.IsAuthenticated && Model.UserId == ViewBag.CurrentUserId)
                     {
-                        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать | </a>
-                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить | </a>
+                        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать</a>
+                        <b> | </b>
+                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
+                        <b> | </b>
                     }
                     <a asp-action="Index" class="btn btn-outline-primary">Назад к списку</a>
                 </div>

@@ -18,6 +18,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
         Task<IEnumerable<string>?> GetUserRolesAsync(User user);
         Task<bool> IsInRoleAsync(User user, string role);
-        public User? GetCurrentUserAsync(HttpContext context);
+        Task<User?> GetCurrentUserAsync(HttpContext context);
     }
 }
