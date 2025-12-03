@@ -11,11 +11,13 @@ public interface IUserService
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<bool> AddToRoleAsync(UserDto user, string role);
     Task<bool> IsInRoleAsync(UserDto user, string role);
+    Task<IEnumerable<string>> GetUserRolesAsync(UserDto user);
     Task<bool> RemoveFromRoleAsync(UserDto user, string role);
     Task<bool> CreateUserAsync(UserDto model, string role);
     Task<SignInResult> LoginAsync(string login, string password, bool rememberMe);
     Task LogoutAsync();
     Task<List<UserDto>> GetAllUsersWithRolesAsync();
+    Task UpdateUserAsync(UserDto model);
     Task DeleteUserAsync(int id);
     Task<UserDto?> GetCurrentUserAsync(HttpContext context);
 }
