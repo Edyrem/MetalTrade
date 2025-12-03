@@ -34,6 +34,7 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }
         public List<ProductViewModel> Products { get; set; } = [];
+        public int UserId { get; set; }
         public List<AdvertisementPhotoViewModel> Photoes { get; set; } = [];
     }
 }
