@@ -23,15 +23,15 @@ public class EditUserViewModel
     [Required(ErrorMessage = "Укажите ваш номер телефона")]
     [Display(Name = "Номер телефона")]
     [DataType(DataType.PhoneNumber)]
-    [RegularExpression(@"^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$", ErrorMessage = "Некорректный ввод номера телефона. Необходимо 10 цифр")]
-    public string PhoneNumber { get; set; }
-    
-    [Remote(action: "CheckWhatsappNumberEdit", controller:"Validation", AdditionalFields = "Id", ErrorMessage = "Аккаунт с таким номером WhatsApp уже существует!")]
+    [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Номер должен содержать ровно 9 цифр")]
+    public string PhoneNumber { get; set; } = string.Empty;
+
+    [Remote("CheckWhatsappNumberEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Аккаунт с таким номером WhatsApp уже существует!")]
     [Required(ErrorMessage = "Укажите номер WhatsApp")]
     [Display(Name = "Номер WhatsApp")]
     [DataType(DataType.PhoneNumber)]
-    [RegularExpression(@"^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$", ErrorMessage = "Некорректный ввод номера WhatsApp. Необходимо 10 цифр")]
-    public string WhatsAppNumber { get; set; }
+    [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Номер WhatsApp должен содержать ровно 9 цифр")]
+    public string WhatsAppNumber { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Загрузите картинку для аватара профиля")]
     [Display(Name = "Аватар")]

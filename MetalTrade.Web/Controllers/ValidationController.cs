@@ -33,8 +33,14 @@ public class ValidationController : Controller
     [AcceptVerbs("GET", "POST")]
     public bool CheckWhatsAppNumber(string whatsAppNumber)
     {
-        return !_context.Users.Any(u =>  u.WhatsAppNumber == whatsAppNumber );
+        var digits = new string((whatsAppNumber ?? "").Where(char.IsDigit).ToArray());
+        
+        if (digits.Length != 9)
+            return false;
+
+        return !_context.Users.Any(u => u.WhatsAppNumber == digits);
     }
+
     
     [AcceptVerbs("GET", "POST")]
     public bool CheckNameOfMetalType(string name)
@@ -87,4 +93,5 @@ public class ValidationController : Controller
             u.Id != id);
         return Json(!exists);
     }
+    
 }

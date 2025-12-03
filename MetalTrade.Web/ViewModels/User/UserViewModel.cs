@@ -12,7 +12,7 @@ namespace MetalTrade.Web.ViewModels.User
         [Display(Name = "Номер телефона")]
         public string PhoneNumber { get; set; }
         [Display(Name = "Номер Whatsapp")]
-        public string? WhatsAppNumber { get; set; }
+        public string WhatsAppNumber { get; set; }
         [Display(Name = "Фото профиля")]
         public string? Photo { get; set; }
         [Display(Name = "Роли")]
