@@ -7,7 +7,7 @@ namespace MetalTrade.Web.ViewModels.Profile
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
-        public string WhatsAppNumber { get; set; }
+        public string? WhatsAppNumber { get; set; }
         public string? PhotoPath { get; set; }
 
         public bool IsSupplier { get; set; }

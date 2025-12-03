@@ -214,7 +214,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("WhatsAppNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

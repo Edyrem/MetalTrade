@@ -22,12 +22,14 @@ namespace MetalTrade.Web.ViewModels.Profile
         [Remote("CheckPhoneNumberEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Телефон уже используется")]
         [Required(ErrorMessage = "Укажите номер телефона")]
         [Display(Name = "Телефон")]
-        [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Номер должен содержать 9 цифр")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Номер должен содержать 10 цифр")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Номер должен содержать ровно 10 цифр")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Display(Name = "WhatsApp")]
-        [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Номер WhatsApp должен содержать 9 цифр")]
-        public string WhatsAppNumber { get; set; }
+        [RegularExpression(@"^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$",
+            ErrorMessage = "Некорректный номер WhatsApp (10 цифр)")]
+        public string? WhatsAppNumber { get; set; }
 
         [Display(Name = "Аватар")]
         public IFormFile? Photo { get; set; }

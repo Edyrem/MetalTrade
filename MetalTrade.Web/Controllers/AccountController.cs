@@ -94,23 +94,5 @@ namespace MetalTrade.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
-        [HttpPost]
-        public async Task<IActionResult> UploadPhoto(IFormFile photo)
-        {
-            if (photo == null || photo.Length == 0)
-                return BadRequest();
-
-            var fileName = Guid.NewGuid() + Path.GetExtension(photo.FileName);
-            var path = Path.Combine("wwwroot/uploads", fileName);
-
-            Directory.CreateDirectory("wwwroot/uploads");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-                await photo.CopyToAsync(stream);
-
-            return Json(new { url = "/uploads/" + fileName });
-        }
-
     }
 }
