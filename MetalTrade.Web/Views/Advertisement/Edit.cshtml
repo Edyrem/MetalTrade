@@ -13,7 +13,6 @@
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id"/>
-            <input type="hidden" asp-for="UserId"/>
             <div class="form-group mt-2">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
