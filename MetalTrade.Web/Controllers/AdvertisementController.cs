@@ -1,6 +1,7 @@
 using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.Product;
@@ -13,45 +14,18 @@ namespace MetalTrade.Web.Controllers;
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
-    private readonly IImageUploadService _imageUploadService;
     private readonly IProductService _productService;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
     public AdvertisementController(IAdvertisementService adsService, IUserService userService,
         IWebHostEnvironment env, IProductService productService,
-        IMapper mapper, IImageUploadService imageUploadService)
+        IMapper mapper)
     {
         _adsService = adsService;
         _userService = userService;
-        _imageUploadService = imageUploadService;
         _productService = productService;
         _mapper = mapper;
-    }
-    public async Task<IActionResult> Create()
-    {
-        var productDtos = await _productService.GetAllAsync();
-        CreateAdvertisementViewModel model = new() { Products = _mapper.Map<List<ProductViewModel>>(productDtos) };
-        return View(model);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
-    {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-
-        if (!ModelState.IsValid || user == null)
-        {
-            var productDtos = await _productService.GetAllAsync();
-            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            return View(model);
-        }
-        var adsDto = _mapper.Map<AdvertisementDto>(model);
-        adsDto.UserId = user.Id;
-        await _adsService.CreateAsync(adsDto);
-        return RedirectToAction("Index");
     }
 
     [AllowAnonymous]
@@ -59,9 +33,18 @@ public class AdvertisementController : Controller
     {
         var adsDtos = await _adsService.GetAllAsync();
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
+
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        bool isAdmin = true;
+        if(!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
+        {
+            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active).ToList();
+            isAdmin = false;
+        }
+        ViewData["IsAdmin"] = isAdmin;
         return View(models);
     }
-        
+
     [AllowAnonymous]
     public async Task<IActionResult> Details(int id)
     {
@@ -72,6 +55,33 @@ public class AdvertisementController : Controller
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user != null)
             ViewBag.CurrentUserId = user.Id;
+        return View(model);
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        var productDtos = await _productService.GetAllAsync();
+        CreateAdvertisementViewModel model = new() { Products = _mapper.Map<List<ProductViewModel>>(productDtos) };
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user != null)
+            {
+                var adsDto = _mapper.Map<AdvertisementDto>(model);
+                adsDto.UserId = user.Id;
+                await _adsService.CreateAsync(adsDto);
+                return RedirectToAction("Index");                
+            }
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        }
+        var productDtos = await _productService.GetAllAsync();
+        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
         return View(model);
     }
 
@@ -151,6 +161,7 @@ public class AdvertisementController : Controller
         await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");
     }
+
     [HttpPost]
     public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
     {
@@ -160,5 +171,47 @@ public class AdvertisementController : Controller
             PhotoLink = photoLink
         });
         return RedirectToAction("Edit", new { Id = advertisementId});
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ApproveAdvertisement(int id)
+    {
+        try
+        {
+            await _adsService.ApproveAsync(id);
+        } 
+        catch (Exception e)
+        {
+            ModelState.AddModelError(string.Empty, e.Message);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> RejectAdvertisement(int id)
+    {
+        try
+        {
+            await _adsService.RejectAsync(id);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError(string.Empty, e.Message);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ArchiveAdvertisement(int id)
+    {
+        try
+        {
+            await _adsService.ArchiveAsync(id);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError(string.Empty, e.Message);
+        }
+        return RedirectToAction("Index");
     }
 }

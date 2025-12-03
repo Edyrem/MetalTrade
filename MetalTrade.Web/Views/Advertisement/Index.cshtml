@@ -1,9 +1,13 @@
-﻿@using MetalTrade.Web.ViewModels.Advertisement
+﻿@using MetalTrade.Domain.Enums
+@using MetalTrade.Web.ViewModels.Advertisement
 @model List<AdvertisementViewModel>
 
 @{
 	ViewData["Title"] = "Advertisements";
+
+    var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
 }
+
 @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
 {
 	<div class="mb-2">
@@ -16,7 +20,7 @@
 		@foreach (var ads in Model)
 		{
 			<div class="col-md-4 mb-4">
-				<div class="card shadow-sm">
+				<div class="card shadow-sm position-relative">
 					@if (ads.Photoes.Count > 0)
 					{
 						string carouselId = $"carousel-{ads.Id}";
@@ -38,11 +42,29 @@
 							<button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
 								<span class="carousel-control-next-icon" aria-hidden="true"></span>
 								<span class="visually-hidden">Next</span>
-							</button>
+							</button>							
 						</div>
 					}
+					@if (isAdmin)
+					{
+                        switch(ads.Status)
+						{
+							case (int)AdvertisementStatus.Draft:
+								<div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
+								break;
+							case (int)AdvertisementStatus.Active:
+								<div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
+								break;
+							case (int)AdvertisementStatus.Rejected:
+								<div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
+								break;	
+							case (int)AdvertisementStatus.Archived:
+								<div class="position-absolute small bg-info-subtle top-0 m-1 p-1 opacity-75">Деактивировано</div>
+								break;
+                        }						
+					}
 					<div class="card-body">
-						<h5 class="card-title">@ads.Title</h5>
+						<h5 class="card-title mt-2">@ads.Title</h5>
 						<p class="card-text text-muted">@ads.Product.Name</p>
 						<p class="card-text fw-bold">@ads.PhoneNumber</p>
 						<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary w-100">Подробнее</a>
