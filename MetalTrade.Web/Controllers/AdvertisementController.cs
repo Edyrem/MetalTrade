@@ -119,36 +119,33 @@ public class AdvertisementController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
         var adsDto = await _adsService.GetAsync(id);
-        bool isInvalidRequest = adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId);
-        if (isInvalidRequest)
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+
+        if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user != null && adsDto != null && user.Id != adsDto.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
         {
-            if (adsDto == null)
-                ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && adsDto != null && user.Id != adsDto.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
+            var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
+            return View(model);
         }
-        var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
-        return View(model);
+        return RedirectToAction("Index");
     }
         
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (user == null || (user != null && user.Id != model.UserId))
-        {
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && user.Id != model.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
-        }
-        await _adsService.DeleteAsync(model.Id);
+        if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user != null && user.Id != model.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
+            await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");
     }
     [HttpPost]
