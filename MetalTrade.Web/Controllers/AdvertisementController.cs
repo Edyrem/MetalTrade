@@ -13,18 +13,16 @@ namespace MetalTrade.Web.Controllers;
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
-    private readonly IImageUploadService _imageUploadService;
     private readonly IProductService _productService;
-    private readonly IMapper _mapper;
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
 
-    public AdvertisementController(IAdvertisementService adsService, IUserService userService,
-        IWebHostEnvironment env, IProductService productService,
-        IMapper mapper, IImageUploadService imageUploadService)
+    public AdvertisementController(IAdvertisementService adsService,
+        IUserService userService, IProductService productService,
+        IMapper mapper)
     {
         _adsService = adsService;
         _userService = userService;
-        _imageUploadService = imageUploadService;
         _productService = productService;
         _mapper = mapper;
     }
