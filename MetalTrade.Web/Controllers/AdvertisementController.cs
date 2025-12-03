@@ -84,7 +84,7 @@ public class AdvertisementController : Controller
             ModelState.AddModelError(string.Empty, "Объявление не найдено");
         else if (user == null)
             ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-        else if (user != null && adsDto != null && user.Id != adsDto.UserId)
+        else if (user.Id != adsDto.UserId)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
         else
         {
@@ -108,7 +108,7 @@ public class AdvertisementController : Controller
                 ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
             else if (adsDto == null)
                 ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            else if (user != null && adsDto != null && user.Id != adsDto.UserId)
+            else if (user.Id != adsDto.UserId)
                 ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
             else
             {
