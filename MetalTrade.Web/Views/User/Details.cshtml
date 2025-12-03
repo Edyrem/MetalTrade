@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "View";
+
+    var isCurrentUserAdmin = User.IsInRole("admin");
 }
 
 <h1>Пользователь</h1>
@@ -79,21 +81,24 @@
     </dl>
 </div>
 <div>
-    @if (Model.Roles.Contains("supplier"))
+    @if(User.IsInRole("admin"))
     {
-        <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Удалить из поставщиков</a>
-    }
-    else
-    {
-        <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Сделать поставщиком</a>
-    }
-    @if (Model.Roles.Contains("moderator"))
-    {
-        <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Удалить из модераторов</a>
-    }
-    else
-    {
-        <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Сделать модератором</a>
+        @if (Model.Roles.Contains("supplier"))
+        {
+            <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Удалить из поставщиков</a>
+        }
+        else
+        {
+            <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Сделать поставщиком</a>
+        }
+        @if (Model.Roles.Contains("moderator"))
+        {
+            <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Удалить из модераторов</a>
+        }
+        else
+        {
+            <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Сделать модератором</a>
+        }
     }
 </div>
 <br />

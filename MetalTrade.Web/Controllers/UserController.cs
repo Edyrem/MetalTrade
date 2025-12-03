@@ -24,7 +24,13 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            
             var users = await _userService.GetAllUsersWithRolesAsync();
+            if (await _userService.IsInRoleAsync(currentUser, "moderator"))
+            {
+                users = users.Where(u => u.Roles != null && !u.Roles.Contains("moderator")).ToList();
+            }
             var usersList = _mapper.Map<List<UserViewModel>>(users);
 
             return View(usersList);
@@ -38,6 +44,13 @@ namespace MetalTrade.Web.AdminPanel.Controllers
 
             if (user == null)
                 return NotFound();
+
+            var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            if (await _userService.IsInRoleAsync(currentUser!, "moderator") && await _userService.IsInRoleAsync(user, "moderator"))
+            {
+                ModelState.AddModelError("", "У вас нет прав для просмотра этой страницы");
+                return RedirectToAction("Index");
+            }
 
             var userViewModel = _mapper.Map<UserViewModel>(user);
             userViewModel.Roles = (List<string>)await _userService.GetUserRolesAsync(user);
@@ -151,6 +164,11 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
                 return NotFound();
+            var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            if(await _userService.IsInRoleAsync(currentUser!, "moderator") && await _userService.IsInRoleAsync(user, "moderator"))
+            {
+                return Forbid();
+            }            
             var userViewModel = _mapper.Map<DeleteUserViewModel>(user);
             return View(userViewModel);
         }
