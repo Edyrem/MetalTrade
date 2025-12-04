@@ -17,7 +17,7 @@ public class EditUserViewModel
     [Required(ErrorMessage = "Укажите email")]
     [EmailAddress(ErrorMessage = "Введите корректный email")]
     [Display(Name = "Почта")]
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     [Remote("CheckPhoneNumberEdit", "Validation", AdditionalFields = "Id", ErrorMessage = "Телефон уже используется")]
     [Required(ErrorMessage = "Укажите ваш номер телефона")]
