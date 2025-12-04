@@ -21,11 +21,6 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-
-                        <li class="nav-item">
-                            <h1>Я ТВОЙ КОМИТ ТРУБА ШАТАЛ</h1>
-
-                        </li>
                         @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator")))
                         {
 
