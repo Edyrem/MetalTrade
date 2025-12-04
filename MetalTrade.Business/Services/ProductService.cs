@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess;
@@ -10,10 +11,12 @@ namespace MetalTrade.Business.Services;
 public class ProductService : IProductService
 {
     private readonly ProductRepository _repository;
-    
-    public ProductService(MetalTradeDbContext context)
+    private readonly IMapper _mapper;
+
+    public ProductService(MetalTradeDbContext context, IMapper mapper)
     {
         _repository = new ProductRepository(context);
+        _mapper = mapper;
     }
 
     public async Task<ProductDto?> GetAsync(int productId)
@@ -21,19 +24,9 @@ public class ProductService : IProductService
         Product? product = await _repository.GetAsync(productId);
         if (product == null)
             return null;
-        ProductDto productDto = new()
-        {
-            Id = product.Id,
-            Name = product.Name,
-            MetalTypeId = product.MetalTypeId,
-            MetalType = product.MetalType == null
-                ? null
-                : new MetalTypeDto
-                {
-                    Id = product.MetalType.Id,
-                    Name = product.MetalType.Name
-                }
-        };
+
+        ProductDto productDto = _mapper.Map<ProductDto>(product);
+
         return productDto;
     }
 

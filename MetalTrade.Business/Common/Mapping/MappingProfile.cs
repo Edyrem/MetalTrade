@@ -33,10 +33,19 @@ namespace MetalTrade.Business.Common.Mapping
             #region MetalService
             CreateMap<MetalTypeDto, MetalType>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
                 .ReverseMap();
 
             CreateMap<List<MetalTypeDto>, List<MetalType>>().ReverseMap();
-            #region
+            #endregion
+
+            #region ProductService
+            CreateMap<ProductDto, Product>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
+                .ReverseMap();
+
+
+            #endregion
         }
     }
 }
