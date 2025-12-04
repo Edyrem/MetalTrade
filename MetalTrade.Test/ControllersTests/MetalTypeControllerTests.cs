@@ -11,7 +11,7 @@ namespace MetalTrade.Test.ControllersTests;
 public class MetalTypeControllerTests
 {
     [Fact]
-    public async Task Index_Returns_View_With_MetalTypes()
+    public async Task IndexReturnsViewWithMetalTypes()
     {
         // Arrange
         var metalDtos = new List<MetalTypeDto>
@@ -40,7 +40,7 @@ public class MetalTypeControllerTests
     
     
     [Fact]
-    public async Task Details_When_Found_Returns_View()
+    public async Task DetailsWhenFoundReturnsView()
     {
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
@@ -61,7 +61,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public async Task Details_When_Null_Redirects_To_Index()
+    public async Task DetailsWhenNullRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -77,7 +77,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public async Task Create_Post_Valid_Model_Redirects_To_Index()
+    public async Task CreatePostValidModelRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -101,7 +101,7 @@ public class MetalTypeControllerTests
     
     
     [Fact]
-    public async Task Create_Post_Invalid_Model_Returns_View()
+    public async Task CreatePostInvalidModelReturnsView()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -122,7 +122,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public void Create_Get_Returns_View()
+    public void CreateGetReturnsView()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -136,7 +136,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public async Task Edit_Get_When_Found_Returns_View()
+    public async Task EditGetWhenFoundReturnsView()
     {
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
@@ -157,7 +157,7 @@ public class MetalTypeControllerTests
     }
 
     [Fact]
-    public async Task Edit_Get_When_Null_Redirects_To_Index()
+    public async Task EditGetWhenNullRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -174,7 +174,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public async Task Edit_Post_Valid_Model_Redirects_To_Index()
+    public async Task EditPostValidModelRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -197,7 +197,7 @@ public class MetalTypeControllerTests
     }
 
     [Fact]
-    public async Task Edit_Post_Invalid_Model_Returns_View()
+    public async Task EditPostInvalidModelReturnsView()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -219,7 +219,7 @@ public class MetalTypeControllerTests
 
     
     [Fact]
-    public async Task Delete_Get_When_Found_Returns_View()
+    public async Task DeleteGetWhenFoundReturnsView()
     {
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
@@ -238,7 +238,7 @@ public class MetalTypeControllerTests
     }
 
     [Fact]
-    public async Task Delete_Get_When_Null_Redirects_To_Index()
+    public async Task DeleteGetWhenNullRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
@@ -254,7 +254,7 @@ public class MetalTypeControllerTests
     }
     
     [Fact]
-    public async Task Delete_Post_Redirects_To_Index()
+    public async Task DeletePostRedirectsToIndex()
     {
         // Arrange
         var mock = new Mock<IMetalService>();
