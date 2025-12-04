@@ -52,9 +52,16 @@ public class AdvertisementController : Controller
         if (adsDto == null) return RedirectToAction("Index");
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (user != null)
-            ViewBag.CurrentUserId = user.Id;
+        bool isAdmin = true;
+        if (!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
+        {
+            isAdmin = false;
+        }
+        ViewData["IsAdmin"] = isAdmin;
+        ViewBag.CurrentUserId = user.Id;
+
         return View(model);
     }
 
@@ -85,80 +92,89 @@ public class AdvertisementController : Controller
         return View(model);
     }
 
-    public async Task<IActionResult> Edit(int id)
+    [HttpGet("Edit/{id}")]
+    public async Task<IActionResult> Edit(int id, string? returnUrl)
     {
         var adsDto = await _adsService.GetAsync(id);
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId))
+
+        if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user.Id != adsDto.UserId && !await _userService.IsInRoleAsync(user, "admin"))
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
+        else
         {
-            if (adsDto == null)
-                ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && adsDto != null && user.Id != adsDto.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
-            return RedirectToAction("Index");
+            var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
+            var productDtos = await _productService.GetAllAsync();
+            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
+            return View(model);
         }
-        var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
-        var productDtos = await _productService.GetAllAsync();
-        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-        return View(model);
+        return returnUrl != null ? Redirect(returnUrl) : RedirectToAction("Index");
+        
     }
 
-    [HttpPost]
+    [HttpPost("Edit/{id}")]
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (!ModelState.IsValid || user == null || (user != null && user.Id != model.UserId))
+        if(ModelState.IsValid)
         {
-            var productDtos = await _productService.GetAllAsync();
-            var tempAdsDto = await _adsService.GetAsync(model.Id);
-            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-            if (tempAdsDto != null)
-                model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
             if (user == null)
+            {
                 ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && user.Id != model.UserId)
+            }
+            else if (user.Id != model.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            {
                 ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
-            return View(model);
+            }
+            else
+            {
+                var adsDto = _mapper.Map<AdvertisementDto>(model);
+                await _adsService.UpdateAsync(adsDto);
+                return RedirectToAction("Details", new { id = model.Id });
+            }
         }
-        var adsDto = _mapper.Map<AdvertisementDto>(model);
-        await _adsService.UpdateAsync(adsDto);
-        return RedirectToAction("Details", new { id = model.Id });
+        var productDtos = await _productService.GetAllAsync();
+        var tempAdsDto = await _adsService.GetAsync(model.Id);
+        if (tempAdsDto != null)
+            model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
+
+        return View(model);
     }
 
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         var adsDto = await _adsService.GetAsync(id);
-        bool isInvalidRequest = adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId);
-        if (isInvalidRequest)
+
+        if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user.Id != adsDto.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
         {
-            if (adsDto == null)
-                ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && adsDto != null && user.Id != adsDto.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
+            var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
+            return View(model);
         }
-        var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
-        return View(model);
+        return RedirectToAction("Index");
     }
         
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (user == null || (user != null && user.Id != model.UserId))
+        if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user.Id != model.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
         {
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && user.Id != model.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
+            await _adsService.DeleteAsync(model.Id);
         }
-        await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");
     }
 
