@@ -55,7 +55,6 @@ namespace MetalTrade.Web.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         public IActionResult Login()
         {
