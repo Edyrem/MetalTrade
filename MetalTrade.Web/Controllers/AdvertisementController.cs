@@ -13,18 +13,16 @@ namespace MetalTrade.Web.Controllers;
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
-    private readonly IImageUploadService _imageUploadService;
     private readonly IProductService _productService;
-    private readonly IMapper _mapper;
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
 
-    public AdvertisementController(IAdvertisementService adsService, IUserService userService,
-        IWebHostEnvironment env, IProductService productService,
-        IMapper mapper, IImageUploadService imageUploadService)
+    public AdvertisementController(IAdvertisementService adsService,
+        IUserService userService, IProductService productService,
+        IMapper mapper)
     {
         _adsService = adsService;
         _userService = userService;
-        _imageUploadService = imageUploadService;
         _productService = productService;
         _mapper = mapper;
     }
@@ -38,20 +36,22 @@ public class AdvertisementController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-
-        if (!ModelState.IsValid || user == null)
+        if (ModelState.IsValid)
         {
-            var productDtos = await _productService.GetAllAsync();
-            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-            if (user == null)
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user != null)
+            {
+                var adsDto = _mapper.Map<AdvertisementDto>(model);
+                adsDto.UserId = user.Id;
+                await _adsService.CreateAsync(adsDto);
+                return RedirectToAction("Index");
+            }
+            else
                 ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            return View(model);
         }
-        var adsDto = _mapper.Map<AdvertisementDto>(model);
-        adsDto.UserId = user.Id;
-        await _adsService.CreateAsync(adsDto);
-        return RedirectToAction("Index");
+        var productDtos = await _productService.GetAllAsync();
+        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
+        return View(model);
     }
 
     [AllowAnonymous]
@@ -79,76 +79,84 @@ public class AdvertisementController : Controller
     {
         var adsDto = await _adsService.GetAsync(id);
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId))
+
+        if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user.Id != adsDto.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
+        else
         {
-            if (adsDto == null)
-                ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && adsDto != null && user.Id != adsDto.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
-            return RedirectToAction("Index");
+            var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
+            var productDtos = await _productService.GetAllAsync();
+            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
+            return View(model);
         }
-        var model = _mapper.Map<EditAdvertisementViewModel>(adsDto);
-        var productDtos = await _productService.GetAllAsync();
-        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-        return View(model);
+        return RedirectToAction("Index");
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model)
     {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (!ModelState.IsValid || user == null || (user != null && user.Id != model.UserId))
+        if (ModelState.IsValid)
         {
-            var productDtos = await _productService.GetAllAsync();
-            var tempAdsDto = await _adsService.GetAsync(model.Id);
-            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
-            if (tempAdsDto != null)
-                model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            var adsDto = await _adsService.GetAsync(model.Id);
+
             if (user == null)
                 ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && user.Id != model.UserId)
+            else if (adsDto == null)
+                ModelState.AddModelError(string.Empty, "Объявление не найдено");
+            else if (user.Id != adsDto.UserId)
                 ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
-            return View(model);
+            else
+            {
+                adsDto = _mapper.Map<AdvertisementDto>(model);
+                await _adsService.UpdateAsync(adsDto);
+                return RedirectToAction("Details", new { id = model.Id });
+            }
+            var productDtos = await _productService.GetAllAsync();
+            model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
+            if (adsDto != null)
+                model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(adsDto.Photoes);
         }
-        var adsDto = _mapper.Map<AdvertisementDto>(model);
-        await _adsService.UpdateAsync(adsDto);
-        return RedirectToAction("Details", new { id = model.Id });
+        return View(model);
+        
     }
 
     public async Task<IActionResult> Delete(int id)
     {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
         var adsDto = await _adsService.GetAsync(id);
-        bool isInvalidRequest = adsDto == null || user == null || (user != null && adsDto != null && user.Id != adsDto.UserId);
-        if (isInvalidRequest)
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+
+        if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (user.Id != adsDto.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
         {
-            if (adsDto == null)
-                ModelState.AddModelError(string.Empty, "Объявление не найдено");
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && adsDto != null && user.Id != adsDto.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
+            var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
+            return View(model);
         }
-        var model = _mapper.Map<DeleteAdvertisementViewModel>(adsDto);
-        return View(model);
+        return RedirectToAction("Index");
     }
         
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (user == null || (user != null && user.Id != model.UserId))
-        {
-            if (user == null)
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            if (user != null && user.Id != model.UserId)
-                ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
-            return RedirectToAction("Index");
-        }
-        await _adsService.DeleteAsync(model.Id);
+        var adsDto = await _adsService.GetAsync(model.Id);
+        if (user == null)
+            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+        else if (adsDto == null)
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");
+        else if (user.Id != adsDto.UserId)
+            ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
+        else
+            await _adsService.DeleteAsync(model.Id);
         return RedirectToAction("Index");
     }
     [HttpPost]
