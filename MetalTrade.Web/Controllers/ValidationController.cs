@@ -27,13 +27,9 @@ public class ValidationController : Controller
     [AcceptVerbs("GET", "POST")]
     public bool CheckPhoneNumber(string phoneNumber)
     {
-        return !_context.Users.Any(u =>  u.PhoneNumber == phoneNumber );
-    }
-    
-    [AcceptVerbs("GET", "POST")]
-    public bool CheckWhatsAppNumber(string whatsAppNumber)
-    {
-        return !_context.Users.Any(u =>  u.WhatsAppNumber == whatsAppNumber );
+        var digits = new string((phoneNumber ?? "").Where(char.IsDigit).ToArray());
+        if (digits.Length != 9) return false;
+        return !_context.Users.Any(u => u.PhoneNumber == digits);
     }
     
     [AcceptVerbs("GET", "POST")]
@@ -79,12 +75,24 @@ public class ValidationController : Controller
     }
 
     [AcceptVerbs("GET", "POST")]
-    public IActionResult CheckWhatsappNumberEdit(string phoneNumber, int id)
+    public IActionResult CheckWhatsAppNumber(string whatsAppNumber)
     {
-        var normalized = new string((phoneNumber ?? "").Where(char.IsDigit).ToArray());
-        bool exists = _context.Users.Any(u =>
-            u.WhatsAppNumber == normalized &&
-            u.Id != id);
+        var digits = new string((whatsAppNumber ?? "").Where(char.IsDigit).ToArray());
+        if (digits.Length != 9) return Json(false);
+
+        bool exists = _context.Users.Any(u => u.WhatsAppNumber == digits);
         return Json(!exists);
     }
+
+
+    [AcceptVerbs("GET", "POST")]
+    public IActionResult CheckWhatsappNumberEdit(string whatsAppNumber, int id)
+    {
+        var digits = new string((whatsAppNumber ?? "").Where(char.IsDigit).ToArray());
+        if (digits.Length != 9) return Json(false);
+
+        bool exists = _context.Users.Any(u => u.WhatsAppNumber == digits && u.Id != id);
+        return Json(!exists);
+    }
+    
 }

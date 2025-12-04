@@ -10,13 +10,11 @@
                 <img src="@(Model.PhotoPath ?? "/images/default-avatar.png")"
                      class="rounded-circle mx-auto d-block mb-3"
                      style="width: 120px; height: 120px; object-fit: cover;" alt="Аватар" />
+
                 <h5>@Model.UserName</h5>
-                <p>Email: @Model.Email</p>
-                <p>Телефон: @Model.PhoneNumber</p>
-                @if (!string.IsNullOrEmpty(Model.WhatsAppNumber))
-                {
-                    <p>WhatsApp: @Model.WhatsAppNumber</p>
-                }
+                
+                <p class="form-control-plaintext">Телефон: +996@(Model.PhoneNumber)</p>
+                <p class="form-control-plaintext">WhatsApp +996@(Model.WhatsAppNumber)</p>
 
                 <div class="d-grid gap-2">
                     <a href="/Profile/Edit" class="btn btn-outline-primary btn-sm">Изменить профиль</a>
