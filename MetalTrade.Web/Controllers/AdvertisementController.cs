@@ -97,12 +97,15 @@ public class AdvertisementController : Controller
     {
         var adsDto = await _adsService.GetAsync(id);
         var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null)
+            return Forbid();
+
+        var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
 
         if (adsDto == null)
             ModelState.AddModelError(string.Empty, "Объявление не найдено");
-        else if (user == null)
-            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-        else if (user.Id != adsDto.UserId && !await _userService.IsInRoleAsync(user, "admin"))
+
+        else if (user.Id != adsDto.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
         else
         {
@@ -119,13 +122,14 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if(ModelState.IsValid)
+        if (user == null)
+            return Forbid();
+        
+        var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
+        
+        if (ModelState.IsValid)
         {
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-            }
-            else if (user.Id != model.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            if (user.Id != model.UserId && !isAdmin)
             {
                 ModelState.AddModelError(string.Empty, "Вы пытаетесь изменить чужое объявление");
             }
@@ -147,13 +151,16 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null)
+            return Forbid();
+
+        var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
+
         var adsDto = await _adsService.GetAsync(id);
 
         if (adsDto == null)
-            ModelState.AddModelError(string.Empty, "Объявление не найдено");
-        else if (user == null)
-            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-        else if (user.Id != adsDto.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            ModelState.AddModelError(string.Empty, "Объявление не найдено");        
+        else if (user.Id != adsDto.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
         else
         {
@@ -168,8 +175,11 @@ public class AdvertisementController : Controller
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null)
-            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
-        else if (user.Id != model.UserId && await _userService.IsInRoleAsync(user, "admin"))
+            return Forbid();
+
+        var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
+
+        else if (user.Id != model.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
         else
         {
