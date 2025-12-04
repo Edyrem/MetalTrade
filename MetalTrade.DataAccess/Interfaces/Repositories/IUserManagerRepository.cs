@@ -1,4 +1,5 @@
 ﻿using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,9 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task<User?> GetByUserNameAsync(string userName);
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<IdentityResult> AddToRoleAsync(User user, string role);
-        Task<string?> GetUserRoleAsync(User user);
+        Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
+        Task<IEnumerable<string>?> GetUserRolesAsync(User user);
+        Task<bool> IsInRoleAsync(User user, string role);
+        Task<User?> GetCurrentUserAsync(HttpContext context);
     }
 }

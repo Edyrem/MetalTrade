@@ -1,10 +1,13 @@
-@model Dictionary<User, string?>
+@using MetalTrade.Web.ViewModels.User
+@model IEnumerable<UserViewModel>
 @{
     ViewBag.Title = "Список пользователей";
+    var isCurrentUserAdmin = User.IsInRole("admin");
 }
 
 <div class="container mt-4">
     <h2 class="mb-4">Все пользователи</h2>
+    <a asp-action="CreateUser" class="btn btn-success">Добавить нового пользователя</a>
     @if (!Model.Any())
     {
         <h4 class="">Пользователей еще нет </h4>
@@ -12,36 +15,85 @@
     else
     {
         <div class="row text-center">
-            <table class="mt-3 table table-success " style="width: 100%;">
+            <table class="mt-3 table" style="width: 100%;">
                 <tr>
                     <th>Аватар</th>
                     <th>Логин</th>
                     <th>Email</th>
                     <th>Номер телефона</th>
                     <th>Роль</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                 </tr>
-                @foreach (var dictionary in Model)
+                @foreach (var user in Model)
                 {
-                    var user = dictionary.Key;
-                    var role = dictionary.Value;
-                    
                     <tr>
-                        <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
-                        <td>@user.UserName</td>
+                        @if (!string.IsNullOrWhiteSpace(user.Photo))
+                        {
+                            if (user.Photo.StartsWith("http"))
+                            {
+                                <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                            }
+                            else
+                            {
+                                user.Photo = user.Photo.Substring(1);                                
+                                <td><img src="~/@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
+                            }
+                        }
+                        else
+                        {
+                            <td></td>    
+                        }
+
+                        <td><a asp-action="Details" asp-route-id="@user.Id" class="link-underline-light"><strong>@user.UserName</strong></a></td>
                         <td>@user.Email</td>
                         <td>@user.PhoneNumber</td>
-                        @if (role == "admin")
+                        @if(user.Roles!=null && user.Roles.Any())
                         {
-                            <td class="text-danger">Админ</td>
+                            @if (user.Roles.Contains("admin"))
+                            {
+                                <td class="text-danger">Админ</td>
+                                <td></td>
+                            }                           
+
+                            if (user.Roles.Contains("supplier"))
+                            {
+                                <td><div class="text-info">Поставщик</div></td>
+                                if (isCurrentUserAdmin)
+                                {
+                                    <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Удалить из поставщиков</a></td>
+                                }                                
+                            }
+                            else
+                            {
+                                <td><div class="text-info">Пользователь</div></td>
+                                if (isCurrentUserAdmin)
+                                {
+                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Сделать поставщиком</a></td>
+                                }
+                            }
+                            if (user.Roles.Contains("moderator"))
+                            {
+                                <td><div class="text-primary">Модератор</div></td>
+                                if (isCurrentUserAdmin)
+                                {
+                                    <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Удалить из модераторов</a></td>
+                                }
+                            }
+                            else
+                            {
+                                <td><div class="text-info"></div></td>
+                                if (isCurrentUserAdmin)
+                                {
+                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
+                                }
+                            }
                         }
-                        @if (role == "moderator")
-                        {
-                            <td class="text-success">Модератор</td>
-                        }
-                        @if (role == "supplier")
-                        {
-                            <td>Поставщик</td>
-                        }
+
+                        <td><a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Удалить</a></td>
+
                     </tr>
                 }
             </table>

@@ -14,7 +14,10 @@ namespace MetalTrade.Business.Common.Mapping
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber ?? ""))
                 .ForMember(dest => dest.Body, opt => opt.MapFrom(src => src.Body ?? ""))
-                .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes));
+                .ForMember(dest => dest.Photoes, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.IsAd, opt => opt.Ignore())
+                .ForMember(dest => dest.IsTop, opt => opt.Ignore());
 
             CreateMap<Advertisement, AdvertisementDto>();
 
