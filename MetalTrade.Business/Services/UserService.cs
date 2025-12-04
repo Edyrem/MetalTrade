@@ -197,6 +197,8 @@ public class UserService : IUserService
     public async Task LogoutAsync() => await _signInManager.SignOutAsync();
     public async Task<UserDto?> GetCurrentUserAsync(HttpContext context) =>
         _mapper.Map<UserDto?>(await _userRepository.GetCurrentUserAsync(context));
-    
-    
+
+    /* Я твой комит труба шатал */
+
+
 }
