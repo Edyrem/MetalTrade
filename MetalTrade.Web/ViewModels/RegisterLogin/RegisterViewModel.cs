@@ -27,6 +27,7 @@ namespace MetalTrade.Web.ViewModels
         
         [Required(ErrorMessage = "Укажите номер WhatsApp")]
         [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Номер WhatsApp должен содержать 9 цифр")]
+        [Remote(action: "CheckWhatsAppNumber", controller: "Validation", ErrorMessage = "Аккаунт с таким номером WhatsApp уже существует!")]
         public string WhatsAppNumber { get; set; }
 
         

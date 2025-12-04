@@ -1,7 +1,6 @@
 $(function () {
     const LOCAL_LEN = 9;
     const FULL_PREFIX = "+996";
-    const ALLOWED_EMAIL_DOMAINS = ["gmail.com", "mail.ru", "yandex.ru", "yandex.com"];
 
     $("#PhoneNumber").attr("maxlength", LOCAL_LEN);
     $("#WhatsAppNumber").attr("maxlength", LOCAL_LEN);
@@ -31,18 +30,6 @@ $(function () {
         waUserEdited = false;
     });
     
-    $("#Email").on("blur", function () {
-        const email = $(this).val().trim();
-        const errorSpan = $("#Email").next("span.text-danger");
-        errorSpan.text("");
-
-        if (!email.includes("@")) return;
-
-        const domain = email.split("@")[1].toLowerCase();
-        if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
-            errorSpan.text("Домен почты запрещён. Разрешено: " + ALLOWED_EMAIL_DOMAINS.join(", "));
-        }
-    });
     
     $("#Photo").on("change", function () {
         const file = this.files && this.files[0];
