@@ -236,7 +236,7 @@ public class AdvertisementController : Controller
 
         var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
 
-        //тут было "else if" но он ругался, и я оставил только if
+        //тут было "else if" но он ругался, и я оставил только if 
         if (user.Id != model.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
         else
