@@ -1,6 +1,7 @@
 using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
@@ -17,32 +18,79 @@ public class AdvertisementController : Controller
     private readonly IProductService _productService;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
-
-    public AdvertisementController(IAdvertisementService adsService, IUserService userService,
-        IWebHostEnvironment env, IProductService productService,
+    private readonly IMetalService _metalService;
+    
+    public AdvertisementController(
+        IAdvertisementService adsService,
+        IUserService userService,
+        IWebHostEnvironment env,
+        IProductService productService,
+        IMetalService metalService,
         IMapper mapper)
     {
         _adsService = adsService;
         _userService = userService;
         _productService = productService;
+        _metalService = metalService;
         _mapper = mapper;
     }
 
     [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
-        var adsDtos = await _adsService.GetAllAsync();
+        var filter = new AdvertisementFilter
+        {
+            Title = Request.Query["title"],
+            City = Request.Query["city"],
+            MetalTypeId = int.TryParse(Request.Query["metalTypeId"], out var mtId) ? mtId : null,
+            ProductId = int.TryParse(Request.Query["productId"], out var pid) ? pid : null,
+            PriceFrom = decimal.TryParse(Request.Query["priceFrom"], out var p1) ? p1 : null,
+            PriceTo = decimal.TryParse(Request.Query["priceTo"], out var p2) ? p2 : null,
+            DateFrom = DateTime.TryParse(Request.Query["dateFrom"], out var d1) ? d1 : null,
+            DateTo = DateTime.TryParse(Request.Query["dateTo"], out var d2) ? d2 : null,
+            Sort = Request.Query["sort"],
+            Page = int.TryParse(Request.Query["page"], out var pg) ? pg : 1
+        };
+
+        var adsDtos = await _adsService.GetFilteredAsync(filter);
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         bool isAdmin = true;
         if(!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
         {
-            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active).ToList();
+            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active || a.UserId == user.Id).ToList();
             isAdmin = false;
         }
         ViewData["IsAdmin"] = isAdmin;
+        ViewBag.Filter = filter;
+
+        var totalCount = await _adsService.GetFilteredCountAsync(filter);
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize);
+        ViewBag.Page = filter.Page;
+        
+        var productDtos = await _productService.GetAllAsync();
+        ViewBag.Products = productDtos;
+
+        ViewBag.MetalTypes = await _metalService.GetAllAsync();
+
         return View(models);
+    }
+    
+    [AllowAnonymous]
+    public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilter filter)
+    {
+        var adsDtos = await _adsService.GetFilteredAsync(filter);
+        var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
+
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (!(await _userService.IsInRoleAsync(user, "admin") ||
+              await _userService.IsInRoleAsync(user, "moderator")))
+        {
+            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active || a.UserId == user.Id).ToList();
+        }
+        
+        return PartialView("_AdsGrid", models);
     }
 
     [AllowAnonymous]
@@ -179,7 +227,8 @@ public class AdvertisementController : Controller
 
         var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
 
-        else if (user.Id != model.UserId && !isAdmin)
+        //тут было "else if" но он ругался, и я оставил только if
+        if (user.Id != model.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
         else
         {
