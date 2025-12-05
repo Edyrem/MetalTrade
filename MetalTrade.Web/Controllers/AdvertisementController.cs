@@ -179,7 +179,7 @@ public class AdvertisementController : Controller
 
         var isAdmin = await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator");
 
-        else if (user.Id != model.UserId && !isAdmin)
+        if (user.Id != model.UserId && !isAdmin)
             ModelState.AddModelError(string.Empty, "Вы пытаетесь удалить чужое объявление");
         else
         {
