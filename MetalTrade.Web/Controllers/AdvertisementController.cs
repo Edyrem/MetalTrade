@@ -56,11 +56,20 @@ public class AdvertisementController : Controller
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        bool isAdmin = true;
-        if(!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
+        bool isAdmin = false;
+        
+        if (user != null && 
+            (await _userService.IsInRoleAsync(user, "admin") ||
+             await _userService.IsInRoleAsync(user, "moderator")))
         {
-            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active || a.UserId == user.Id).ToList();
-            isAdmin = false;
+            isAdmin = true;
+        }
+        else
+        {
+            models = models
+                .Where(a => a.Status == (int)AdvertisementStatus.Active ||
+                            (user != null && a.UserId == user.Id))
+                .ToList();
         }
         ViewData["IsAdmin"] = isAdmin;
         ViewBag.Filter = filter;
