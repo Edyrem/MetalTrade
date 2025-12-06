@@ -57,5 +57,40 @@ namespace MetalTrade.DataAccess.Repositories
                 _context.Remove(advertisementPhoto);
 
         }
+        
+        public IQueryable<Advertisement> GetFilteredQueryable(AdvertisementFilter filter)
+        {
+            var q = _context.Advertisements
+                .Include(a => a.Product)
+                .Include(a => a.Photoes)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.Title))
+                q = q.Where(a => a.Title.Contains(filter.Title));
+
+            if (!string.IsNullOrWhiteSpace(filter.City))
+                q = q.Where(a => a.City == filter.City);
+
+            if (filter.MetalTypeId.HasValue)
+                q = q.Where(a => a.Product.MetalTypeId == filter.MetalTypeId.Value);
+
+            if (filter.PriceFrom.HasValue)
+                q = q.Where(a => a.Price >= filter.PriceFrom.Value);
+
+            if (filter.PriceTo.HasValue)
+                q = q.Where(a => a.Price <= filter.PriceTo.Value);
+
+            if (filter.DateFromUtc.HasValue)
+                q = q.Where(a => a.CreateDate >= filter.DateFromUtc.Value);
+
+            if (filter.DateToUtc.HasValue)
+                q = q.Where(a => a.CreateDate <= filter.DateToUtc.Value);
+            
+            return q;
+        }
+        public async Task<int> GetFilteredCountAsync(AdvertisementFilter filter)
+        {
+            return await GetFilteredQueryable(filter).CountAsync();
+        }
     }
 }

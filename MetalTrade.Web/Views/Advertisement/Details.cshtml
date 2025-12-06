@@ -1,7 +1,10 @@
-﻿@model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
+﻿@using MetalTrade.Domain.Enums
+@model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
 @{
     ViewData["Title"] = "Details";
+
+    var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
 }
 
 <h1>Детали</h1>
@@ -58,14 +61,38 @@
                     </dd>
                 </dl>
                 <div>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated && Model.UserId == ViewBag.CurrentUserId)
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && (Model.UserId == ViewBag.CurrentUserId || isAdmin))
                     {
-                        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редактировать</a>
+                        <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Редактировать</a>
                         <b> | </b>
                         <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
                         <b> | </b>
+                        if(isAdmin)
+                        {
+                            switch(Model.Status)
+                            {
+                                case (int)AdvertisementStatus.Active:
+                                    <a asp-controller="Advertisement" asp-action="ArchiveAdvertisement" class="btn btn-outline-warning" asp-route-id="@Model?.Id">Деактивировать</a>
+                                    break;
+                                case (int)AdvertisementStatus.Archived:
+                                    <a asp-controller="Advertisement" asp-action="ApproveAdvertisement" class="btn btn-outline-success" asp-route-id="@Model?.Id">Активировать</a>
+                                    break;
+                                case (int)AdvertisementStatus.Draft:
+                                    <a asp-controller="Advertisement" asp-action="ApproveAdvertisement" class="btn btn-outline-success" asp-route-id="@Model?.Id">Одобрить</a>
+                                    <b> | </b>
+                                    <a asp-controller="Advertisement" asp-action="RejectAdvertisement" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Отклонить</a>
+                                    break;
+                                case (int)AdvertisementStatus.Rejected:
+                                    <a asp-controller="Advertisement" asp-action="ArchiveAdvertisement" class="btn btn-outline-warning" asp-route-id="@Model?.Id">Деактивировать</a>
+                                    break;
+                            }                            
+                        }
                     }
-                    <a asp-action="Index" class="btn btn-outline-primary">Назад к списку</a>
+                    
+                </div>
+                <br/>
+                <div>
+                    <a asp-action="Index">Назад к списку</a>
                 </div>
             </div>
             <div class="col-md-6">

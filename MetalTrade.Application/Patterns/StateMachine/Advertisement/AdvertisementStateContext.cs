@@ -40,6 +40,6 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement
         public async Task MoveToDeletedAsync(int advertisementId)
         {
             await MoveAsync(advertisementId, s => s.MoveToDeleted());
-        }
+        }        
     }
 }
