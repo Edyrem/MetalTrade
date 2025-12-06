@@ -44,6 +44,8 @@ namespace MetalTrade.Business.Common.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
                 .ReverseMap();
 
+            CreateMap<List<ProductDto>, List<Product>>()
+                .ReverseMap();
 
             #endregion
         }

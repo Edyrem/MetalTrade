@@ -25,57 +25,25 @@ public class ProductService : IProductService
         if (product == null)
             return null;
 
-        ProductDto productDto = _mapper.Map<ProductDto>(product);
-
-        return productDto;
+        return _mapper.Map<ProductDto>(product);
     }
 
     public async Task<List<ProductDto>> GetAllAsync()
     {
         IEnumerable<Product> products = await _repository.GetAllAsync();
-        return products.Select(product => new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            MetalTypeId = product.MetalTypeId,
-            MetalType = new MetalTypeDto
-            {
-                Id = product.MetalType.Id,
-                Name = product.MetalType.Name
-            },
-            Advertisements = product.Advertisements
-                .Select(a => new AdvertisementDto
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    Price = a.Price
-                })
-                .ToList()
-        }).ToList();
-        
+        return _mapper.Map<List<ProductDto>>(products);        
     }
 
     public async Task CreateAsync(ProductDto productDto)
     {
-        Product product = new Product()
-        {
-            Id = productDto.Id,
-            Name = productDto.Name.ToLower(),
-            MetalTypeId = productDto.MetalTypeId
-        };
+        Product product = _mapper.Map<Product>(productDto);
         await _repository.CreateAsync(product);
         await _repository.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(ProductDto productDto)
     {
-        Product? product = await _repository.GetAsync(productDto.Id);
-        if (product == null)
-            return;
-        
-        product.Id = productDto.Id;
-        product.Name = productDto.Name.ToLower();
-        product.MetalTypeId = productDto.MetalTypeId;
+        Product? product =  _mapper.Map<Product>(productDto);
         await _repository.UpdateAsync(product);
         await _repository.SaveChangesAsync();
     }
