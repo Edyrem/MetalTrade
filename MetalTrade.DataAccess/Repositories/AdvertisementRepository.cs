@@ -57,6 +57,10 @@ namespace MetalTrade.DataAccess.Repositories
                 _context.Remove(advertisementPhoto);
 
         }
+        public async Task<AdvertisementPhoto?> GetAdvertisementPhotoAsync(int advertisementPhotoId)
+        {
+            return await _context.AdvertisementPhotos.FirstOrDefaultAsync(p => p.Id == advertisementPhotoId);
+        }
         
         public IQueryable<Advertisement> GetFilteredQueryable(AdvertisementFilter filter)
         {

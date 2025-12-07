@@ -19,20 +19,23 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
-    
+    private readonly ILogger<AdvertisementController> _logger;
+
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
         IWebHostEnvironment env,
         IProductService productService,
         IMetalService metalService,
-        IMapper mapper)
+        IMapper mapper, 
+        ILogger<AdvertisementController> logger)
     {
         _adsService = adsService;
         _userService = userService;
         _productService = productService;
         _metalService = metalService;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [AllowAnonymous]
@@ -248,14 +251,22 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
+    public async Task<IActionResult> DeleteAdvertisementPhotoAjax(int advertisementPhotoId, string photoLink)
     {
-        await _adsService.DeleteAdvertisementPhotoAsync(new AdvertisementPhotoDto
+        try
         {
-            Id = advertisementPhotoId,
-            PhotoLink = photoLink
-        });
-        return RedirectToAction("Edit", new { Id = advertisementId});
+            var success = await _adsService.DeleteAdvertisementPhotoAsync( new AdvertisementPhotoDto
+            {
+                Id = advertisementPhotoId,
+                PhotoLink = photoLink
+            });
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении фото с id {PhotoId}", advertisementPhotoId);
+            return Json(new { success = false });
+        }
     }
 
     [Authorize(Roles = "admin,moderator")]

@@ -114,11 +114,14 @@ public class AdvertisementService : IAdvertisementService
         return _mapper.Map<List<AdvertisementDto>>(await _repository.FindAsync(predicate));
     }
 
-    public async Task DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhoto)
+    public async Task<bool> DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhoto)
     {
-        await _imageUploadService.DeleteImageAsync(advertisementPhoto.PhotoLink);
         await _repository.DeleteAdvertisementPhotoAsync(advertisementPhoto.Id);
         await _repository.SaveChangesAsync();
+        var deleted = await _repository.GetAdvertisementPhotoAsync(advertisementPhoto.Id) is null;
+        if (deleted)
+            await _imageUploadService.DeleteImageAsync(advertisementPhoto.PhotoLink);
+        return deleted;
     }
     
     public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilter filter)
