@@ -11,16 +11,19 @@ namespace MetalTrade.Web.Controllers;
 [Authorize]
 public class ProfileController : Controller
 {
-    private readonly IProfileService _profileService;
+    
+    private readonly IUserService _userService;    
     private readonly UserManager<User> _userManager;
     private readonly IWebHostEnvironment _env;
 
     public ProfileController(
-        IProfileService profileService, 
+        
+        IUserService userService,
         UserManager<User> userManager, 
         IWebHostEnvironment env)
     {
-        _profileService = profileService;
+        
+        _userService = userService;
         _userManager = userManager;
         _env = env;
     }
@@ -30,7 +33,7 @@ public class ProfileController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return NotFound();
 
-        var dto = await _profileService.GetProfileAsync(user);
+        var dto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);        
 
         var vm = new UserProfileWithAdsViewModel
         {
@@ -38,8 +41,8 @@ public class ProfileController : Controller
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber,
             WhatsAppNumber = dto.WhatsAppNumber,
-            PhotoPath = dto.PhotoPath,
-            IsSupplier = dto.IsSupplier,
+            PhotoPath = dto.PhotoLink,
+            IsSupplier = await _userService.IsInRoleAsync(dto, "supplier"),
             Advertisements = dto.Advertisements,
         };
 
@@ -49,19 +52,16 @@ public class ProfileController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return NotFound();
-
-        var dto = await _profileService.GetProfileEditModelAsync(user);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);        
 
         var vm = new UserProfileEditViewModel
         {
-            Id = dto.Id,
-            UserName = dto.UserName,
-            Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber,
-            WhatsAppNumber = dto.WhatsAppNumber,
-            PhotoPath = dto.PhotoPath
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            WhatsAppNumber = user.WhatsAppNumber,
+            PhotoPath = user.PhotoLink,
         };
 
         return View(vm);
@@ -76,23 +76,17 @@ public class ProfileController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var dto = new ProfileDto
+        var dto = new UserDto
         {
             Id = model.Id,
             UserName = model.UserName,
             Email = model.Email,
             PhoneNumber = model.PhoneNumber,
             WhatsAppNumber = model.WhatsAppNumber,
-            PhotoPath = model.PhotoPath
+            PhotoLink = model.PhotoPath
         };
 
-        bool ok = await _profileService.UpdateProfileAsync(user, dto, model.Photo, _env);
-
-        if (!ok)
-        {
-            ModelState.AddModelError("PhoneNumber", "Телефон уже используется");
-            return View(model);
-        }
+        await _userService.UpdateUserAsync(dto);
 
         return RedirectToAction(nameof(Index));
     }

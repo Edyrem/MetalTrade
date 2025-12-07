@@ -8,6 +8,7 @@ namespace MetalTrade.Business.Interfaces;
 public interface IUserService
 {
     Task<UserDto?> GetUserByIdAsync(int id);
+    Task<UserDto?> GetUserWithAdvertisementByIdAsync(int id);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<bool> AddToRoleAsync(UserDto user, string role);
     Task<bool> IsInRoleAsync(UserDto user, string role);

@@ -7,7 +7,7 @@ namespace MetalTrade.Domain.Entities
     {
         public string Photo { get; set; }
         public string WhatsAppNumber { get; set; }
-        List<Advertisement> Advertisements { get; set; }
+        public List<Advertisement> Advertisements { get; set; } = null!;
         public bool IsDeleted { get; set; }
     }
 }

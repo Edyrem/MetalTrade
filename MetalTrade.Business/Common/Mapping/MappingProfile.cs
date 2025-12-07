@@ -28,7 +28,6 @@ namespace MetalTrade.Business.Common.Mapping
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
             CreateMap<MetalTypeDto, MetalType>().ReverseMap();
-            CreateMap<ProductDto, Product>().ReverseMap();
 
             #region MetalService
             CreateMap<MetalTypeDto, MetalType>()
@@ -46,7 +45,10 @@ namespace MetalTrade.Business.Common.Mapping
 
             CreateMap<List<ProductDto>, List<Product>>()
                 .ReverseMap();
+            #endregion
 
+            #region UserService
+            CreateMap<UserDto, User>().ReverseMap();
             #endregion
         }
     }
