@@ -13,7 +13,6 @@ namespace MetalTrade.Web.Common.Mapping
         public MappingProfile()
         {
             CreateMap<MetalTypeDto, MetalTypeViewModel>().ReverseMap();
-            CreateMap<ProductDto, ProductViewModel>().ReverseMap();
 
             CreateMap<UserDto, MetalTrade.Web.ViewModels.User.UserViewModel>()
                 .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
@@ -65,6 +64,17 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore()) 
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore());
+
+            CreateMap<RegisterViewModel, UserDto>().ReverseMap();
+
+            CreateMap<CreateMetalViewModel, MetalTypeDto>().ReverseMap();
+            CreateMap<EditMetalViewModel, MetalTypeDto>().ReverseMap();
+            CreateMap<List<CreateMetalViewModel>, List<MetalTypeDto>>().ReverseMap();
+            
+            CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+            CreateMap<ProductDto, CreateProductViewModel>().ReverseMap();
+            CreateMap<ProductDto, EditProductViewModel>().ReverseMap();
+            CreateMap<List<ProductDto>, List<ProductViewModel>>().ReverseMap();
         }
     }
 }

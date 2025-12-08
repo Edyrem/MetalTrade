@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Entities;
@@ -11,10 +12,12 @@ namespace MetalTrade.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -33,15 +36,7 @@ namespace MetalTrade.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var dto = new UserDto
-            {
-                Email = model.Email,
-                UserName = model.UserName,
-                PhoneNumber = model.PhoneNumber,
-                WhatsAppNumber = model.WhatsAppNumber,
-                Password = model.Password,
-                Photo = model.Photo
-            };
+            var dto =  _mapper.Map<UserDto>(model);
 
             var success = await _userService.CreateUserAsync(dto, "user");
             if (success)
