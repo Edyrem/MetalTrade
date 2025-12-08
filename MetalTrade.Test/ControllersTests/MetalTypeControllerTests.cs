@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.Controllers;
@@ -20,9 +21,11 @@ public class MetalTypeControllerTests
             new MetalTypeDto { Id = 2, Name = "Copper" }
         };
 
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s=> s.GetAllAsync()).ReturnsAsync(metalDtos);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+
+        mockMetal.Setup(s=> s.GetAllAsync()).ReturnsAsync(metalDtos);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Index();
@@ -35,7 +38,7 @@ public class MetalTypeControllerTests
         Assert.Equal("Steel", model[0].Name);
         Assert.Equal("Copper", model[1].Name);
 
-        mock.Verify(s => s.GetAllAsync());
+        mockMetal.Verify(s => s.GetAllAsync());
     }
     
     
@@ -45,9 +48,12 @@ public class MetalTypeControllerTests
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
 
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
+        
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Details(1);
@@ -64,9 +70,12 @@ public class MetalTypeControllerTests
     public async Task DetailsWhenNullRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
+
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Details(1);
@@ -80,9 +89,12 @@ public class MetalTypeControllerTests
     public async Task CreatePostValidModelRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.CreateAsync(It.IsAny<MetalTypeDto>())).Returns(Task.CompletedTask);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        
+        mockMetal.Setup(s => s.CreateAsync(It.IsAny<MetalTypeDto>())).Returns(Task.CompletedTask);
+
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         var model = new CreateMetalViewModel
         {
@@ -96,7 +108,7 @@ public class MetalTypeControllerTests
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
 
-        mock.Verify(s => s.CreateAsync(It.IsAny<MetalTypeDto>()));
+        mockMetal.Verify(s => s.CreateAsync(It.IsAny<MetalTypeDto>()));
     }
     
     
@@ -104,8 +116,9 @@ public class MetalTypeControllerTests
     public async Task CreatePostInvalidModelReturnsView()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         controller.ModelState.AddModelError("Name", "Required");
 
@@ -118,15 +131,16 @@ public class MetalTypeControllerTests
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal(model, view.Model);
 
-        mock.Verify(s => s.CreateAsync(It.IsAny<MetalTypeDto>()), Times.Never);
+        mockMetal.Verify(s => s.CreateAsync(It.IsAny<MetalTypeDto>()), Times.Never);
     }
     
     [Fact]
     public void CreateGetReturnsView()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = controller.Create();
@@ -141,10 +155,11 @@ public class MetalTypeControllerTests
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
 
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
 
-        var controller = new MetalTypeController(mock.Object);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Edit(1);
@@ -160,10 +175,11 @@ public class MetalTypeControllerTests
     public async Task EditGetWhenNullRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
 
-        var controller = new MetalTypeController(mock.Object);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Edit(1);
@@ -177,9 +193,10 @@ public class MetalTypeControllerTests
     public async Task EditPostValidModelRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.UpdateAsync(It.IsAny<MetalTypeDto>())).Returns(Task.CompletedTask);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.UpdateAsync(It.IsAny<MetalTypeDto>())).Returns(Task.CompletedTask);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         var model = new EditMetalViewModel
         {
@@ -193,15 +210,16 @@ public class MetalTypeControllerTests
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
-        mock.Verify(s => s.UpdateAsync(It.IsAny<MetalTypeDto>()));
+        mockMetal.Verify(s => s.UpdateAsync(It.IsAny<MetalTypeDto>()));
     }
 
     [Fact]
     public async Task EditPostInvalidModelReturnsView()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         controller.ModelState.AddModelError("Name", "Required");
 
@@ -214,7 +232,7 @@ public class MetalTypeControllerTests
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal(model, view.Model);
 
-        mock.Verify(s => s.UpdateAsync(It.IsAny<MetalTypeDto>()), Times.Never);
+        mockMetal.Verify(s => s.UpdateAsync(It.IsAny<MetalTypeDto>()), Times.Never);
     }
 
     
@@ -224,9 +242,10 @@ public class MetalTypeControllerTests
         // Arrange
         var dto = new MetalTypeDto { Id = 1, Name = "Steel" };
 
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync(dto);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Delete(1);
@@ -241,9 +260,10 @@ public class MetalTypeControllerTests
     public async Task DeleteGetWhenNullRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.GetAsync(1)).ReturnsAsync((MetalTypeDto?)null);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         // Act
         var result = await controller.Delete(1);
@@ -257,9 +277,10 @@ public class MetalTypeControllerTests
     public async Task DeletePostRedirectsToIndex()
     {
         // Arrange
-        var mock = new Mock<IMetalService>();
-        mock.Setup(s => s.DeleteAsync(1)).Returns(Task.CompletedTask);
-        var controller = new MetalTypeController(mock.Object);
+        var mockMetal = new Mock<IMetalService>();
+        var mockMapper = new Mock<IMapper>();
+        mockMetal.Setup(s => s.DeleteAsync(1)).Returns(Task.CompletedTask);
+        var controller = new MetalTypeController(mockMetal.Object, mockMapper.Object);
 
         var model = new DeleteMetalViewModel { Id = 1 };
 
@@ -270,6 +291,6 @@ public class MetalTypeControllerTests
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
 
-        mock.Verify(s => s.DeleteAsync(1));
+        mockMetal.Verify(s => s.DeleteAsync(1));
     }
 }
