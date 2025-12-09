@@ -74,12 +74,10 @@ namespace MetalTrade.Web.Common.Mapping
             CreateMap<EditMetalViewModel, MetalTypeDto>()
                 .ForMember(dest => dest.Products, opt => opt.Ignore())
                 .ReverseMap();
-            CreateMap<List<CreateMetalViewModel>, List<MetalTypeDto>>().ReverseMap();
             
             CreateMap<ProductDto, ProductViewModel>().ReverseMap();
             CreateMap<ProductDto, CreateProductViewModel>().ReverseMap();
             CreateMap<ProductDto, EditProductViewModel>().ReverseMap();
-            CreateMap<List<ProductDto>, List<ProductViewModel>>().ReverseMap();
         }
     }
 }

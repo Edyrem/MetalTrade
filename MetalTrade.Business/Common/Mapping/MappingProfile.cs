@@ -8,7 +8,8 @@ namespace MetalTrade.Business.Common.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<AdvertisementDto, Advertisement>()
+            CreateMap<Advertisement, AdvertisementDto>()
+                .ForMember(dest => dest.PhotoFiles, opt => opt.Ignore())
                 .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore())
@@ -17,9 +18,8 @@ namespace MetalTrade.Business.Common.Mapping
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.IsAd, opt => opt.Ignore())
-                .ForMember(dest => dest.IsTop, opt => opt.Ignore());
-
-            CreateMap<Advertisement, AdvertisementDto>();
+                .ForMember(dest => dest.IsTop, opt => opt.Ignore())                
+                .ReverseMap();
 
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()) 
@@ -32,19 +32,11 @@ namespace MetalTrade.Business.Common.Mapping
             CreateMap<MetalTypeDto, MetalType>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
                 .ForMember(dest => dest.Products, opt => opt.Ignore());
-
-            CreateMap<MetalType, MetalTypeDto>()
-                .ForMember(dest => dest.Products, opt => opt.Ignore());
-
-            CreateMap<List<MetalTypeDto>, List<MetalType>>().ReverseMap();
             #endregion
 
             #region ProductService
             CreateMap<ProductDto, Product>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
-                .ReverseMap();
-
-            CreateMap<List<ProductDto>, List<Product>>()
                 .ReverseMap();
             #endregion
 
