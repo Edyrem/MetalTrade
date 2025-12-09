@@ -26,6 +26,7 @@ public class UserService : IUserService
         _userRepository = new UserManagerRepository(context, userManager);
         _imageUploadService = imageUploadService;
         _mapper = mapper;
+        _signInManager = signInManager;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id)

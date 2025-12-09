@@ -41,7 +41,9 @@ namespace MetalTrade.Business.Common.Mapping
             #endregion
 
             #region UserService
-            CreateMap<UserDto, User>().ReverseMap();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore())
+                .ReverseMap();
             #endregion
         }
     }
