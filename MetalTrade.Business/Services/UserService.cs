@@ -85,6 +85,16 @@ public class UserService : IUserService
         return await _userRepository.IsInRoleAsync(user, role);
     }
 
+    public async Task<bool> IsInRolesAsync(UserDto userDto, string[] roles)
+    {
+        if (userDto == null) return false;
+        var user = await _userRepository.GetAsync(userDto.Id);
+        if (user == null) return false;
+        var userRoles = await _userRepository.GetUserRolesAsync(user);
+
+        return userRoles != null ? userRoles.Any(r => roles.Contains(r)) : false;
+    }
+
     public async Task<IEnumerable<string>> GetUserRolesAsync(UserDto userDto)
     {
         if (userDto == null) return Enumerable.Empty<string>();

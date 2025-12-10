@@ -36,7 +36,7 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         bool isAdmin = true;
-        if (!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
+        if (!await _userService.IsInRolesAsync(user, ["admin", "moderator"]))
         {
             models = models.Where(a => a.Status == (int)AdvertisementStatus.Active).ToList();
             isAdmin = false;

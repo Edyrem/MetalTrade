@@ -37,20 +37,12 @@ public class ProfileController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return NotFound();
 
-        var dto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);        
+        var userDto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);
+        
+        var userViewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
+        userViewModel.IsSupplier = await _userService.IsInRoleAsync(userDto!, "supplier");
 
-        var vm = new UserProfileWithAdsViewModel
-        {
-            UserName = dto.UserName,
-            Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber,
-            WhatsAppNumber = dto.WhatsAppNumber,
-            PhotoPath = dto.PhotoLink,
-            IsSupplier = await _userService.IsInRoleAsync(dto, "supplier"),
-            Advertisements = dto.Advertisements,
-        };
-
-        return View(vm);
+        return View(userViewModel);
     }
 
     [HttpGet]
@@ -58,17 +50,9 @@ public class ProfileController : Controller
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);        
 
-        var vm = new UserProfileEditViewModel
-        {
-            Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            WhatsAppNumber = user.WhatsAppNumber,
-            PhotoPath = user.PhotoLink,
-        };
+        var userModel = _mapper.Map<UserProfileEditViewModel>(user);
 
-        return View(vm);
+        return View(userModel);
     }
 
     [HttpPost]
@@ -80,17 +64,9 @@ public class ProfileController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var dto = new UserDto
-        {
-            Id = model.Id,
-            UserName = model.UserName,
-            Email = model.Email,
-            PhoneNumber = model.PhoneNumber,
-            WhatsAppNumber = model.WhatsAppNumber,
-            Photo = model.Photo
-        };
+        var userDto = _mapper.Map<UserDto>(user);
 
-        await _userService.UpdateUserAsync(dto);
+        await _userService.UpdateUserAsync(userDto);
 
         return RedirectToAction(nameof(Index));
     }
