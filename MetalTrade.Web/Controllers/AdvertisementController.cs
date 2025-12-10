@@ -75,17 +75,16 @@ public class AdvertisementController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if(user == null)
+            return Forbid();
+
         if (ModelState.IsValid)
         {
-            var user = await _userService.GetCurrentUserAsync(HttpContext);
-            if (user != null)
-            {
-                var adsDto = _mapper.Map<AdvertisementDto>(model);
-                adsDto.UserId = user.Id;
-                await _adsService.CreateAsync(adsDto);
-                return RedirectToAction("Index");                
-            }
-            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+            var adsDto = _mapper.Map<AdvertisementDto>(model);
+            adsDto.UserId = user.Id;
+            await _adsService.CreateAsync(adsDto);
+            return RedirectToAction("Index");
         }
         var productDtos = await _productService.GetAllAsync();
         model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
