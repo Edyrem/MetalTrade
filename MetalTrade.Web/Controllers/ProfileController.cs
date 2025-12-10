@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -15,16 +16,19 @@ public class ProfileController : Controller
     private readonly IUserService _userService;    
     private readonly UserManager<User> _userManager;
     private readonly IWebHostEnvironment _env;
+    private readonly IMapper _mapper;
 
     public ProfileController(
         
         IUserService userService,
         UserManager<User> userManager, 
+        IMapper mapper,
         IWebHostEnvironment env)
     {
         
         _userService = userService;
         _userManager = userManager;
+        _mapper = mapper;
         _env = env;
     }
 
@@ -83,7 +87,7 @@ public class ProfileController : Controller
             Email = model.Email,
             PhoneNumber = model.PhoneNumber,
             WhatsAppNumber = model.WhatsAppNumber,
-            PhotoLink = model.PhotoPath
+            Photo = model.Photo
         };
 
         await _userService.UpdateUserAsync(dto);

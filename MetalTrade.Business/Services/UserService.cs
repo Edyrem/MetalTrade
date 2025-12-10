@@ -95,7 +95,7 @@ public class UserService : IUserService
 
     public async Task<bool> CreateUserAsync(UserDto model, string role)
     {
-        var avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars") ?? "";
+        model.PhotoLink = await _imageUploadService.UploadImageAsync(model.Photo, "avatars") ?? "";
 
         var user = _mapper.Map<User>(model);
 

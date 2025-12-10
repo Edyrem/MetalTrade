@@ -12,12 +12,14 @@ namespace MetalTrade.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IImageUploadService _imageUploadService;
         private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService, IMapper mapper)
+        public AccountController(IUserService userService, IMapper mapper, IImageUploadService imageUploadService)
         {
             _userService = userService;
             _mapper = mapper;
+            _imageUploadService = imageUploadService;
         }
 
         [HttpGet]
@@ -95,15 +97,9 @@ namespace MetalTrade.Web.Controllers
             if (photo == null || photo.Length == 0)
                 return BadRequest();
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(photo.FileName);
-            var path = Path.Combine("wwwroot/uploads", fileName);
+            var fileName = await _imageUploadService.UploadImageAsync(photo, "uploads");
 
-            Directory.CreateDirectory("wwwroot/uploads");
-
-            using (var stream = new FileStream(path, FileMode.Create))
-                await photo.CopyToAsync(stream);
-
-            return Json(new { url = "/uploads/" + fileName });
+            return Json(new { fileName });
         }
 
     }
