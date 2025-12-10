@@ -22,4 +22,5 @@ public interface IUserService
     Task UpdateUserAsync(UserDto model);
     Task DeleteUserAsync(int id);
     Task<UserDto?> GetCurrentUserAsync(HttpContext context);
+    Task<IdentityResult> ChangePasswordAsync(UserDto user, string currentPassword, string newPassword);
 }

@@ -73,5 +73,10 @@ namespace MetalTrade.DataAccess.Repositories
         }
 
         public async Task<User?> GetCurrentUserAsync(HttpContext context) => await _userManager.GetUserAsync(context.User);
+
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+        {
+            return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        }
     }
 }

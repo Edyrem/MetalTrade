@@ -181,6 +181,20 @@ public class UserService : IUserService
     }
 
     public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+
+    public async Task<IdentityResult> ChangePasswordAsync(UserDto userDto, string currentPassword, string newPassword)
+    {
+        if (userDto == null) 
+            return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+
+        var user = await _userRepository.GetAsync(userDto.Id);
+
+        if (user == null) 
+            return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+
+        return await _userRepository.ChangePasswordAsync(user, currentPassword, newPassword);
+    }
+
     public async Task<UserDto?> GetCurrentUserAsync(HttpContext context) =>
         _mapper.Map<UserDto?>(await _userRepository.GetCurrentUserAsync(context));
     

@@ -20,5 +20,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task<IEnumerable<string>?> GetUserRolesAsync(User user);
         Task<bool> IsInRoleAsync(User user, string role);
         Task<User?> GetCurrentUserAsync(HttpContext context);
+        Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
     }
 }

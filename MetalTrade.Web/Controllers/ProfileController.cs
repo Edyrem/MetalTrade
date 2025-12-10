@@ -13,28 +13,24 @@ namespace MetalTrade.Web.Controllers;
 public class ProfileController : Controller
 {
     
-    private readonly IUserService _userService;    
-    private readonly UserManager<User> _userManager;
+    private readonly IUserService _userService;
     private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public ProfileController(
         
         IUserService userService,
-        UserManager<User> userManager, 
         IMapper mapper,
         IWebHostEnvironment env)
-    {
-        
+    {        
         _userService = userService;
-        _userManager = userManager;
         _mapper = mapper;
         _env = env;
     }
 
     public async Task<IActionResult> Index()
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
         var userDto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);
@@ -58,7 +54,7 @@ public class ProfileController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(UserProfileEditViewModel model)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
         if (!ModelState.IsValid)
@@ -85,10 +81,10 @@ public class ProfileController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
-        var result = await _userManager.ChangePasswordAsync(
+        var result = await _userService.ChangePasswordAsync(
             user,
             model.OldPassword,
             model.NewPassword
