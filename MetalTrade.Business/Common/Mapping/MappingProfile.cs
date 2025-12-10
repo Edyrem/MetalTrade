@@ -21,7 +21,7 @@ namespace MetalTrade.Business.Common.Mapping
                 //.ForMember(dest => dest.IsTop, opt => opt.Ignore())                
                 .ReverseMap()
                 .ForMember(d => d.Id, opt => opt.Ignore())
-                .ForMember(d => d.ProductId, opt => opt.Ignore())
+                //.ForMember(d => d.ProductId, opt => opt.Ignore())
                 .ForMember(d => d.Product, opt => opt.Ignore());
 
             CreateMap<User, UserDto>()

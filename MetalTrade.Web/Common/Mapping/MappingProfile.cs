@@ -7,6 +7,7 @@ using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
 using MetalTrade.Web.ViewModels.Profile;
 using MetalTrade.Web.ViewModels.User;
+
 namespace MetalTrade.Web.Common.Mapping
 {
     public class MappingProfile : Profile
@@ -37,6 +38,7 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
 
             CreateMap<UserDto, UserProfileEditViewModel>().ReverseMap();
+
             CreateMap<UserDto, UserProfileWithAdsViewModel>()
                 .ForMember(dest => dest.PhotoPath, opt => opt.MapFrom(src => src.PhotoLink))
                 .ReverseMap()

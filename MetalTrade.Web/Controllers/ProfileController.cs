@@ -60,7 +60,7 @@ public class ProfileController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var userDto = _mapper.Map<UserDto>(user);
+        var userDto = _mapper.Map<UserDto>(model);
 
         await _userService.UpdateUserAsync(userDto);
 
