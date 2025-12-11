@@ -67,7 +67,11 @@ public class AdvertisementService : IAdvertisementService
             var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
             foreach (var link in photoLinks)
             {
-                entity.Photoes.Add( new AdvertisementPhoto { PhotoLink = link });
+                entity.Photoes.Add(new AdvertisementPhoto 
+                { 
+                    PhotoLink = link,
+                    AdvertisementId = entity.Id
+                });
             }
         }
 

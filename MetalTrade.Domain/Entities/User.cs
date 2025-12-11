@@ -6,7 +6,7 @@ namespace MetalTrade.Domain.Entities
     public class User: IdentityUser<int>, ISoftDeletable
     {
         public string Photo { get; set; }
-        public string WhatsAppNumber { get; set; }
+        public string? WhatsAppNumber { get; set; }
         public List<Advertisement> Advertisements { get; set; } = null!;
         public bool IsDeleted { get; set; }
     }
