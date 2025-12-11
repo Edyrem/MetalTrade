@@ -5,6 +5,9 @@
     ViewData["Title"] = "Details";
 
     var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+    int currentUserId;
+    int.TryParse(ViewData["CurrentUserId"]?.ToString(), out currentUserId);
+
 }
 
 <h1>Детали</h1>
@@ -61,7 +64,7 @@
                     </dd>
                 </dl>
                 <div>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated && (Model.UserId == ViewBag.CurrentUserId || isAdmin))
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && (Model.UserId == currentUserId || isAdmin))
                     {
                         <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Редактировать</a>
                         <b> | </b>

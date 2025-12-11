@@ -115,7 +115,7 @@ public class AdvertisementController : Controller
             isAdmin = false;
         }
         ViewData["IsAdmin"] = isAdmin;
-        ViewBag.CurrentUserId = user.Id;
+        ViewData["CurrentUserId"] = user?.Id;
 
         return View(model);
     }
