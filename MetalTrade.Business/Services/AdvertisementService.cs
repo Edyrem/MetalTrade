@@ -7,6 +7,7 @@ using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Business.Services;
 
@@ -123,4 +124,47 @@ public class AdvertisementService : IAdvertisementService
         await _repository.DeleteAdvertisementPhotoAsync(advertisementPhoto.Id);
         await _repository.SaveChangesAsync();
     }
+    
+    public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilterDto filter)
+    {
+        var queriableAdvertisements = _repository.CreateFilter();
+        if (!string.IsNullOrWhiteSpace(filter.Title))
+            queriableAdvertisements = _repository.FilterTitle(queriableAdvertisements, filter.Title);
+        
+        if (!string.IsNullOrWhiteSpace(filter.City))
+            queriableAdvertisements = _repository.FilterCity(queriableAdvertisements, filter.City);
+        
+        if (filter.MetalTypeId.HasValue)
+            queriableAdvertisements = _repository.FilterMetalType(queriableAdvertisements, filter.MetalTypeId.Value);
+
+        if (filter.PriceFrom.HasValue)
+            queriableAdvertisements = _repository.FilterPriceFrom(queriableAdvertisements, filter.PriceFrom.Value);
+
+        if (filter.PriceTo.HasValue)
+            queriableAdvertisements = _repository.FilterPriceTo(queriableAdvertisements, filter.PriceTo.Value);
+
+        if (filter.DateFromUtc.HasValue)
+            queriableAdvertisements = _repository.FilterDateFromUtc(queriableAdvertisements, filter.DateFromUtc.Value);
+
+        if (filter.DateToUtc.HasValue)
+            queriableAdvertisements = _repository.FilterDateToUtc(queriableAdvertisements, filter.DateToUtc.Value);
+        
+        if (filter.ProductId.HasValue)
+            queriableAdvertisements = _repository.FilterProduct(queriableAdvertisements, filter.ProductId.Value);
+
+        queriableAdvertisements = filter?.Sort switch
+        {
+            "price_asc" => queriableAdvertisements.OrderBy(a => a.Price),
+            "price_desc" => queriableAdvertisements.OrderByDescending(a => a.Price),
+            "date_asc" => queriableAdvertisements.OrderBy(a => a.CreateDate),
+            "date_desc" => queriableAdvertisements.OrderByDescending(a => a.CreateDate),
+            _ => queriableAdvertisements.OrderByDescending(a => a.CreateDate)
+        };
+
+        queriableAdvertisements = queriableAdvertisements.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+
+        var ads = await queriableAdvertisements.ToListAsync();
+        return _mapper.Map<List<AdvertisementDto>>(ads);
+    }
+
 }

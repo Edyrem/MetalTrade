@@ -1,11 +1,15 @@
-﻿@using MetalTrade.Domain.Enums
+﻿@using MetalTrade.Business.Dtos
 @using MetalTrade.Web.ViewModels.Advertisement
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<AdvertisementViewModel>
 
 @{
 	ViewData["Title"] = "Advertisements";
 
-    var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+	var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+	var filter = ViewBag.Filter as AdvertisementFilterDto;
+	var metalTypes = ViewBag.MetalTypes as List<MetalTypeDto> ?? new();
+	var products = ViewBag.Products as List<ProductDto> ?? new();
 }
 
 @if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
@@ -14,63 +18,140 @@
 		<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
 	</div>
 }
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<div class="container mt-4">
-	<div class="row">
-		@foreach (var ads in Model)
-		{
-			<div class="col-md-4 mb-4">
-				<div class="card shadow-sm position-relative">
-					@if (ads.Photoes.Count > 0)
-					{
-						string carouselId = $"carousel-{ads.Id}";
-						<div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
-							<div class="carousel-inner">
-								@for (int i = 0; i < ads.Photoes.Count; i++)
-								{
-									var photo = ads.Photoes[i];
-									<div class="carousel-item @(i == 0 ? "active" : "")">
-										<img src="@photo.PhotoLink" class="d-block w-100" alt="Фото объявления"
-										style="height: 200px; object-fit: cover;" />
-									</div>
-								}
-							</div>
-							<button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
-								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-								<span class="visually-hidden">Prev</span>
-							</button>
-							<button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
-								<span class="carousel-control-next-icon" aria-hidden="true"></span>
-								<span class="visually-hidden">Next</span>
-							</button>							
-						</div>
-					}
-					@if (isAdmin)
-					{
-                        switch(ads.Status)
-						{
-							case (int)AdvertisementStatus.Draft:
-								<div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
-								break;
-							case (int)AdvertisementStatus.Active:
-								<div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
-								break;
-							case (int)AdvertisementStatus.Rejected:
-								<div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
-								break;	
-							case (int)AdvertisementStatus.Archived:
-								<div class="position-absolute small bg-info-subtle top-0 m-1 p-1 opacity-75">Деактивировано</div>
-								break;
-                        }						
-					}
-					<div class="card-body">
-						<h5 class="card-title mt-2">@ads.Title</h5>
-						<p class="card-text text-muted">@ads.Product.Name</p>
-						<p class="card-text fw-bold">@ads.PhoneNumber</p>
-						<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary w-100">Подробнее</a>
-					</div>
-				</div>
-			</div>
-		}
+
+<form method="get" class="mb-4" id="ads-filter-form">
+	<div class="row g-2">
+
+		<div class="col-md-3">
+			<input class="form-control"
+			       type="text"
+			       name="title"
+			       placeholder="Название"
+			       value="@filter?.Title" />
+		</div>
+
+		<div class="col-md-3">
+			<input class="form-control"
+			       type="text"
+			       name="city"
+			       placeholder="Город"
+			       value="@filter?.City" />
+		</div>
+
+		<div class="col-md-3">
+			<input class="form-control"
+			       type="number"
+			       name="priceFrom"
+			       placeholder="Цена от"
+			       value="@filter?.PriceFrom" />
+		</div>
+
+		<div class="col-md-3">
+			<input class="form-control"
+			       type="number"
+			       name="priceTo"
+			       placeholder="Цена до"
+			       value="@filter?.PriceTo" />
+		</div>
+
+		<div class="col-md-3">
+			<input type="date" class="form-control"
+			       name="dateFrom"
+			       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
+		</div>
+
+		<div class="col-md-3">
+			<input type="date" class="form-control"
+			       name="dateTo"
+			       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
+		</div>
+
+		<div class="col-md-3">
+			<select class="form-control" name="metalTypeId" id="metalTypeSelect">
+				<option value="">Тип металла</option>
+				@foreach (var type in metalTypes)
+				{
+					<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
+						@type.Name
+					</option>
+				}
+			</select>
+		</div>
+
+		<div class="col-md-3">
+			<select class="form-control" name="productId" id="productSelect">
+				<option value="">Продукт</option>
+				@foreach (var p in products)
+				{
+					<option value="@p.Id" selected="@(filter?.ProductId == p.Id)">
+						@p.Name
+					</option>
+				}
+			</select>
+		</div>
+
+		<div class="col-md-3">
+			<select class="form-control" name="sort">
+				<option value="" selected="@(string.IsNullOrWhiteSpace(filter?.Sort))">Сортировка</option>
+				<option value="price_asc" selected="@(filter?.Sort == "price_asc")">Цена ↑</option>
+				<option value="price_desc" selected="@(filter?.Sort == "price_desc")">Цена ↓</option>
+				<option value="date_asc" selected="@(filter?.Sort == "date_asc")">Дата ↑</option>
+				<option value="date_desc" selected="@(filter?.Sort == "date_desc")">Дата ↓</option>
+			</select>
+		</div>
+
+		<div class="col-md-3 d-flex">
+			<button class="btn btn-primary w-100 me-1" id="filter-submit">Фильтр</button>
+			<a href="/Advertisement/Index" class="btn btn-secondary w-100">Сбросить</a>
+		</div>
+
 	</div>
+</form>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div id="ads-grid">
+	@Html.Partial("_AdsGrid", Model)
 </div>
+
+@section Scripts {
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const form = document.getElementById('ads-filter-form');
+			const grid = document.getElementById('ads-grid');
+			const basePartialUrl = '/Advertisement/PartialList';
+
+			if (!form || !grid) return;
+
+			function buildQueryFromForm(formElement) {
+				const params = new URLSearchParams();
+				const fd = new FormData(formElement);
+				for (const [k, v] of fd.entries()) {
+					if (!v) continue;
+					params.append(k, v);
+				}
+				return params.toString();
+			}
+
+			function loadPartialWithParams(queryString, pushUrl = true) {
+				const url = basePartialUrl + (queryString ? '?' + queryString : '');
+				fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+					.then(response => response.text())
+					.then(html => {
+						grid.innerHTML = html;
+						if (pushUrl) {
+							const newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+							window.history.pushState({}, '', newUrl);
+						}
+					})
+					.catch(err => console.error(err));
+			}
+
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				const qs = buildQueryFromForm(form);
+				loadPartialWithParams(qs, true);
+			});
+		});
+	</script>
+}
