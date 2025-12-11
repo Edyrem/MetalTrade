@@ -104,6 +104,7 @@ namespace MetalTrade.DataAccess.Repositories
             return query.Where(ad => ad.CreateDate >= dateFrom);
         }
 
+        
         public IQueryable<Advertisement> FilterDateToUtc(IQueryable<Advertisement> query, DateTime dateTo)
         {
             return query.Where(ad => ad.CreateDate <= dateTo);
