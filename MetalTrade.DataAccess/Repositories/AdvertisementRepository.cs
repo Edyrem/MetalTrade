@@ -67,12 +67,14 @@ namespace MetalTrade.DataAccess.Repositories
 
         public IQueryable<Advertisement> FilterTitle(IQueryable<Advertisement> query, string title)
         {
-            return query.Where(q => q.Title.Contains(title));
+            var lowered = title.ToLower();
+            return query.Where(q => q.Title.ToLower().Contains(lowered));
         }
 
         public IQueryable<Advertisement> FilterCity(IQueryable<Advertisement> query, string city)
         {
-            return query.Where(q => q.City.Contains(city));
+            var c = city.ToLower();
+            return query.Where(q => q.City != null && q.City.ToLower().Contains(c));
         }
 
         public IQueryable<Advertisement> FilterProduct(IQueryable<Advertisement> query, int productId)
