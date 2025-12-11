@@ -38,7 +38,7 @@ public class AdvertisementController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
-        var filter = new AdvertisementFilter
+        var filter = new AdvertisementFilterDto
         {
             Title = Request.Query["title"],
             City = Request.Query["city"],
@@ -56,49 +56,48 @@ public class AdvertisementController : Controller
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        bool isAdmin = false;
-        
-        if (user != null && 
-            (await _userService.IsInRoleAsync(user, "admin") ||
-             await _userService.IsInRoleAsync(user, "moderator")))
+        bool isAdmin = user != null &&
+                       (await _userService.IsInRoleAsync(user, "admin") ||
+                        await _userService.IsInRoleAsync(user, "moderator"));
+
+        if (!isAdmin)
         {
-            isAdmin = true;
+            models = models.Where(a =>
+                a.Status == (int)AdvertisementStatus.Active ||
+                (user != null && a.UserId == user.Id)
+            ).ToList();
         }
-        else
-        {
-            models = models
-                .Where(a => a.Status == (int)AdvertisementStatus.Active ||
-                            (user != null && a.UserId == user.Id))
-                .ToList();
-        }
+
         ViewData["IsAdmin"] = isAdmin;
         ViewBag.Filter = filter;
 
-        var totalCount = await _adsService.GetFilteredCountAsync(filter);
-        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize);
-        ViewBag.Page = filter.Page;
-        
-        var productDtos = await _productService.GetAllAsync();
-        ViewBag.Products = productDtos;
-
+        ViewBag.Products = await _productService.GetAllAsync();
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
         return View(models);
     }
-    
+
+
     [AllowAnonymous]
-    public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilter filter)
+    public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilterDto filter)
     {
         var adsDtos = await _adsService.GetFilteredAsync(filter);
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (!(await _userService.IsInRoleAsync(user, "admin") ||
-              await _userService.IsInRoleAsync(user, "moderator")))
+
+        bool isAdmin = user != null &&
+                       (await _userService.IsInRoleAsync(user, "admin") ||
+                        await _userService.IsInRoleAsync(user, "moderator"));
+
+        if (!isAdmin)
         {
-            models = models.Where(a => a.Status == (int)AdvertisementStatus.Active || a.UserId == user.Id).ToList();
+            models = models.Where(a =>
+                a.Status == (int)AdvertisementStatus.Active ||
+                (user != null && a.UserId == user.Id)
+            ).ToList();
         }
-        
+
         return PartialView("_AdsGrid", models);
     }
 

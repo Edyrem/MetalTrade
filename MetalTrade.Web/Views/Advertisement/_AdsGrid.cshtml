@@ -12,7 +12,7 @@
 			<div class="col-md-4 mb-4">
 				<div class="card shadow-sm position-relative">
 
-					@if (ads.Photoes.Count > 0)
+					@if (ads.Photoes != null && ads.Photoes.Count > 0)
 					{
 						string carouselId = $"carousel-{ads.Id}";
 						<div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
@@ -35,6 +35,7 @@
 						</div>
 					}
 
+
 					@if (isAdmin)
 					{
 						<div class="position-absolute small top-0 m-1 p-1 opacity-75 
@@ -54,8 +55,6 @@
 
 					<div class="card-body">
 						<h5 class="card-title mt-2">@ads.Title</h5>
-						<p class="card-text text-muted">@ads.Product.Name</p>
-
 						<p class="card-text fs-6 text-muted d-inline">Цена: </p>
 						<p class="card-text fw-bold fs-5 d-inline">@ads.Price.ToString("N0")</p>
 
