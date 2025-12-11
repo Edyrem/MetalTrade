@@ -60,52 +60,55 @@ namespace MetalTrade.DataAccess.Repositories
         public IQueryable<Advertisement> CreateFilter()
         {
             return _context.Advertisements
-                .Include(q => q.Product)
-                .Include(q => q.Photoes)
+                .Include(ad => ad.Product)
+                .Include(ad => ad.Photoes)
                 .AsQueryable();
         }
 
         public IQueryable<Advertisement> FilterTitle(IQueryable<Advertisement> query, string title)
         {
-            var lowered = title.ToLower();
-            return query.Where(q => q.Title.ToLower().Contains(lowered));
+            return query.Where(ad =>
+                ad.Title != null &&
+                ad.Title.ToLower().Contains(title.ToLower()));
         }
 
         public IQueryable<Advertisement> FilterCity(IQueryable<Advertisement> query, string city)
         {
-            var c = city.ToLower();
-            return query.Where(q => q.City != null && q.City.ToLower().Contains(c));
+            return query.Where(ad =>
+                ad.City != null &&
+                ad.City.ToLower().Contains(city.ToLower()));
         }
 
         public IQueryable<Advertisement> FilterProduct(IQueryable<Advertisement> query, int productId)
         {
-            return query.Where(q => q.ProductId == productId);
+            return query.Where(ad => ad.ProductId == productId);
         }
 
         public IQueryable<Advertisement> FilterMetalType(IQueryable<Advertisement> query, int metalTypeId)
         {
-            return query.Where(q => q.Product.MetalTypeId == metalTypeId);
+            return query.Where(ad => ad.Product.MetalTypeId == metalTypeId);
         }
 
         public IQueryable<Advertisement> FilterPriceFrom(IQueryable<Advertisement> query, decimal priceFrom)
         {
-            return query.Where(q => q.Price >= priceFrom);
+            return query.Where(ad => ad.Price >= priceFrom);
         }
 
         public IQueryable<Advertisement> FilterPriceTo(IQueryable<Advertisement> query, decimal priceTo)
         {
-            return query.Where(q => q.Price <= priceTo);
+            return query.Where(ad => ad.Price <= priceTo);
         }
 
         public IQueryable<Advertisement> FilterDateFromUtc(IQueryable<Advertisement> query, DateTime dateFrom)
         {
-            return query.Where(q => q.CreateDate >= dateFrom);
+            return query.Where(ad => ad.CreateDate >= dateFrom);
         }
 
         public IQueryable<Advertisement> FilterDateToUtc(IQueryable<Advertisement> query, DateTime dateTo)
         {
-            return query.Where(q => q.CreateDate <= dateTo);
+            return query.Where(ad => ad.CreateDate <= dateTo);
         }
+
 
     }
 }
