@@ -60,36 +60,39 @@ namespace MetalTrade.DataAccess.Repositories
         public IQueryable<Advertisement> CreateFilter()
         {
             return _context.Advertisements
+                .Include(q => q.Product)
+                .Include(q => q.Photoes)
                 .AsQueryable();
         }
 
         public IQueryable<Advertisement> FilterTitle(IQueryable<Advertisement> query, string title)
         {
-            return query.Where(q => q.Title == title);
+            return query.Where(q => q.Title.Contains(title));
         }
 
         public IQueryable<Advertisement> FilterCity(IQueryable<Advertisement> query, string city)
         {
-            return query.Where(q => q.City == city);
+            return query.Where(q => q.City.Contains(city));
         }
 
         public IQueryable<Advertisement> FilterProduct(IQueryable<Advertisement> query, int productId)
         {
-            return query.Include(q => q.Product).Where(q => q.Product != null && q.Product.Id == productId);
+            return query.Where(q => q.ProductId == productId);
         }
 
         public IQueryable<Advertisement> FilterMetalType(IQueryable<Advertisement> query, int metalTypeId)
         {
-            return query.Include(q => q.Product).Where(q => q.Product != null && q.Product.MetalTypeId == metalTypeId);
+            return query.Where(q => q.Product.MetalTypeId == metalTypeId);
         }
 
         public IQueryable<Advertisement> FilterPriceFrom(IQueryable<Advertisement> query, decimal priceFrom)
         {
             return query.Where(q => q.Price >= priceFrom);
         }
-        public IQueryable<Advertisement> FilterPriceTo(IQueryable<Advertisement> query, decimal priceFrom)
+
+        public IQueryable<Advertisement> FilterPriceTo(IQueryable<Advertisement> query, decimal priceTo)
         {
-            return query.Where(q => q.Price >= priceFrom);
+            return query.Where(q => q.Price <= priceTo);
         }
 
         public IQueryable<Advertisement> FilterDateFromUtc(IQueryable<Advertisement> query, DateTime dateFrom)
@@ -101,5 +104,6 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return query.Where(q => q.CreateDate <= dateTo);
         }
+
     }
 }
