@@ -59,7 +59,7 @@
                 <label class="control-label">Добавить фото</label>
                 <div class="d-flex align-items-start gap-2">
                     <button type="button" id="addPhotoBtn">+</button>
-                    <div id="photoContainer"></div>
+                    <div id="photoContainer" data-existing-photos="@Model.Photoes.Count"></div>
                 </div>
                 <div id="hiddenPhotoFileInputs"></div>
                 <span asp-validation-for="PhotoFiles" class="text-danger"></span>

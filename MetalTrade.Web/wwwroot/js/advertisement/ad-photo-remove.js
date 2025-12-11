@@ -2,6 +2,7 @@
 
     let id = $(this).data("id");
     let link = $(this).data("link");
+    let $photoContainer = $("#photoContainer");
 
     Swal.fire({
         title: "Удалить фото?",
@@ -30,6 +31,11 @@
                     card.animate({ opacity: 0, height: 0, margin: 0, padding: 0 }, 400, function () {
                         $(this).remove();
                     });
+
+                    // Декремент существующих фото
+                    let existingCount = parseInt($photoContainer.data("existing-photos")) || 0;
+                    existingCount = Math.max(existingCount - 1, 0);
+                    $photoContainer.data("existing-photos", existingCount);
 
                     Swal.fire({
                         toast: true,

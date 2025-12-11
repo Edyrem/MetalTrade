@@ -6,10 +6,15 @@
 
     // Контейнер для превью изображений
     const $photoContainer = $("#photoContainer");
+    // div для скрытых фото-файлов
+    const $hiddenInputs = $("#hiddenPhotoFileInputs");
 
     // Кнопка "Добавить фото"
     $("#addPhotoBtn").on("click", function () {
-        if ($photoContainer.children(".photo-preview").length >= maxPhotos) {
+        let existingPhotosCount = parseInt($photoContainer.data("existing-photos")) || 0;
+        let newAddedPhotosCount = $hiddenInputs.find("input").length;
+
+        if ((existingPhotosCount + newAddedPhotosCount) >= maxPhotos) {
             Swal.fire({
                 toast: true,
                 icon: 'warning',
