@@ -121,33 +121,6 @@ public class AdvertisementService : IAdvertisementService
         await _repository.SaveChangesAsync();
     }
     
-    public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilter filter)
-    {
-        var q = _repository.GetFilteredQueryable(filter);
-        
-        if (filter.ProductId.HasValue)
-            q = q.Where(a => a.ProductId == filter.ProductId.Value);
-        
-        q = filter?.Sort switch
-        {
-            "price_asc" => q.OrderBy(a => a.Price),
-            "price_desc" => q.OrderByDescending(a => a.Price),
-            "date_asc" => q.OrderBy(a => a.CreateDate),
-            "date_desc" => q.OrderByDescending(a => a.CreateDate),
-            _ => q.OrderByDescending(a => a.CreateDate)
-        };
-        
-        q = q.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
-
-        var ads = await q.ToListAsync();
-        return _mapper.Map<List<AdvertisementDto>>(ads);
-    }
-
-    public async Task<int> GetFilteredCountAsync(AdvertisementFilter filter)
-    {
-        return await _repository.GetFilteredCountAsync(filter);
-    }
-
     public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilterDto filter)
     {
         var queriableAdvertisements = _repository.CreateFilter();
