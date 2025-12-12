@@ -4,6 +4,7 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -27,10 +28,10 @@ public class ProductController : Controller
      public async Task<IActionResult> Create()
      {
          var metalTypes = await _metalService.GetAllAsync();
-         
-         CreateProductViewModel model =  _mapper.Map<CreateProductViewModel>(metalTypes);
-         
-         return View(model);
+
+        //CreateProductViewModel model =  _mapper.Map<CreateProductViewModel>(metalTypes);
+        ViewData["MetalTypes"] = new SelectList(metalTypes, "Id", "Name");
+         return View();
      }
 
      [HttpPost]
@@ -66,14 +67,15 @@ public class ProductController : Controller
 
      public async Task<IActionResult> Edit(int id)
      {
-         ProductDto? productDto = await _productService.GetAsync(id);
-         if (productDto == null)
-             return RedirectToAction("Index");
+        ProductDto? productDto = await _productService.GetAsync(id);
+        if (productDto == null)
+            return RedirectToAction("Index");
          
-         var metalTypes = await _metalService.GetAllAsync();
-         EditProductViewModel model = _mapper.Map<EditProductViewModel>(metalTypes);
+        var metalTypes = await _metalService.GetAllAsync();
+        EditProductViewModel model = _mapper.Map<EditProductViewModel>(productDto);
+        ViewData["MetalTypes"] = new SelectList(metalTypes, "Id", "Name");
 
-         return View(model);
+        return View();
      }
 
      [HttpPost]
