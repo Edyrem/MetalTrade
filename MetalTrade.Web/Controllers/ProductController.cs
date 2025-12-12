@@ -75,7 +75,7 @@ public class ProductController : Controller
         EditProductViewModel model = _mapper.Map<EditProductViewModel>(productDto);
         ViewData["MetalTypes"] = new SelectList(metalTypes, "Id", "Name");
 
-        return View();
+        return View(model);
      }
 
      [HttpPost]
