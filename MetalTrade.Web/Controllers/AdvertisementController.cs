@@ -56,11 +56,10 @@ public class AdvertisementController : Controller
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        bool isAdmin = user != null &&
-                       (await _userService.IsInRoleAsync(user, "admin") ||
-                        await _userService.IsInRoleAsync(user, "moderator"));
 
-        if (!isAdmin)
+        bool isAdmin = true;
+        if (!await _userService.IsInRolesAsync(user, ["admin", "moderator"]))
+
         {
             models = models.Where(a =>
                 a.Status == (int)AdvertisementStatus.Active ||
@@ -111,12 +110,12 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         bool isAdmin = true;
-        if (!(await _userService.IsInRoleAsync(user, "admin") || await _userService.IsInRoleAsync(user, "moderator")))
+        if (!await _userService.IsInRolesAsync(user, ["admin", "moderator"]))
         {
             isAdmin = false;
         }
         ViewData["IsAdmin"] = isAdmin;
-        ViewBag.CurrentUserId = user.Id;
+        ViewData["CurrentUserId"] = user?.Id;
 
         return View(model);
     }
@@ -131,17 +130,16 @@ public class AdvertisementController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if(user == null)
+            return Forbid();
+
         if (ModelState.IsValid)
         {
-            var user = await _userService.GetCurrentUserAsync(HttpContext);
-            if (user != null)
-            {
-                var adsDto = _mapper.Map<AdvertisementDto>(model);
-                adsDto.UserId = user.Id;
-                await _adsService.CreateAsync(adsDto);
-                return RedirectToAction("Index");                
-            }
-            ModelState.AddModelError(string.Empty, "Пользователь не авторизован");
+            var adsDto = _mapper.Map<AdvertisementDto>(model);
+            adsDto.UserId = user.Id;
+            await _adsService.CreateAsync(adsDto);
+            return RedirectToAction("Index");
         }
         var productDtos = await _productService.GetAllAsync();
         model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);

@@ -12,8 +12,8 @@ namespace MetalTrade.Business;
 public class UserService : IUserService
 {
     private readonly UserManagerRepository _userRepository;
-    private readonly SignInManager<User> _signInManager;
     private readonly IImageUploadService _imageUploadService;
+    private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
 
     public UserService(
@@ -24,9 +24,9 @@ public class UserService : IUserService
         IMapper mapper)
     {
         _userRepository = new UserManagerRepository(context, userManager);
-        _signInManager = signInManager;
         _imageUploadService = imageUploadService;
         _mapper = mapper;
+        _signInManager = signInManager;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id)
@@ -36,28 +36,26 @@ public class UserService : IUserService
         if (user == null)
             return null;
 
-        var userDto = new UserDto {
-            Id = user.Id,
-            Email = user.Email,
-            UserName = user.UserName,
-            PhoneNumber = user.PhoneNumber,
-            WhatsAppNumber = user.WhatsAppNumber,
-            PhotoLink = user.Photo
-        };
+        var userDto = _mapper.Map<UserDto>(user);
+        return userDto;
+    }
+
+    public async Task<UserDto?> GetUserWithAdvertisementByIdAsync(int id)
+    {
+        var user = await _userRepository.GetWithAdvertisementsAsync(id);
+        
+        if (user == null)
+            return null;
+
+        var userDto = _mapper.Map<UserDto>(user);
+
         return userDto;
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
         var users = await _userRepository.GetAllAsync();
-        var userDtos = users.Select(user => new UserDto
-        {
-            Email = user.Email,
-            UserName = user.UserName,
-            PhoneNumber = user.PhoneNumber,
-            WhatsAppNumber = user.WhatsAppNumber,
-            PhotoLink = user.Photo
-        });
+        var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
         return userDtos;
     }
 
@@ -87,6 +85,16 @@ public class UserService : IUserService
         return await _userRepository.IsInRoleAsync(user, role);
     }
 
+    public async Task<bool> IsInRolesAsync(UserDto userDto, string[] roles)
+    {
+        if (userDto == null) return false;
+        var user = await _userRepository.GetAsync(userDto.Id);
+        if (user == null) return false;
+        var userRoles = await _userRepository.GetUserRolesAsync(user);
+
+        return userRoles != null ? userRoles.Any(r => roles.Contains(r)) : false;
+    }
+
     public async Task<IEnumerable<string>> GetUserRolesAsync(UserDto userDto)
     {
         if (userDto == null) return Enumerable.Empty<string>();
@@ -97,16 +105,9 @@ public class UserService : IUserService
 
     public async Task<bool> CreateUserAsync(UserDto model, string role)
     {
-        var avatarPath = await _imageUploadService.UploadImageAsync(model.Photo, "avatars") ?? "";
+        model.PhotoLink = await _imageUploadService.UploadImageAsync(model.Photo, "avatars") ?? "";
 
-        var user = new User()
-        {
-            Email = model.Email,
-            UserName = model.UserName,
-            PhoneNumber = model.PhoneNumber,
-            WhatsAppNumber = model.WhatsAppNumber,
-            Photo = avatarPath
-        };
+        var user = _mapper.Map<User>(model);
 
         var result = await _userRepository.CreateAsync(user, model.Password);        
         if (result.Succeeded)
@@ -133,22 +134,7 @@ public class UserService : IUserService
     public async Task<List<UserDto>> GetAllUsersWithRolesAsync()
     {
         var users = await _userRepository.GetAllAsync();
-        var result = new List<UserDto>();
-        foreach (var user in users)
-        {
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                PhoneNumber = user.PhoneNumber,
-                WhatsAppNumber = user.WhatsAppNumber,
-                PhotoLink = user.Photo                
-            };
-            var role = await _userRepository.GetUserRolesAsync(user);
-            userDto.Roles = role.ToList() ?? new List<string>();
-            result.Add(userDto);
-        }
+        var result = _mapper.Map<List<UserDto>>(users);
         return result;
     }
 
@@ -181,8 +167,8 @@ public class UserService : IUserService
     public async Task<SignInResult> LoginAsync(string login, string password, bool rememberMe)
     {
         var user = login.Contains('@')
-            ? await _signInManager.UserManager.FindByEmailAsync(login)
-            : await _signInManager.UserManager.FindByNameAsync(login);
+            ? await _userRepository.GetByEmailAsync(login)
+            : await _userRepository.GetByUserNameAsync(login);
 
         if (user == null)
             return SignInResult.Failed;
@@ -195,6 +181,20 @@ public class UserService : IUserService
     }
 
     public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+
+    public async Task<IdentityResult> ChangePasswordAsync(UserDto userDto, string currentPassword, string newPassword)
+    {
+        if (userDto == null) 
+            return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+
+        var user = await _userRepository.GetAsync(userDto.Id);
+
+        if (user == null) 
+            return IdentityResult.Failed(new IdentityError { Description = "User not found." });
+
+        return await _userRepository.ChangePasswordAsync(user, currentPassword, newPassword);
+    }
+
     public async Task<UserDto?> GetCurrentUserAsync(HttpContext context) =>
         _mapper.Map<UserDto?>(await _userRepository.GetCurrentUserAsync(context));
     
