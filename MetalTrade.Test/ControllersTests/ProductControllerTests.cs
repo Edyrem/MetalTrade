@@ -102,38 +102,35 @@ public class ProductControllerTests: ControllerTestBase
         MapperMock.Verify(m => m.Map<ProductDto>(It.IsAny<CreateProductViewModel>()), Times.Never);
     }
 
-    public class ProductControllerCreatePostValidTests : ControllerTestBase
+    [Fact]
+    public async Task Create_Post_ValidModel_RedirectsToIndex()
     {
-        [Fact]
-        public async Task Create_Post_ValidModel_RedirectsToIndex()
+        // Arrange
+        var model = new CreateProductViewModel
         {
-            // Arrange
-            var model = new CreateProductViewModel
-            {
-                Name = "сталь",
-                MetalTypeId = 1
-            };
+            Name = "сталь",
+            MetalTypeId = 1
+        };
 
-            var productDto = new ProductDto
-            {
-                Name = "сталь",
-                MetalTypeId = 1
-            };
+        var productDto = new ProductDto
+        {
+            Name = "сталь",
+            MetalTypeId = 1
+        };
 
-            MapperMock
-                .Setup(m => m.Map<ProductDto>(model))
-                .Returns(productDto);
+        MapperMock
+            .Setup(m => m.Map<ProductDto>(model))
+            .Returns(productDto);
 
-            // Act
-            var result = await ProductController.Create(model);
+        // Act
+        var result = await ProductController.Create(model);
 
-            // Assert
-            var redirect = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirect.ActionName);
+        // Assert
+        var redirect = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirect.ActionName);
 
-            MapperMock.Verify(m => m.Map<ProductDto>(model), Times.Once);
-            ProductMock.Verify(p => p.CreateAsync(productDto), Times.Once);
-        }
+        MapperMock.Verify(m => m.Map<ProductDto>(model), Times.Once);
+        ProductMock.Verify(p => p.CreateAsync(productDto), Times.Once);
     }
 
     [Fact]
