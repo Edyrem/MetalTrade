@@ -52,7 +52,6 @@ public class AccountControllerTests : ControllerTestBase
             PasswordConfirm = "Qweqwe1!"
         };
     
-
     [Fact]
     public void RegisterGetReturnsView()
     {
