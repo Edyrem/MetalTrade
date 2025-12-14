@@ -1,16 +1,155 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Test.Helpers;
 using MetalTrade.Web.Controllers;
 using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using Xunit;
 
 namespace MetalTrade.Test.ControllersTests;
 
-public class ProductControllerTests
+public class ProductControllerTests: ControllerTestBase
 {
+
+    [Fact]
+    public async Task Index_ReturnsView_WithMappedProducts()
+    {
+        // Arrange
+        var productDtos = new List<ProductDto>
+            {
+                new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
+                new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
+            };
+
+        var viewModels = new List<ProductViewModel>
+            {
+                new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
+                new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
+            };
+
+        ProductMock
+            .Setup(p => p.GetAllAsync())
+            .ReturnsAsync(productDtos);
+
+        MapperMock
+            .Setup(m => m.Map<List<ProductViewModel>>(productDtos))
+            .Returns(viewModels);
+
+        // Act
+        var result = await ProductController.Index();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<ProductViewModel>>(viewResult.Model);
+
+        Assert.Equal(2, model.Count);
+        Assert.Equal("Сталь", model[0].Name);
+
+        ProductMock.Verify(p => p.GetAllAsync(), Times.Once);
+        MapperMock.Verify(m => m.Map<List<ProductViewModel>>(productDtos), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_Get_ReturnsView_WithMetalTypesInViewData()
+    {
+        // Arrange
+        var metalTypes = new List<MetalTypeDto>
+            {
+                new() { Id = 1, Name = "Сталь" },
+                new() { Id = 2, Name = "Железо" }
+            };
+
+        MetalMock
+            .Setup(m => m.GetAllAsync())
+            .ReturnsAsync(metalTypes);
+
+        // Act
+        var result = await ProductController.Create();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+
+        Assert.True(viewResult.ViewData.ContainsKey("MetalTypes"));
+
+        var selectList = Assert.IsType<SelectList>(viewResult.ViewData["MetalTypes"]);
+        Assert.Equal(2, selectList.Count());
+
+        MetalMock.Verify(m => m.GetAllAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_Post_InvalidModel_ReturnsView_WithSameModel()
+    {
+        // Arrange
+        var model = new CreateProductViewModel(); // пустой → невалидный
+
+        ProductController.ModelState.AddModelError("Name", "Required");
+
+        // Act
+        var result = await ProductController.Create(model);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var returnedModel = Assert.IsType<CreateProductViewModel>(viewResult.Model);
+
+        Assert.Equal(model, returnedModel);
+
+        ProductMock.Verify(p => p.CreateAsync(It.IsAny<ProductDto>()), Times.Never);
+        MapperMock.Verify(m => m.Map<ProductDto>(It.IsAny<CreateProductViewModel>()), Times.Never);
+    }
+
+    public class ProductControllerCreatePostValidTests : ControllerTestBase
+    {
+        [Fact]
+        public async Task Create_Post_ValidModel_RedirectsToIndex()
+        {
+            // Arrange
+            var model = new CreateProductViewModel
+            {
+                Name = "сталь",
+                MetalTypeId = 1
+            };
+
+            var productDto = new ProductDto
+            {
+                Name = "сталь",
+                MetalTypeId = 1
+            };
+
+            MapperMock
+                .Setup(m => m.Map<ProductDto>(model))
+                .Returns(productDto);
+
+            // Act
+            var result = await ProductController.Create(model);
+
+            // Assert
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirect.ActionName);
+
+            MapperMock.Verify(m => m.Map<ProductDto>(model), Times.Once);
+            ProductMock.Verify(p => p.CreateAsync(productDto), Times.Once);
+        }
+    }
+
+    [Fact]
+    public async Task CreateGetReturnViewTest()
+    {
+        var metalTypes = new List<MetalTypeDto>
+        {
+            new () { Id = 1, Name = "сталь" },
+            new() { Id = 2, Name = "железо" }
+        };
+
+        var result = await ProductController.Create();
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<CreateProductViewModel>(viewResult.Model);        
+    }
     
     [Fact]
     public async Task CreateGetReturnsView()
@@ -23,21 +162,20 @@ public class ProductControllerTests
         };
         var mockProduct = new Mock<IProductService>();
         var mockMetal = new Mock<IMetalService>();
-        
+        var mapperMock = new Mock<IMapper>();
+
         mockMetal.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        var controller = new ProductController(mockProduct.Object, mockMetal.Object, mapperMock.Object);
 
         // Act
-        var result = await controller.Create();
+        var result = await ProductController.Create();
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
-        var model = Assert.IsType<CreateProductViewModel>(viewResult.Model);
-        
-        Assert.Equal(2, model.MetalTypes.Count);
-        Assert.Equal("сталь", model.MetalTypes[0].Text);
-        Assert.Equal("железо", model.MetalTypes[1].Text);
-        Assert.NotNull(model.MetalTypes);
+        var model = Assert.IsType<CreateProductViewModel>(viewResult.Model);        
+
+        Assert.Equal(1, model.MetalTypeId);
+        Assert.NotNull(model.MetalTypeId);
         
         mockMetal.Verify(m => m.GetAllAsync());
     }
@@ -48,45 +186,37 @@ public class ProductControllerTests
     {
         // Arrange
         var product = new CreateProductViewModel { Name = "труба", MetalTypeId = 1 };
-        
-        var mockProduct = new Mock<IProductService>();
-        var mockMetal = new Mock<IMetalService>();
-        
-        mockProduct.Setup(s => s.CreateAsync(It.IsAny<ProductDto>())).Returns(Task.CompletedTask);
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+
+        ProductMock.Setup(s => s.CreateAsync(It.IsAny<ProductDto>())).Returns(Task.CompletedTask);
 
         // Act
-        var result = await controller.Create(product);
+        var result = await ProductController.Create(product);
         
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
 
-        mockProduct.Verify(s => s.CreateAsync(It.IsAny<ProductDto>()));
+        ProductMock.Verify(s => s.CreateAsync(It.IsAny<ProductDto>()));
     }
     
     [Fact]
     public async Task CreatePostInvalidModelReturnsView()
     {
         // Arrange
-        
-        var mockProduct = new Mock<IProductService>();
-        var mockMetal = new Mock<IMetalService>();
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
-        controller.ModelState.AddModelError("Name", "Required");
+
+        ProductController.ModelState.AddModelError("Name", "Required");
 
         var model = new CreateProductViewModel();
         
         // Act
-        var result = await controller.Create(model);
+        var result = await ProductController.Create(model);
         
         // Assert
         var view = Assert.IsType<ViewResult>(result);
         Assert.IsType<CreateProductViewModel>(view.Model);
         Assert.Equal(model, view.Model);
         
-        mockProduct.Verify(s => s.CreateAsync(It.IsAny<ProductDto>()), Times.Never);
+        ProductMock.Verify(s => s.CreateAsync(It.IsAny<ProductDto>()), Times.Never);
     }
     
 
@@ -107,15 +237,11 @@ public class ProductControllerTests
             new ProductDto { Id = 2, Name = "арматура" , MetalTypeId = metalDtos[1].Id, MetalType = metalDtos[1]}
         };
 
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockMetal.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
-        mockProduct.Setup(p=> p.GetAllAsync()).ReturnsAsync(productDtos);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        MetalMock.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
+        ProductMock.Setup(p=> p.GetAllAsync()).ReturnsAsync(productDtos);
 
         // Act
-        var result = await controller.Index();
+        var result = await ProductController.Index();
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
@@ -127,7 +253,7 @@ public class ProductControllerTests
         Assert.Equal("труба", model[0].Name);
         Assert.Equal("арматура", model[1].Name);
 
-        mockProduct.Verify(p => p.GetAllAsync());
+        ProductMock.Verify(p => p.GetAllAsync());
     }
 
     [Fact]
@@ -147,14 +273,10 @@ public class ProductControllerTests
             }
         };
 
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p=> p.GetAsync(1)).ReturnsAsync(product);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync(product);        
 
         // Act
-        var result = await controller.Details(1);
+        var result = await ProductController.Details(1);
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
@@ -164,27 +286,22 @@ public class ProductControllerTests
         Assert.Equal(1, model.MetalTypeId);
         Assert.Equal(1, model.Id);
 
-        mockProduct.Verify(p => p.GetAsync(1));
+        ProductMock.Verify(p => p.GetAsync(1));
     }
 
     [Fact]
     public async Task DetailsWhenNullRedirectsToIndex()
     {
         // Arrange
-        
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
 
         // Act
-        var result = await controller.Details(1);
+        var result = await ProductController.Details(1);
 
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
-        mockProduct.Verify(p => p.GetAsync(1));
+        ProductMock.Verify(p => p.GetAsync(1));
     }
     
     
@@ -210,16 +327,12 @@ public class ProductControllerTests
         };
         
         // Arrange
+        ProductMock.Setup(p => p.GetAsync(1)).ReturnsAsync(product);
+        MetalMock.Setup(m => m.GetAllAsync()).ReturnsAsync(metalTypes);
         
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p => p.GetAsync(1)).ReturnsAsync(product);
-        mockMetal.Setup(m => m.GetAllAsync()).ReturnsAsync(metalTypes);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
 
         // Act
-        var result = await controller.Edit(1);
+        var result = await ProductController.Edit(1);
         
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
@@ -228,32 +341,24 @@ public class ProductControllerTests
         Assert.Equal("труба", model.Name);
         Assert.Equal(1, model.MetalTypeId);
         Assert.Equal(1, model.Id);
-        Assert.Equal(2, model.MetalTypes.Count);
-        Assert.Equal("сталь", model.MetalTypes[0].Text);
-        Assert.Equal("железо", model.MetalTypes[1].Text);
-        
-        mockProduct.Verify(p => p.GetAsync(1));
-        mockMetal.Verify(p=>p.GetAllAsync());
+
+        ProductMock.Verify(p => p.GetAsync(1));
+        MetalMock.Verify(p=>p.GetAllAsync());
     }
     
     [Fact]
     public async Task EditGetWhenNullRedirectsToIndex()
     {
         // Arrange
+        ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
         
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
-
         // Act
-        var result = await controller.Edit(1);
+        var result = await ProductController.Edit(1);
 
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
-        mockProduct.Verify(p => p.GetAsync(1));
+        ProductMock.Verify(p => p.GetAsync(1));
     }
     
     
@@ -261,12 +366,7 @@ public class ProductControllerTests
     public async Task EditPostValidModelRedirectsToIndex()
     {
         // Arrange
-        
-        var mockProduct = new Mock<IProductService>();
-        var mockMetal = new Mock<IMetalService>();
-        
-        mockProduct.Setup(s => s.UpdateAsync(It.IsAny<ProductDto>())).Returns(Task.CompletedTask);
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        ProductMock.Setup(s => s.UpdateAsync(It.IsAny<ProductDto>())).Returns(Task.CompletedTask);
 
         var model = new EditProductViewModel() 
         {
@@ -276,36 +376,32 @@ public class ProductControllerTests
         };
         
         // Act
-        var result = await controller.Edit(model);
+        var result = await ProductController.Edit(model);
         
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
 
-        mockProduct.Verify(s => s.UpdateAsync(It.IsAny<ProductDto>()));
+        ProductMock.Verify(s => s.UpdateAsync(It.IsAny<ProductDto>()));
     }
     
     [Fact]
     public async Task EditPostInvalidModelReturnsView()
     {
         // Arrange
-        
-        var mockProduct = new Mock<IProductService>();
-        var mockMetal = new Mock<IMetalService>();
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
-        controller.ModelState.AddModelError("Name", "Required");
+
+        ProductController.ModelState.AddModelError("Name", "Required");
 
         var model = new EditProductViewModel();
         
         // Act
-        var result = await controller.Edit(model);
+        var result = await ProductController.Edit(model);
         
         // Assert
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal(model, view.Model);
-        
-        mockProduct.Verify(s => s.UpdateAsync(It.IsAny<ProductDto>()), Times.Never);
+
+        ProductMock.Verify(s => s.UpdateAsync(It.IsAny<ProductDto>()), Times.Never);
     }
 
 
@@ -313,15 +409,10 @@ public class ProductControllerTests
     public async Task DeleteGetWhenNullRedirectsToIndex()
     {
         // Arrange
-        
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync((ProductDto?)null);
 
         // Act
-        var result = await controller.Delete(1);
+        var result = await ProductController.Delete(1);
 
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
@@ -345,14 +436,10 @@ public class ProductControllerTests
             }
         };
         
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(p=> p.GetAsync(1)).ReturnsAsync(product);
-        
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync(product);        
         
         // Act
-        var result = await controller.Delete(1);
+        var result = await ProductController.Delete(1);
 
         // Assert
         
@@ -365,23 +452,19 @@ public class ProductControllerTests
     [Fact]
     public async Task DeletePostRedirectsToIndex()
     {
-        // Arrange
-        
-        var mockMetal = new Mock<IMetalService>();
-        var mockProduct = new Mock<IProductService>();
-        mockProduct.Setup(s => s.DeleteAsync(1)).Returns(Task.CompletedTask);
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object);
+        // Arrange        
+        ProductMock.Setup(s => s.DeleteAsync(1)).Returns(Task.CompletedTask);
 
         var model = new DeleteProductViewModel() { Id = 1 };
 
         // Act
-        var result = await controller.Delete(model);
+        var result = await ProductController.Delete(model);
 
         // Assert
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
 
-        mockProduct.Verify(s => s.DeleteAsync(1));
+        ProductMock.Verify(s => s.DeleteAsync(1));
     }
 
 }
