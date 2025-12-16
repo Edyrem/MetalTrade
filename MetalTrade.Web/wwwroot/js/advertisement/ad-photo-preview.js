@@ -2,104 +2,93 @@
     let photoIndex = 0;
     const maxPhotos = 5;
     const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    const maxSizeMB = 4;
+    const maxSizeMB = 3;
 
     // Контейнер для превью изображений
     const $photoContainer = $("#photoContainer");
     // div для скрытых фото-файлов
     const $hiddenInputs = $("#hiddenPhotoFileInputs");
 
+
+    
+
     // Кнопка "Добавить фото"
     $("#addPhotoBtn").on("click", function () {
-        let existingPhotosCount = parseInt($photoContainer.data("existing-photos")) || 0;
-        let newAddedPhotosCount = $hiddenInputs.find("input").length;
+        let alreadyAddedPhotosCount = $hiddenInputs.find("input").length;
+        let slotsLeft = maxPhotos - alreadyAddedPhotosCount;
 
-        if ((existingPhotosCount + newAddedPhotosCount) >= maxPhotos) {
-            Swal.fire({
-                toast: true,
-                icon: 'warning',
-                title: `Можно загрузить не более ${maxPhotos} фото`,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            });
+        if (slotsLeft <= 0) {
+            toastr.warning(`Можно загрузить не более ${maxPhotos} фото`);
             return;
         }
 
+        // Подсказка, сколько файлов можно выбрать
+        toastr.info(`Можно выбрать до ${slotsLeft} фото`);
+
         // Создаём скрытый input
-        const $input = $('<input type="file" name="PhotoFiles" accept="image/*" style="display:none;">');
+        const $multyInput = $('<input type="file" accept="image/*" multiple style="display:none;">');
 
         // Обработчик выбора файла
-        $input.on("change", function () {
+        $multyInput.on("change", function () {
             if (!this.files || this.files.length === 0) return;
 
-            const file = this.files[0];
-            const reader = new FileReader();
+            const files = Array.from(this.files);
 
-            // Проверка типа
-            if (!allowedTypes.includes(file.type)) {
-                Swal.fire({
-                    toast: true,
-                    icon: 'warning',
-                    title: `Недопустимый формат файла`,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-                $input.remove();
+            if ((alreadyAddedPhotosCount + files.length) > maxPhotos) {
+
+                toastr.warning(`Вы выбрали слишком много файлов (макс. ${maxPhotos})`);
                 return;
             }
 
-            // Проверка размера
-            if (file.size > maxSizeMB * 1024 * 1024) {
-                Swal.fire({
-                    toast: true,
-                    icon: 'warning',
-                    title: `Файл не должен превышать ${maxSizeMB} МБ`,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-                $input.remove();
-                return;
-            }
+            // Обрабатываем каждый файл
+            files.forEach(file => {
 
-            $input.attr("data-index", photoIndex++);
-            $("#hiddenPhotoFileInputs").append($input);
+                // Проверка формата
+                if (!allowedTypes.includes(file.type)) {
 
-            
+                    toastr.warning(`Файл ${file.name} недопустимого формата`);
+                    return;
+                }
 
-            reader.onload = function (e) {
-                // Создаём preview
+                // Проверка размера
+                if (file.size > (maxSizeMB * 1024 * 1024)) {
 
-                const $preview = $(`
-                    <div class="photo-preview" data-index="${$input.data('index')}">
-                        <button type="button" class="remove-photo btn btn-sm btn-danger mt-1">&times;</button>
-                        <img src="${e.target.result}">
-                    </div>
-                `);
+                    toastr.warning(`Файл ${file.name} превышает ${maxSizeMB} МБ`);
+                    return;
+                }
+                // Узнаём индекс и сразу увеличиваем
+                const index = photoIndex++;
 
-                $photoContainer.append($preview);
 
-                Swal.fire({
-                    toast: true,
-                    icon: 'success',
-                    title: 'Фото добавлено',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true
-                });
-            };
+                // Создаём скрытый input под этот файл
+                const $singleInput = $('<input type="file" name="PhotoFiles" style="display:none;">');
+                $singleInput[0].files = createFileList(file);
+                $singleInput.attr("data-index", index);
 
-            reader.readAsDataURL(file);
+                $hiddenInputs.append($singleInput);
+
+                // Создание превью
+                const reader = new FileReader();
+                reader.onload = (e) => {
+
+                    const $preview = $(`
+                        <div class="photo-preview" data-index="${index}">
+                            <button type="button" class="remove-photo btn btn-sm btn-danger mt-1">&times;</button>
+                            <img src="${e.target.result}">
+                        </div>
+                    `);
+
+                    $photoContainer.append($preview);
+
+                    toastr.success('Фото добавлено');
+                };
+
+                reader.readAsDataURL(file);
+            });
         });
 
         // Автоматически открываем диалог выбора файла
-        $input[0].click();
+        $multyInput[0].click();
     });
 
     // Обработка удаления фото
@@ -113,4 +102,11 @@
 
         $(`input[data-index='${index}']`).remove(); // удаляем скрытый input
     });
+    function createFileList(file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        return dt.files;
+    }
 });
+
+    

@@ -20,20 +20,19 @@
     }
 
 #photoContainer {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 110px);
     gap: 10px;
-    overflow-x: auto;
-    max-width: calc(100% - 60px);
+    justify-content: start;
+    width: 100%;
+    box-sizing: border-box;
 }
+
 .photo-preview {
     width: 110px;
     height: 110px;
     position: relative;
-    flex-shrink: 0;
-    margin: 5px;
     text-align: center;
-    display: inline-block;
 }
 
     .photo-preview img {
