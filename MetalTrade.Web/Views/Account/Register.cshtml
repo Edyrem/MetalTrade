@@ -80,4 +80,7 @@
 
 @section Scripts {
     <script src="~/js/register.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
