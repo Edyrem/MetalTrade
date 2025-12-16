@@ -18,18 +18,6 @@ public class AccountControllerTests : ControllerTestBase
         InitAccountController();
     }
     
-
-    private void SetUnauthenticated()
-    {
-        AccountController.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity())
-            }
-        };
-    }
-
     private void SetAuthenticated()
     {
         var identity = new ClaimsIdentity(
@@ -53,14 +41,14 @@ public class AccountControllerTests : ControllerTestBase
         };
     
     [Fact]
-    public void RegisterGetReturnsView()
+    public async Task RegisterGetReturnsView()
     {
         var result = AccountController.Register();
         Assert.IsType<ViewResult>(result);
     }
 
     [Fact]
-    public void RegisterGetAuthenticatedRedirects()
+    public async Task RegisterGetAuthenticatedRedirects()
     {
         SetAuthenticated();
 
