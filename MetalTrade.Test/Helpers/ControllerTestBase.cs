@@ -22,34 +22,48 @@ namespace MetalTrade.Test.Helpers
         protected MetalTypeController MetalTypeController
             => new(MetalMock.Object, MapperMock.Object);
         
-        protected AccountController AccountController { get; private set; }
-
-        protected void InitAccountController()
-        {
-            AccountController = new AccountController(
-                UserMock.Object,
-                MapperMock.Object,
-                ImageUploadMock.Object
-            );
-
-            AccountController.ControllerContext = new ControllerContext
+        protected AccountController AccountController 
+        { 
+            get
             {
-                HttpContext = new DefaultHttpContext
+                var controller = new AccountController(
+                    UserMock.Object,
+                    MapperMock.Object,
+                    ImageUploadMock.Object
+                );
+                controller.ControllerContext = new ControllerContext
                 {
-                    User = new ClaimsPrincipal(new ClaimsIdentity())
-                }
-            };
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity())
+                    }
+                };
+                return controller;
+            }            
         }
-
-        protected void SetAuthenticated()
-        {
-            var identity = new ClaimsIdentity(
-                new[] { new Claim(ClaimTypes.Name, "user1111") },
-                "mock"
-            );
-
-            AccountController.ControllerContext.HttpContext.User =
-                new ClaimsPrincipal(identity);
+        
+        protected AccountController AuthenticatedAccountController 
+        { 
+            get
+            {
+                var controller = new AccountController(
+                    UserMock.Object,
+                    MapperMock.Object,
+                    ImageUploadMock.Object
+                );
+                var identity = new ClaimsIdentity(
+                    new[] { new Claim(ClaimTypes.Name, "user123") },
+                    "mock"
+                );
+                controller.ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(identity)
+                    }
+                };
+                return controller;
+            }
         }
     }
 }

@@ -12,23 +12,7 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace MetalTrade.Test.ControllersTests;
 
 public class AccountControllerTests : ControllerTestBase
-{
-    public AccountControllerTests()
-    {
-        InitAccountController();
-    }
-    
-    private void SetAuthenticated()
-    {
-        var identity = new ClaimsIdentity(
-            new[] { new Claim(ClaimTypes.Name, "user123") },
-            "mock"
-        );
-
-        AccountController.ControllerContext.HttpContext.User =
-            new ClaimsPrincipal(identity);
-    }
-
+{    
     private RegisterViewModel ValidRegisterModel() =>
         new()
         {
@@ -50,9 +34,7 @@ public class AccountControllerTests : ControllerTestBase
     [Fact]
     public async Task RegisterGetAuthenticatedRedirects()
     {
-        SetAuthenticated();
-
-        var result = AccountController.Register();
+        var result = AuthenticatedAccountController.Register();
 
         var redirect = Assert.IsType<RedirectToActionResult>(result);
         Assert.Equal("Index", redirect.ActionName);
@@ -62,10 +44,11 @@ public class AccountControllerTests : ControllerTestBase
     [Fact]
     public async Task RegisterPostInvalidModelReturnsView()
     {
-        AccountController.ModelState.AddModelError("Email", "Required");
+        var controller = AccountController;
+        controller.ModelState.AddModelError("Email", "Required");
 
         var model = new RegisterViewModel();
-        var result = await AccountController.Register(model);
+        var result = await controller.Register(model);
 
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal(model, view.Model);
@@ -79,14 +62,15 @@ public class AccountControllerTests : ControllerTestBase
     [Fact]
     public async Task RegisterPostCreateFailedReturnsView()
     {
+        var controller = AccountController;
         UserMock
             .Setup(s => s.CreateUserAsync(It.IsAny<UserDto>(), "user"))
             .ReturnsAsync(false);
 
-        var result = await AccountController.Register(ValidRegisterModel());
+        var result = await controller.Register(ValidRegisterModel());
 
         Assert.IsType<ViewResult>(result);
-        Assert.False(AccountController.ModelState.IsValid);
+        Assert.False(controller.ModelState.IsValid);
     }
 
     [Fact]
@@ -132,9 +116,7 @@ public class AccountControllerTests : ControllerTestBase
     [Fact]
     public async Task LogoutAuthenticatedCallsServiceAndRedirects()
     {
-        SetAuthenticated();
-
-        var result = await AccountController.Logout();
+        var result = await AuthenticatedAccountController.Logout();
 
         UserMock.Verify(s => s.LogoutAsync(), Times.Once);
 
