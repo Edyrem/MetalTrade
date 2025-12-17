@@ -20,6 +20,17 @@ namespace MetalTrade.DataAccess.Repositories
             return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<User?> GetWithAdvertisementsAsync(int id)
+        {
+            return await _dbSet
+                .Include(u => u.Advertisements.Where(a => !a.IsDeleted))
+                .ThenInclude(p => p.Product)
+                .ThenInclude(c => c.MetalType)
+                .Include(u => u.Advertisements.Where(a => !a.IsDeleted))
+                .ThenInclude(a => a.Photoes.Where(p => !p.IsDeleted))
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
@@ -60,6 +71,12 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _userManager.IsInRoleAsync(user, role);
         }
+
         public async Task<User?> GetCurrentUserAsync(HttpContext context) => await _userManager.GetUserAsync(context.User);
+
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+        {
+            return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        }
     }
 }

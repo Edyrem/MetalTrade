@@ -10,47 +10,49 @@
                 <img src="@(Model.PhotoPath ?? "/images/default-avatar.png")"
                      class="rounded-circle mx-auto d-block mb-3"
                      style="width: 120px; height: 120px; object-fit: cover;" alt="Аватар" />
+
                 <h5>@Model.UserName</h5>
-                <p>Email: @Model.Email</p>
-                <p>Телефон: @Model.PhoneNumber</p>
-                @if (!string.IsNullOrEmpty(Model.WhatsAppNumber))
-                {
-                    <p>WhatsApp: @Model.WhatsAppNumber</p>
-                }
+                
+                <p class="form-control-plaintext">Телефон: +996@(Model.PhoneNumber)</p>
+                <p class="form-control-plaintext">WhatsApp +996@(Model.WhatsAppNumber)</p>
 
                 <div class="d-grid gap-2">
                     <a href="/Profile/Edit" class="btn btn-outline-primary btn-sm">Изменить профиль</a>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-8">
+        </div>        
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
             @if (Model.IsSupplier)
             {
                 <h4 class="mb-3">Мои объявления</h4>
+                <hr />
+                <div class="col-md-12">
+                    @if (Model.Advertisements == null || !Model.Advertisements.Any())
+                    {
+                        <p class="text-muted">У вас пока нет объявлений.</p>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            @foreach (var ad in Model.Advertisements)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <partial name="_AdCardPartial" model="ad" />
+                                </div>
+                            }
+                        </div>
+                    }
 
-                @if (Model.Advertisements == null || !Model.Advertisements.Any())
-                {
-                    <p class="text-muted">У вас пока нет объявлений.</p>
-                }
-                else
-                {
-                    <div class="row">
-                        @foreach (var ad in Model.Advertisements)
-                        {
-                            <div class="col-md-6 mb-3">
-                                <partial name="_AdCardPartial" model="ad" />
-                            </div>
-                        }
-                    </div>
-                }
+                </div>
             }
             else
             {
                 <h4>Сохранённые объявления</h4>
             }
         </div>
-
     </div>
 </div>
 

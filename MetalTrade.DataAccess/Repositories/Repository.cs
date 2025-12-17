@@ -20,22 +20,27 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _dbSet.ToListAsync();
         }
+
         public virtual async Task<T?> GetAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
+
         public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, Boolean>> predicate)
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
+
         public virtual async Task CreateAsync(T item)
         {
             await _dbSet.AddAsync(item);
         }
+
         public virtual async Task UpdateAsync(T item)
         {
             _dbSet.Update(item);
         }
+
         public virtual async Task DeleteAsync(int id)
         {
             T entity = await _dbSet.FindAsync(id);

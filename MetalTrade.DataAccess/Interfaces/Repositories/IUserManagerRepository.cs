@@ -13,11 +13,13 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
     {
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByUserNameAsync(string userName);
+        Task<User?> GetWithAdvertisementsAsync(int id);
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<IdentityResult> AddToRoleAsync(User user, string role);
         Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
         Task<IEnumerable<string>?> GetUserRolesAsync(User user);
         Task<bool> IsInRoleAsync(User user, string role);
         Task<User?> GetCurrentUserAsync(HttpContext context);
+        Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
     }
 }

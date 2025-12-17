@@ -16,7 +16,5 @@ public class EditProductViewModel
     
     [Display(Name = "Тип металла")]
     [Required(ErrorMessage = "Укажите тип металла")]
-    public int MetalTypeId { get; set; }
-    
-    public List<SelectListItem> MetalTypes { get; set; } = [];
+    public int MetalTypeId { get; set; }   
 }

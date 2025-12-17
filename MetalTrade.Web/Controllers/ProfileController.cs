@@ -5,94 +5,64 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
 
 namespace MetalTrade.Web.Controllers;
 
 [Authorize]
 public class ProfileController : Controller
 {
-    private readonly IProfileService _profileService;
-    private readonly UserManager<User> _userManager;
+    
+    private readonly IUserService _userService;
     private readonly IWebHostEnvironment _env;
+    private readonly IMapper _mapper;
 
     public ProfileController(
-        IProfileService profileService, 
-        UserManager<User> userManager, 
+        
+        IUserService userService,
+        IMapper mapper,
         IWebHostEnvironment env)
-    {
-        _profileService = profileService;
-        _userManager = userManager;
+    {        
+        _userService = userService;
+        _mapper = mapper;
         _env = env;
     }
 
     public async Task<IActionResult> Index()
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
-        var dto = await _profileService.GetProfileAsync(user);
+        var userDto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);
+        
+        var userViewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
+        userViewModel.IsSupplier = await _userService.IsInRoleAsync(userDto!, "supplier");
 
-        var vm = new UserProfileWithAdsViewModel
-        {
-            UserName = dto.UserName,
-            Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber,
-            WhatsAppNumber = dto.WhatsAppNumber,
-            PhotoPath = dto.PhotoPath,
-            IsSupplier = dto.IsSupplier,
-            Advertisements = dto.Advertisements,
-        };
-
-        return View(vm);
+        return View(userViewModel);
     }
 
     [HttpGet]
     public async Task<IActionResult> Edit()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return NotFound();
+        var user = await _userService.GetCurrentUserAsync(HttpContext);        
 
-        var dto = await _profileService.GetProfileEditModelAsync(user);
+        var userModel = _mapper.Map<UserProfileEditViewModel>(user);
 
-        var vm = new UserProfileEditViewModel
-        {
-            Id = dto.Id,
-            UserName = dto.UserName,
-            Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber,
-            WhatsAppNumber = dto.WhatsAppNumber,
-            PhotoPath = dto.PhotoPath
-        };
-
-        return View(vm);
+        return View(userModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(UserProfileEditViewModel model)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
         if (!ModelState.IsValid)
             return View(model);
 
-        var dto = new ProfileDto
-        {
-            Id = model.Id,
-            UserName = model.UserName,
-            Email = model.Email,
-            PhoneNumber = model.PhoneNumber,
-            WhatsAppNumber = model.WhatsAppNumber,
-            PhotoPath = model.PhotoPath
-        };
+        var userDto = _mapper.Map<UserDto>(model);
 
-        bool ok = await _profileService.UpdateProfileAsync(user, dto, model.Photo, _env);
-
-        if (!ok)
-        {
-            ModelState.AddModelError("PhoneNumber", "Телефон уже используется");
-            return View(model);
-        }
+        await _userService.UpdateUserAsync(userDto);
 
         return RedirectToAction(nameof(Index));
     }
@@ -111,10 +81,10 @@ public class ProfileController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         if (user == null) return NotFound();
 
-        var result = await _userManager.ChangePasswordAsync(
+        var result = await _userService.ChangePasswordAsync(
             user,
             model.OldPassword,
             model.NewPassword

@@ -1,11 +1,26 @@
+@using MetalTrade.Domain.Enums
 @model MetalTrade.Business.Dtos.AdvertisementDto
 
-
-<div class="card h-100 shadow-sm">
+<div class="card h-100 shadow-sm position-relative">
     <img src="@(Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "/images/no-image.png")"
          class="card-img-top"
          style="height:160px; object-fit:cover;" alt="Фото" />
 
+    @switch(Model.Status)
+    {
+        case (int)AdvertisementStatus.Draft:
+            <div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
+            break;
+        case (int)AdvertisementStatus.Active:
+            <div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
+            break;
+        case (int)AdvertisementStatus.Archived:
+            <div class="position-absolute small bg-secondary-subtle top-0 m-1 p-1 opacity-75">Деактивированные</div>
+            break;
+        case (int)AdvertisementStatus.Rejected:
+            <div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
+            break;
+    }
     <div class="card-body">
         <h6 class="card-title text-truncate">@Model.Title</h6>
         <p class="card-text small text-muted">
@@ -26,9 +41,7 @@
                    asp-action="Edit"
                    asp-route-id="@Model.Id"
                    class="btn btn-outline-warning btn-sm">Редактировать</a>
-            }
-
-            
+            }            
         </div>
     </div>
 </div>

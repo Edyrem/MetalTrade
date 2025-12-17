@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Entities;
@@ -11,10 +12,14 @@ namespace MetalTrade.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IImageUploadService _imageUploadService;
+        private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, IMapper mapper, IImageUploadService imageUploadService)
         {
             _userService = userService;
+            _mapper = mapper;
+            _imageUploadService = imageUploadService;
         }
 
         [HttpGet]
@@ -33,15 +38,7 @@ namespace MetalTrade.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var dto = new UserDto
-            {
-                Email = model.Email,
-                UserName = model.UserName,
-                PhoneNumber = model.PhoneNumber,
-                WhatsAppNumber = model.WhatsAppNumber,
-                Password = model.Password,
-                Photo = model.Photo
-            };
+            var dto =  _mapper.Map<UserDto>(model);
 
             var success = await _userService.CreateUserAsync(dto, "user");
             if (success)
@@ -54,7 +51,6 @@ namespace MetalTrade.Web.Controllers
             ModelState.AddModelError("", "Ошибка при регистрации пользователя.");
             return View(model);
         }
-
 
         [HttpGet]
         public IActionResult Login()
@@ -94,5 +90,17 @@ namespace MetalTrade.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile photo)
+        {
+            if (photo == null || photo.Length == 0)
+                return BadRequest();
+
+            var fileName = await _imageUploadService.UploadImageAsync(photo, "uploads");
+
+            return Json(new { fileName });
+        }
+
     }
 }

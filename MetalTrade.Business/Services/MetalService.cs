@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
@@ -9,10 +10,12 @@ namespace MetalTrade.Business.Services;
 public class MetalService : IMetalService
 {
     private readonly MetalTypeRepository _repository;
+    private readonly IMapper _mapper;
     
-    public MetalService(MetalTradeDbContext context)
+    public MetalService(MetalTradeDbContext context, IMapper mapper)
     {
         _repository = new MetalTypeRepository(context);
+        _mapper = mapper;
     }
     
     public async Task<MetalTypeDto?> GetAsync(int metalTypeId)
@@ -21,44 +24,26 @@ public class MetalService : IMetalService
         if (metalType == null)
             return null;
         
-        MetalTypeDto metalTypeDto = new()
-        {
-            Id = metalType.Id,
-            Name = metalType.Name
-        };
+        MetalTypeDto metalTypeDto = _mapper.Map<MetalTypeDto>(metalType);
         return metalTypeDto;
     }
 
     public async Task<List<MetalTypeDto>> GetAllAsync()
     {
         IEnumerable<MetalType> metalTypes = await _repository.GetAllAsync();
-        return metalTypes.Select(metalType => new MetalTypeDto
-        {
-            Id = metalType.Id,
-            Name = metalType.Name
-        }).ToList();
+        return _mapper.Map<List<MetalTypeDto>>(metalTypes);
     }
 
     public async Task CreateAsync(MetalTypeDto metalTypeDto)
     {
-        MetalType metalType = new MetalType()
-        {
-            Id = metalTypeDto.Id,
-            Name = metalTypeDto.Name.ToLower()
-        };
+        MetalType metalType = _mapper.Map<MetalType>(metalTypeDto);
         await _repository.CreateAsync(metalType);
         await _repository.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(MetalTypeDto metalTypeDto)
     {
-        MetalType? metalType = await _repository.GetAsync(metalTypeDto.Id);
-        if (metalType is null)
-            throw new Exception($"Metal type not found by id = {metalTypeDto.Id}");
-        
-        metalType.Id = metalTypeDto.Id;
-        metalType.Name = metalTypeDto.Name.ToLower();
-        
+        MetalType? metalType = _mapper.Map<MetalType>(metalTypeDto);
         await _repository.UpdateAsync(metalType);
         await _repository.SaveChangesAsync();
     }

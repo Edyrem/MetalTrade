@@ -5,16 +5,15 @@ using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.Profile;
 using MetalTrade.Web.ViewModels.User;
+
 namespace MetalTrade.Web.Common.Mapping
 {
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
-            CreateMap<MetalTypeDto, MetalTypeViewModel>().ReverseMap();
-            CreateMap<ProductDto, ProductViewModel>().ReverseMap();
-
             CreateMap<UserDto, MetalTrade.Web.ViewModels.User.UserViewModel>()
                 .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink))
                 .ReverseMap()
@@ -37,6 +36,13 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()) 
                 .ReverseMap()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
+
+            CreateMap<UserDto, UserProfileEditViewModel>().ReverseMap();
+
+            CreateMap<UserDto, UserProfileWithAdsViewModel>()
+                .ForMember(dest => dest.PhotoPath, opt => opt.MapFrom(src => src.PhotoLink))
+                .ReverseMap()
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.PhotoPath));
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhotoViewModel>().ReverseMap();
             CreateMap<CreateAdvertisementViewModel, AdvertisementDto>()
@@ -65,6 +71,22 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore()) 
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore());
+
+            CreateMap<RegisterViewModel, UserDto>().ReverseMap();
+
+            CreateMap<MetalTypeDto, MetalTypeViewModel>()
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<CreateMetalViewModel, MetalTypeDto>()
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<EditMetalViewModel, MetalTypeDto>()
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
+                .ReverseMap();
+            
+            CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+            CreateMap<ProductDto, CreateProductViewModel>().ReverseMap();
+            CreateMap<ProductDto, EditProductViewModel>().ReverseMap();
         }
     }
 }

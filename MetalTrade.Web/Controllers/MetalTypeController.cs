@@ -1,3 +1,4 @@
+using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.ViewModels.MetalType;
@@ -9,12 +10,14 @@ namespace MetalTrade.Web.Controllers;
 [Authorize(Roles = "admin, moderator")]
 public class MetalTypeController : Controller
 {
-     private readonly IMetalService _metalService;
+    private readonly IMetalService _metalService;
+    private readonly IMapper _mapper;
 
-     public MetalTypeController(IMetalService metalService)
-     {
-         _metalService = metalService;
-     }
+    public MetalTypeController(IMetalService metalService, IMapper mapper)
+    {
+        _metalService = metalService;
+        _mapper = mapper;
+    }
      
      public IActionResult Create()
      {
@@ -28,10 +31,7 @@ public class MetalTypeController : Controller
          if (!ModelState.IsValid)
              return View(model);
 
-         MetalTypeDto metalDto = new()
-         {
-             Name = model.Name
-         };
+         MetalTypeDto metalDto = _mapper.Map<MetalTypeDto>(model);
          await _metalService.CreateAsync(metalDto);
          return RedirectToAction("Index");
      }
@@ -40,11 +40,7 @@ public class MetalTypeController : Controller
      {
          List<MetalTypeDto> metalDtos = await _metalService.GetAllAsync();
          
-         List<MetalTypeViewModel> models = metalDtos.Select(metalType => new MetalTypeViewModel
-         {
-             Id = metalType.Id,
-             Name = metalType.Name
-         }).ToList();
+         List<MetalTypeViewModel> models = _mapper.Map<List<MetalTypeViewModel>>(metalDtos);
          
          return View(models);
      }
@@ -55,11 +51,7 @@ public class MetalTypeController : Controller
          if (metalDto == null)
              return RedirectToAction("Index");
          
-         MetalTypeViewModel model = new()
-         {
-             Id = metalDto.Id,
-             Name = metalDto.Name
-         };
+         MetalTypeViewModel model = _mapper.Map<MetalTypeViewModel>(metalDto);
          return View(model);
      }
 
@@ -69,11 +61,7 @@ public class MetalTypeController : Controller
          if (metalDto == null)
              return RedirectToAction("Index");
          
-         EditMetalViewModel model = new()
-         {
-             Id = metalDto.Id,
-             Name = metalDto.Name
-         };
+         EditMetalViewModel model = _mapper.Map<EditMetalViewModel>(metalDto);
          return View(model);
      }
 
@@ -84,11 +72,7 @@ public class MetalTypeController : Controller
          if (!ModelState.IsValid)
              return View(model);
          
-         MetalTypeDto metalDto = new()
-         {
-             Id = model.Id,
-             Name = model.Name
-         };
+         MetalTypeDto metalDto = _mapper.Map<MetalTypeDto>(model);
          await _metalService.UpdateAsync(metalDto);
          return RedirectToAction("Index");
      }

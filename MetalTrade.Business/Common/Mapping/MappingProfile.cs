@@ -8,18 +8,13 @@ namespace MetalTrade.Business.Common.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<AdvertisementDto, Advertisement>()
-                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
-                .ForMember(dest => dest.Product, opt => opt.Ignore())
-                .ForMember(dest => dest.User, opt => opt.Ignore())
-                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber ?? ""))
-                .ForMember(dest => dest.Body, opt => opt.MapFrom(src => src.Body ?? ""))
+            CreateMap<Advertisement, AdvertisementDto>()
+                .ForMember(dest => dest.PhotoFiles, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Photoes, opt => opt.Ignore())
-                .ForMember(dest => dest.Status, opt => opt.Ignore())
-                .ForMember(dest => dest.IsAd, opt => opt.Ignore())
-                .ForMember(dest => dest.IsTop, opt => opt.Ignore());
-
-            CreateMap<Advertisement, AdvertisementDto>();
+                .ForMember(dest => dest.Product, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
 
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()) 
@@ -27,8 +22,29 @@ namespace MetalTrade.Business.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore()); 
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
-            CreateMap<MetalTypeDto, MetalType>().ReverseMap();
-            CreateMap<ProductDto, Product>().ReverseMap();
+
+            #region MetalService
+            CreateMap<MetalType, MetalTypeDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
+                .ForMember(dest => dest.Products, opt => opt.Ignore())
+                .ReverseMap();
+            #endregion
+
+            #region ProductService
+            CreateMap<ProductDto, Product>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))
+                .ForMember(dest => dest.Advertisements, opt => opt.Ignore())
+                .ReverseMap();
+            #endregion
+
+            #region UserService
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore())
+                .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo))
+                .ReverseMap()
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink));
+            #endregion
         }
     }
 }
