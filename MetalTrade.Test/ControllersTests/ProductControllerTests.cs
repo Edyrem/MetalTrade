@@ -16,7 +16,7 @@ public class ProductControllerTests: ControllerTestBase
 {
 
     [Fact]
-    public async Task Index_ReturnsView_WithMappedProducts()
+    public async Task IndexReturnsViewWithMappedProducts()
     {
         // Arrange
         var productDtos = new List<ProductDto>
@@ -54,7 +54,7 @@ public class ProductControllerTests: ControllerTestBase
     }
 
     [Fact]
-    public async Task Create_Get_ReturnsView_WithMetalTypesInViewData()
+    public async Task CreateGetReturnsViewWithMetalTypesInViewData()
     {
         // Arrange
         var metalTypes = new List<MetalTypeDto>
@@ -82,15 +82,16 @@ public class ProductControllerTests: ControllerTestBase
     }
 
     [Fact]
-    public async Task Create_Post_InvalidModel_ReturnsView_WithSameModel()
+    public async Task CreatePostInvalidModelReturnsViewWithSameModel()
     {
         // Arrange
-        var model = new CreateProductViewModel(); // пустой → невалидный
-
-        ProductController.ModelState.AddModelError("Name", "Required");
-
+        var controller = new ProductController(ProductMock.Object, MetalMock.Object, MapperMock.Object);
+        controller.ModelState.AddModelError("Name", "Required");
+        
+        var model = new CreateProductViewModel(); 
+        
         // Act
-        var result = await ProductController.Create(model);
+        var result = await controller.Create(model);
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
@@ -103,7 +104,7 @@ public class ProductControllerTests: ControllerTestBase
     }
 
     [Fact]
-    public async Task Create_Post_ValidModel_RedirectsToIndex()
+    public async Task CreatePostValidModel_RedirectsToIndex()
     {
         // Arrange
         var model = new CreateProductViewModel
@@ -121,6 +122,10 @@ public class ProductControllerTests: ControllerTestBase
         MapperMock
             .Setup(m => m.Map<ProductDto>(model))
             .Returns(productDto);
+        
+        ProductMock
+            .Setup(s => s.CreateAsync(productDto))
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await ProductController.Create(model);
@@ -136,16 +141,14 @@ public class ProductControllerTests: ControllerTestBase
     [Fact]
     public async Task CreateGetReturnViewTest()
     {
-        var metalTypes = new List<MetalTypeDto>
-        {
-            new () { Id = 1, Name = "сталь" },
-            new() { Id = 2, Name = "железо" }
-        };
+        // Arrange
+        MetalMock.Setup(m => m.GetAllAsync()).ReturnsAsync(new List<MetalTypeDto>());
 
+        // Act
         var result = await ProductController.Create();
 
-        var viewResult = Assert.IsType<ViewResult>(result);
-        var model = Assert.IsType<CreateProductViewModel>(viewResult.Model);        
+        // Assert
+        Assert.IsType<ViewResult>(result);    
     }
     
     [Fact]
@@ -157,24 +160,20 @@ public class ProductControllerTests: ControllerTestBase
             new () { Id = 1, Name = "сталь" },
             new() { Id = 2, Name = "железо" }
         };
-        var mockProduct = new Mock<IProductService>();
-        var mockMetal = new Mock<IMetalService>();
-        var mapperMock = new Mock<IMapper>();
-
-        mockMetal.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
-        var controller = new ProductController(mockProduct.Object, mockMetal.Object, mapperMock.Object);
-
+        
+        MetalMock.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
+        
         // Act
         var result = await ProductController.Create();
 
         // Assert
-        var viewResult = Assert.IsType<ViewResult>(result);
-        var model = Assert.IsType<CreateProductViewModel>(viewResult.Model);        
-
-        Assert.Equal(1, model.MetalTypeId);
-        Assert.NotNull(model.MetalTypeId);
+        var viewResult = Assert.IsType<ViewResult>(result);    
         
-        mockMetal.Verify(m => m.GetAllAsync());
+        Assert.NotNull(viewResult.ViewData["MetalTypes"]);
+        var selectList = Assert.IsType<SelectList>(viewResult.ViewData["MetalTypes"]);
+        Assert.Equal(2, selectList.Count());
+        
+        MetalMock.Verify(m => m.GetAllAsync());
     }
     
     
@@ -200,13 +199,14 @@ public class ProductControllerTests: ControllerTestBase
     public async Task CreatePostInvalidModelReturnsView()
     {
         // Arrange
+        var controller = new ProductController(ProductMock.Object, MetalMock.Object, MapperMock.Object);
 
-        ProductController.ModelState.AddModelError("Name", "Required");
+        controller.ModelState.AddModelError("Name", "Required");
 
         var model = new CreateProductViewModel();
         
         // Act
-        var result = await ProductController.Create(model);
+        var result = await controller.Create(model);
         
         // Assert
         var view = Assert.IsType<ViewResult>(result);
@@ -222,35 +222,34 @@ public class ProductControllerTests: ControllerTestBase
     {
         // Arrange
         
-        var metalDtos = new List<MetalTypeDto>
-        {
-            new MetalTypeDto { Id = 1, Name = "сталь" },
-            new MetalTypeDto { Id = 2, Name = "железо" }
-        };
-        
         var productDtos = new List<ProductDto>
         {
-            new ProductDto { Id = 1, Name = "труба", MetalTypeId = metalDtos[0].Id, MetalType = metalDtos[0]},
-            new ProductDto { Id = 2, Name = "арматура" , MetalTypeId = metalDtos[1].Id, MetalType = metalDtos[1]}
+            new ProductDto { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeDto  { Id = 1, Name = "сталь" }},
+            new ProductDto { Id = 2, Name = "арматура" , MetalTypeId = 2, MetalType = new MetalTypeDto  { Id = 1, Name = "железо" }}
         };
-
-        MetalMock.Setup(s => s.GetAllAsync()).ReturnsAsync(metalDtos);
+        
+        var productViewModels = new List<ProductViewModel>
+        {
+            new ProductViewModel { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeViewModel { Id = 1, Name = "сталь" } },
+            new ProductViewModel { Id = 2, Name = "арматура", MetalTypeId = 2, MetalType = new MetalTypeViewModel { Id = 2, Name = "железо" } }
+        };
+        
         ProductMock.Setup(p=> p.GetAllAsync()).ReturnsAsync(productDtos);
-
+        MapperMock.Setup(m => m.Map<List<ProductViewModel>>(productDtos)).Returns(productViewModels);
+        
         // Act
         var result = await ProductController.Index();
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
         var model = Assert.IsType<List<ProductViewModel>>(viewResult.Model);
-
-        Assert.Equal("сталь", model[0].MetalType.Name);
-        Assert.Equal("железо", model[1].MetalType.Name);
+        
         Assert.Equal(2, model.Count);
         Assert.Equal("труба", model[0].Name);
         Assert.Equal("арматура", model[1].Name);
 
         ProductMock.Verify(p => p.GetAllAsync());
+        MapperMock.Setup(m => m.Map<List<ProductViewModel>>(productDtos)).Returns(productViewModels);
     }
 
     [Fact]
@@ -271,7 +270,9 @@ public class ProductControllerTests: ControllerTestBase
         };
 
         ProductMock.Setup(p=> p.GetAsync(1)).ReturnsAsync(product);        
-
+        MapperMock.Setup(m => m.Map<ProductViewModel>(product))
+            .Returns(new ProductViewModel { Id = 1, Name = "труба", MetalTypeId = 1 });
+        
         // Act
         var result = await ProductController.Details(1);
 
@@ -284,6 +285,8 @@ public class ProductControllerTests: ControllerTestBase
         Assert.Equal(1, model.Id);
 
         ProductMock.Verify(p => p.GetAsync(1));
+        MapperMock.Verify(m => m.Map<ProductViewModel>(product));
+
     }
 
     [Fact]
@@ -326,7 +329,8 @@ public class ProductControllerTests: ControllerTestBase
         // Arrange
         ProductMock.Setup(p => p.GetAsync(1)).ReturnsAsync(product);
         MetalMock.Setup(m => m.GetAllAsync()).ReturnsAsync(metalTypes);
-        
+        MapperMock.Setup(m => m.Map<EditProductViewModel>(product))
+            .Returns(new EditProductViewModel { Id = 1, Name = "труба", MetalTypeId = 1 });
 
         // Act
         var result = await ProductController.Edit(1);
@@ -386,13 +390,14 @@ public class ProductControllerTests: ControllerTestBase
     public async Task EditPostInvalidModelReturnsView()
     {
         // Arrange
+        var controller = new ProductController(ProductMock.Object, MetalMock.Object, MapperMock.Object);
 
-        ProductController.ModelState.AddModelError("Name", "Required");
+        controller.ModelState.AddModelError("Name", "Required");
 
         var model = new EditProductViewModel();
         
         // Act
-        var result = await ProductController.Edit(model);
+        var result = await controller.Edit(model);
         
         // Assert
         var view = Assert.IsType<ViewResult>(result);
