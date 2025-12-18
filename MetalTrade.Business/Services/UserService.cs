@@ -133,8 +133,14 @@ public class UserService : IUserService
 
     public async Task<List<UserDto>> GetAllUsersWithRolesAsync()
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetAllAsync();        
         var result = _mapper.Map<List<UserDto>>(users);
+        foreach(var userDto in result)
+        {
+            var user = _mapper.Map<User>(userDto);
+            var roles = await _userRepository.GetUserRolesAsync(user!);
+            userDto.Roles = roles?.ToList() ?? new List<string>();
+        }
         return result;
     }
 
