@@ -44,7 +44,7 @@ namespace MetalTrade.Business.Common.Mapping
                 .ForMember(dest => dest.Photo, opt => opt.Ignore())
                 .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.Photo))
                 .ReverseMap()
-                .ForMember(dest => dest.Photo, opt => opt.Ignore());
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink));
             #endregion
             
         }
