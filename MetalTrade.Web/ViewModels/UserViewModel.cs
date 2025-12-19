@@ -11,8 +11,6 @@ public class UserViewModel
     [Display(Name = "Логин")]
     public string UserName { get; set; }
     
-    public string? PhotoLink { get; set; } 
-    
     [Remote(action:"CheckEmail", controller:"Validation", ErrorMessage = "Аккаунт с таким Email уже существует!")]
     [Required(ErrorMessage = "Укажите email")]
     [EmailAddress(ErrorMessage = "Введите корректный email")]
@@ -54,6 +52,4 @@ public class UserViewModel
     [Required(ErrorMessage = "Укажите роль")]
     [Display(Name = "Роль")]
     public UserRole Role { get; set; }
-
-    
 }

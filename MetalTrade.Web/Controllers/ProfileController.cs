@@ -121,10 +121,10 @@
             var userDto = await _userService.GetUserWithAdvertisementByIdAsync(id);
             if (userDto == null) return NotFound();
 
-            var vm = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
-            vm.IsSupplier = await _userService.IsInRoleAsync(userDto, "supplier");
+            var viewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
+            viewModel.IsSupplier = await _userService.IsInRoleAsync(userDto, "supplier");
 
-            return View("UserProfile", vm);
+            return View("UserProfile", viewModel);
         }
 
         
