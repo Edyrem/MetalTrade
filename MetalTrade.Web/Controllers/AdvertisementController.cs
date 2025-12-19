@@ -56,17 +56,16 @@ public class AdvertisementController : Controller
         var models = _mapper.Map<List<AdvertisementViewModel>>(adsDtos);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-
-        bool isAdmin = true;
-        if (!await _userService.IsInRolesAsync(user, ["admin", "moderator"]))
-
+        bool isAdmin = user != null && await _userService.IsInRolesAsync(user, ["admin", "moderator"]);
+        
+        if (!isAdmin)
         {
             models = models.Where(a =>
                 a.Status == (int)AdvertisementStatus.Active ||
                 (user != null && a.UserId == user.Id)
             ).ToList();
         }
-
+        
         ViewData["IsAdmin"] = isAdmin;
         ViewBag.Filter = filter;
 
@@ -89,13 +88,17 @@ public class AdvertisementController : Controller
                        (await _userService.IsInRoleAsync(user, "admin") ||
                         await _userService.IsInRoleAsync(user, "moderator"));
 
-        if (!isAdmin)
+        if (!isAdmin && user != null)
         {
             models = models.Where(a =>
                 a.Status == (int)AdvertisementStatus.Active ||
-                (user != null && a.UserId == user.Id)
+                a.UserId == user.Id
             ).ToList();
         }
+        
+        ViewData["IsAdmin"] = isAdmin;
+        ViewData["CurrentUserId"] = user?.Id;
+        
 
         return PartialView("_AdsGrid", models);
     }
@@ -104,21 +107,23 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var adsDto = await _adsService.GetAsync(id);
-        if (adsDto == null) return RedirectToAction("Index");
+        if (adsDto == null)
+            return RedirectToAction("Index");
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
-        bool isAdmin = true;
-        if (!await _userService.IsInRolesAsync(user, ["admin", "moderator"]))
-        {
-            isAdmin = false;
-        }
+
+        bool isAdmin = user != null &&
+                       await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
+
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user?.Id;
 
         return View(model);
     }
+
+
 
     public async Task<IActionResult> Create()
     {

@@ -1,14 +1,25 @@
 ﻿@using MetalTrade.Domain.Enums
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
-@{
-    ViewData["Title"] = "Details";
-
-    var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
-    int currentUserId;
-    int.TryParse(ViewData["CurrentUserId"]?.ToString(), out currentUserId);
-
+@if (Model == null)
+{
+    <p class="text-danger">Объявление не найдено.</p>
+    return;
 }
+
+@{
+    var isAdmin = ViewData["IsAdmin"] as bool? == true;
+
+    int? currentUserId = ViewData["CurrentUserId"] as int?;
+
+    var isOwner =
+        User.Identity?.IsAuthenticated == true &&
+        currentUserId.HasValue &&
+        Model != null &&
+        Model.UserId == currentUserId.Value;
+}
+
+
 
 <h1>Детали</h1>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -19,6 +30,48 @@
         <div class="row">
             <div class="col-md-6">
                 <h2 class="fw-bold">@Model.Title</h2>
+                
+                <p class="text-muted mb-1">
+                    Артикул: <span class="fw-semibold">#@Model.Id</span>
+                </p>
+
+                <p class="mb-3">
+                    Автор:
+                    @if (Model.User != null)
+                    {
+                        <a asp-controller="Profile"
+                           asp-action="User"
+                           asp-route-id="@Model.UserId"
+                           class="fw-semibold text-decoration-none">
+                            @Model.User.UserName
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Автор не указан</span>
+                    }
+                </p>
+
+                
+                @if (isAdmin || isOwner)
+                {
+                    <div class="mb-2">
+                        <span class="badge
+                            @(Model.Status == (int)AdvertisementStatus.Active ? "bg-success" :
+                                                 Model.Status == (int)AdvertisementStatus.Draft ? "bg-warning text-dark" :
+                                                 Model.Status == (int)AdvertisementStatus.Rejected ? "bg-danger" :
+                                                 "bg-secondary")">
+                            @(Model.Status switch
+                            {
+                                (int)AdvertisementStatus.Draft => "На рассмотрении",
+                                (int)AdvertisementStatus.Active => "Активно",
+                                (int)AdvertisementStatus.Rejected => "Отклонено",
+                                _ => "Деактивировано"
+                            })
+                        </span>
+                    </div>
+                }
+
                 <dl class="row">
                     <dt class="col-sm-2">
                         @Html.DisplayNameFor(model => model.Body)
@@ -64,7 +117,7 @@
                     </dd>
                 </dl>
                 <div>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated && (Model.UserId == currentUserId || isAdmin))
+                    @if (isAdmin || isOwner)
                     {
                         <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Редактировать</a>
                         <b> | </b>
