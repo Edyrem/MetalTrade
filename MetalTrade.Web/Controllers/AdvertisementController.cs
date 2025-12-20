@@ -23,7 +23,6 @@ public class AdvertisementController : Controller
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
-        IWebHostEnvironment env,
         IProductService productService,
         IMetalService metalService,
         IMapper mapper)
