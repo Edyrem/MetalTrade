@@ -1,4 +1,3 @@
-using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace MetalTrade.Business.Dtos;
