@@ -12,13 +12,13 @@ namespace MetalTrade.Web.Controllers;
 [Authorize]
 public class ProfileController : Controller
 {
-    
+        
     private readonly IUserService _userService;
     private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public ProfileController(
-        
+            
         IUserService userService,
         IMapper mapper,
         IWebHostEnvironment env)
@@ -34,7 +34,7 @@ public class ProfileController : Controller
         if (user == null) return NotFound();
 
         var userDto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);
-        
+            
         var userViewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
         userViewModel.IsSupplier = await _userService.IsInRoleAsync(userDto!, "supplier");
 
@@ -61,6 +61,20 @@ public class ProfileController : Controller
             return View(model);
 
         var userDto = _mapper.Map<UserDto>(model);
+            
+        if (model.Photo != null)
+        {
+            var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "avatars");
+            Directory.CreateDirectory(uploadsDir);
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.Photo.FileName)}";
+            var fullPath = Path.Combine(uploadsDir, fileName);
+
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await model.Photo.CopyToAsync(stream);
+
+            userDto.PhotoLink = "/uploads/avatars/" + fileName;
+        }
 
         await _userService.UpdateUserAsync(userDto);
 
@@ -100,4 +114,18 @@ public class ProfileController : Controller
 
         return RedirectToAction("Index");
     }
+        
+    [AllowAnonymous]
+    public async Task<IActionResult> User(int id)
+    {
+        var userDto = await _userService.GetUserWithAdvertisementByIdAsync(id);
+        if (userDto == null) return NotFound();
+
+        var viewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
+        viewModel.IsSupplier = await _userService.IsInRoleAsync(userDto, "supplier");
+
+        return View("UserProfile", viewModel);
+    }
+
+        
 }
