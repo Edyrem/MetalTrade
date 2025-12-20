@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using MetalTrade.Web.ViewModels.MetalType;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetalTrade.Web.ViewModels.Product;
 
@@ -18,6 +16,4 @@ public class CreateProductViewModel
     [Display(Name = "Тип металла")]
     [Required(ErrorMessage = "Укажите тип металла")]
     public int MetalTypeId { get; set; }
-    
-    public List<SelectListItem> MetalTypes { get; set; } = [];
 }
