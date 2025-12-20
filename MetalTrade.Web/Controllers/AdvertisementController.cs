@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;
 
-[Authorize(Roles = "admin, moderator, supplier")]
+[Authorize]
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
@@ -121,9 +121,6 @@ public class AdvertisementController : Controller
 
         return View(model);
     }
-
-
-
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
