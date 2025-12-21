@@ -610,4 +610,124 @@ public class UserControllerTests : ControllerTestBase
         // Assert
         Assert.IsType<RedirectToActionResult>(result);
     }
+    [Fact]
+    public async Task CreateUser_Post_InvalidModel_ReturnsViewWithError()
+    {
+        // Arrange
+        var controller = CreateControllerWithUser();
+        controller.ModelState.AddModelError("UserName", "Required");
+
+        var model = new MetalTrade.Web.ViewModels.User.CreateUserViewModel
+        {
+            Email = "test@test.com",
+            PhoneNumber = "123456789"
+        };
+
+        // Act
+        var result = await controller.CreateUser(model);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(controller.ModelState.IsValid);
+        Assert.Equal(model, viewResult.Model);
+    }
+
+    [Fact]
+    public async Task CreateUser_Post_PasswordMismatch_ReturnsViewWithModelError()
+    {
+        // Arrange
+        var controller = CreateControllerWithUser();
+
+        var model = new MetalTrade.Web.ViewModels.User.CreateUserViewModel
+        {
+            UserName = "testuser",
+            Email = "test@test.com",
+            Password = "Password123!",
+            PasswordConfirm = "DifferentPassword123!",
+            Role = UserRole.Supplier
+        };
+
+        // Act
+        var result = await controller.CreateUser(model);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.Equal(model, viewResult.Model);
+        Assert.False(controller.ModelState.IsValid);
+    }
+
+    [Fact]
+    public async Task Edit_Post_ModelIdMismatch_ReturnsNotFound()
+    {
+        // Arrange
+        var controller = CreateControllerWithUser();
+        var id = 1;
+
+        var editModel = new MetalTrade.Web.ViewModels.User.EditUserViewModel
+        {
+            Id = 2, // ID не совпадает с параметром
+            UserName = "updated"
+        };
+
+        // Act
+        var result = await controller.Edit(id, editModel);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public async Task Edit_Post_ValidModel_UpdatesUserAndRedirectsToIndex()
+    {
+        // Arrange
+        var controller = CreateControllerWithUser();
+        var id = 1;
+
+        var editModel = new MetalTrade.Web.ViewModels.User.EditUserViewModel
+        {
+            Id = id,
+            UserName = "updatedusername",
+            Email = "updated@test.com",
+            PhoneNumber = "987654321",
+            WhatsAppNumber = "123456789",
+            Role = UserRole.Moderator
+        };
+
+        var userDto = new UserDto { Id = id };
+
+        MapperMock.Setup(m => m.Map<UserDto>(editModel)).Returns(userDto);
+        UserMock.Setup(s => s.UpdateUserAsync(userDto)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await controller.Edit(id, editModel);
+
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectResult.ActionName);
+        UserMock.Verify(s => s.UpdateUserAsync(It.IsAny<UserDto>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Edit_Post_InvalidModel_ReturnsViewWithModel()
+    {
+        // Arrange
+        var controller = CreateControllerWithUser();
+        controller.ModelState.AddModelError("Email", "Invalid email format");
+
+        var id = 1;
+        var editModel = new MetalTrade.Web.ViewModels.User.EditUserViewModel
+        {
+            Id = id,
+            UserName = "testuser",
+            Email = "invalid-email"
+        };
+
+        // Act
+        var result = await controller.Edit(id, editModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.Equal(editModel, viewResult.Model);
+        Assert.False(controller.ModelState.IsValid);
+    }
 }
