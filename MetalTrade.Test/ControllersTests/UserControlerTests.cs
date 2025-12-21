@@ -13,22 +13,6 @@ namespace MetalTrade.Test.ControllersTests;
 
 public class UserControllerTests : ControllerTestBase
 {
-    private UserController CreateControllerWithUser(params Claim[] claims)
-    {
-        var controller = new UserController(UserMock.Object, MapperMock.Object);
-
-        var identity = new ClaimsIdentity(claims, "mock");
-        controller.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(identity)
-            }
-        };
-
-        return controller;
-    }
-
     [Fact]
     public async Task Index_Admin_ReturnsViewWithUsers()
     {
