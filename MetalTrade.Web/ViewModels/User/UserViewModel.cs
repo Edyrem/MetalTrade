@@ -19,3 +19,4 @@ namespace MetalTrade.Web.ViewModels.User
         public List<string>? Roles { get; set; }
     }
 }
+    

@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Web.AdminPanel.Controllers;
 using MetalTrade.Web.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 
 namespace MetalTrade.Test.Helpers
 {
@@ -66,6 +67,22 @@ namespace MetalTrade.Test.Helpers
                 };
                 return controller;
             }
+        }
+      
+        protected UserController CreateControllerWithUser(params Claim[] claims)
+        {
+            var controller = new UserController(UserMock.Object, MapperMock.Object);
+
+            var identity = new ClaimsIdentity(claims, "mock");
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(identity)
+                }
+            };
+
+            return controller;
         }
         
         protected AdvertisementController AdvertisementController
