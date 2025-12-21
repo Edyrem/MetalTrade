@@ -572,4 +572,179 @@ public class AdvertisementControllerTests : ControllerTestBase
         AdvertisementMock.Verify(s => s.ArchiveAsync(adId), Times.Once);
     }
     
+    [Fact]
+    public async Task CreatePostOnExceptionThrowsException()
+    {
+        // Arrange
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 5 });
+
+        MapperMock
+            .Setup(m => m.Map<AdvertisementDto>(It.IsAny<CreateAdvertisementViewModel>()))
+            .Returns(new AdvertisementDto());
+
+        AdvertisementMock
+            .Setup(s => s.CreateAsync(It.IsAny<AdvertisementDto>()))
+            .ThrowsAsync(new Exception("fail"));
+
+        var model = new CreateAdvertisementViewModel();
+
+        // Act & Assert
+
+        await Assert.ThrowsAsync<Exception>(() =>
+            AdvertisementController.Create(model));
+    }
+    
+    [Fact]
+    public async Task CreatePostUserAuthenticatedReturnsRedirect()
+    {
+        // Arrange
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 99 });
+
+        MapperMock
+            .Setup(m => m.Map<AdvertisementDto>(It.IsAny<CreateAdvertisementViewModel>()))
+            .Returns(new AdvertisementDto());
+
+        AdvertisementMock
+            .Setup(s => s.CreateAsync(It.IsAny<AdvertisementDto>()))
+            .Returns(Task.CompletedTask);
+
+        var model = new CreateAdvertisementViewModel();
+
+        // Act
+        var result = await AdvertisementController.Create(model);
+
+        // Assert
+        Assert.IsType<RedirectToActionResult>(result);
+    }
+    
+
+    [Fact]
+    public async Task EditPostUserNullReturnsForbid()
+    {
+        // Arrange
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync((UserDto?)null);
+
+        var model = new EditAdvertisementViewModel();
+
+        // Act
+        var result = await AdvertisementController.Edit(model);
+
+        // Assert
+        Assert.IsType<ForbidResult>(result);
+    }
+    
+    [Fact]
+    public async Task EditPostOnExceptionThrowsException()
+    {
+        // Arrange
+        var model = new EditAdvertisementViewModel
+        {
+            Id = 3,
+            UserId = 10
+        };
+
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 10 });
+
+        AdvertisementMock
+            .Setup(s => s.UpdateAsync(It.IsAny<AdvertisementDto>()))
+            .ThrowsAsync(new Exception("fail"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<Exception>(() =>
+            AdvertisementController.Edit(model));
+    }
+
+    [Fact]
+    public async Task EditPostDtoNotFoundReturnsView()
+    {
+        // Arrange
+        var model = new EditAdvertisementViewModel { Id = 3 };
+
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 10 });
+
+        AdvertisementMock
+            .Setup(s => s.GetAsync(model.Id))
+            .ReturnsAsync((AdvertisementDto?)null);
+
+        // Act
+        var result = await AdvertisementController.Edit(model);
+
+        // Assert
+        Assert.IsType<ViewResult>(result);
+    }
+
+
+    [Fact]
+    public async Task DeletePostUserNullReturnsForbid()
+    {
+        // Arrange
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync((UserDto?)null);
+
+        var model = new DeleteAdvertisementViewModel();
+
+        // Act
+        var result = await AdvertisementController.Delete(model);
+
+        // Assert
+        Assert.IsType<ForbidResult>(result);
+    }
+
+    [Fact]
+    public async Task DeletePostDtoNotFoundRedirectsToIndex()
+    {
+        // Arrange
+        var model = new DeleteAdvertisementViewModel { Id = 5 };
+    
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 10 });
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAsync(model.Id))
+            .ThrowsAsync(new KeyNotFoundException());
+
+        // Act
+        var result = await AdvertisementController.Delete(model);
+
+        // Assert
+        var redirect = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirect.ActionName);
+    }
+
+    
+    [Fact]
+    public async Task DeletePostOnExceptionThrowsException()
+    {
+        // Arrange
+        var model = new DeleteAdvertisementViewModel
+        {
+            Id = 5,
+            UserId = 10
+        };
+
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 10 });
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAsync(model.Id))
+            .ThrowsAsync(new Exception("fail"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<Exception>(() =>
+            AdvertisementController.Delete(model));
+    }
+    
 }
