@@ -92,7 +92,6 @@ namespace MetalTrade.Test.Helpers
                 var controller = new AdvertisementController(
                     AdvertisementMock.Object,
                     UserMock.Object,
-                    null,
                     ProductMock.Object,
                     MetalMock.Object,
                     MapperMock.Object
