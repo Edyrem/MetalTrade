@@ -101,8 +101,7 @@ public class AdvertisementController : Controller
 
         return PartialView("_AdsGrid", models);
     }
-
-    [Authorize]
+    
     public async Task<IActionResult> Details(int id)
     {
         var adsDto = await _adsService.GetAsync(id);
