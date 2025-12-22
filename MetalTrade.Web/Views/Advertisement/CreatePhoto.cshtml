@@ -1,0 +1,59 @@
+﻿@model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
+
+@{
+    ViewData["Title"] = "CreateAdvertisementPhoto";
+}
+
+<h1>Изменить фото</h1>
+<div class="row">
+    <div class="col-md-6">
+        <button class="btn btn-success mb-3" id="addPhotoBtn">Добавить фото</button>
+        <input type="file" id="photoInput" multiple hidden />
+        <h4>Фото объявления</h4>
+        <hr />
+        <div class="photo-list-container">
+            <div class="photo-list" id="photoList" data-advertisement-id="@Model.Id">
+                @if (Model.Photoes != null && Model.Photoes.Count > 0)
+                {
+                    @foreach (var photo in Model.Photoes)
+                    {
+                        <div class="photo-card" data-photo-id="@photo.Id">
+                            <img src="@photo.PhotoLink" class="photo-card-img" />
+
+                            <button class="photo-delete-btn"
+                                    title="Удалить"
+                                    data-id="@photo.Id"
+                                    data-link="@photo.PhotoLink">
+                                <i class="fas fa-trash"></i>
+                                <span class="tooltip">Удалить фото</span>
+                            </button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p id="noPhotosMessage" class="text-muted">Фото отсутствуют.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Details" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Назад</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/advertisement/ad-photo-remove.js"></script>
+        <link rel="stylesheet" href="~/css/advertisement/ad-photo-remove.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script src="~/js/toast/toastr-config.js"></script>
+        <script src="~/js/advertisement/ad-photo-create.js"></script>
+    }
+}

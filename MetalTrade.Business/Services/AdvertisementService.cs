@@ -170,4 +170,22 @@ public class AdvertisementService : IAdvertisementService
         return _mapper.Map<List<AdvertisementDto>>(ads);
     }
 
+    public async Task<List<AdvertisementPhotoAjaxDto>?> CreateAdvertisementPhotoAsync(AdvertisementDto adsDto)
+    {
+        var entity = await _repository.GetAsync(adsDto.Id) 
+            ?? throw new ArgumentException("Объявление не найдено");
+
+        if (adsDto.PhotoFiles?.Any() != true) return null;
+
+        var newPhotoEntities = new List<AdvertisementPhoto>();
+        var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
+        newPhotoEntities.AddRange(photoLinks.Select(link => new AdvertisementPhoto { PhotoLink = link }));
+
+        entity.Photoes.AddRange(newPhotoEntities);
+        await _repository.UpdateAsync(entity);
+        await _repository.SaveChangesAsync();
+
+        var photoes = _mapper.Map<List<AdvertisementPhotoAjaxDto>>(newPhotoEntities);
+        return photoes;
+    }
 }

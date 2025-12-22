@@ -307,4 +307,24 @@ public class AdvertisementController : Controller
         }
         return RedirectToAction("Index");
     }
+    public async Task<IActionResult> CreatePhoto(int id)
+    {
+        var adsDto = await _adsService.GetAsync(id);
+        var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateAdvertisementPhotoAjax(int advertisementId, List<IFormFile> photos)
+    {
+        if (photos?.Any() != true)
+            return Json(new { success = false });
+
+        var newPhotos = 
+            await _adsService.CreateAdvertisementPhotoAsync(new AdvertisementDto { Id = advertisementId, PhotoFiles = photos });
+
+        if (newPhotos == null || !newPhotos.Any())
+            return Json(new { success = false });
+
+        return Json(new { success = true, photos = newPhotos });
+    }
 }
