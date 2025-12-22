@@ -23,6 +23,7 @@ namespace MetalTrade.DataAccess.Repositories
         public async override Task<Advertisement?> GetAsync(int id)
         {
             return await _dbSet
+                .Include(a => a.User)
                 .Include(a => a.Photoes)
                 .Include(a => a.Product)
                     .ThenInclude(p => p.MetalType)

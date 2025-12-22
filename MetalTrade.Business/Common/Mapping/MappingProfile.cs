@@ -9,6 +9,7 @@ namespace MetalTrade.Business.Common.Mapping
         public MappingProfile()
         {
             CreateMap<Advertisement, AdvertisementDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.PhotoFiles, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -47,6 +48,7 @@ namespace MetalTrade.Business.Common.Mapping
                 .ReverseMap()
                 .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoLink));
             #endregion
+            
         }
     }
 }

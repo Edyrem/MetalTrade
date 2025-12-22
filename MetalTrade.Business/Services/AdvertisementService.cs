@@ -132,7 +132,19 @@ public class AdvertisementService : IAdvertisementService
     {
         var queriableAdvertisements = _repository.CreateFilter();
         if (!string.IsNullOrWhiteSpace(filter.Title))
-            queriableAdvertisements = _repository.FilterTitle(queriableAdvertisements, filter.Title);
+        {
+            if (int.TryParse(filter.Title, out var adId))
+            {
+                queriableAdvertisements = queriableAdvertisements
+                    .Where(a => a.Id == adId);
+            }
+            else
+            {
+                queriableAdvertisements = _repository
+                    .FilterTitle(queriableAdvertisements, filter.Title);
+            }
+        }
+
         
         if (!string.IsNullOrWhiteSpace(filter.City))
             queriableAdvertisements = _repository.FilterCity(queriableAdvertisements, filter.City);
