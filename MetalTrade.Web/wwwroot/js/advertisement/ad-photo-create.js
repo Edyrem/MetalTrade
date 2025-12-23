@@ -1,5 +1,5 @@
 ﻿$(function () {
-    const maxPhotos = 5;
+    const maxPhotos = 10;
     const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
     const maxSizeMB = 3;
 
