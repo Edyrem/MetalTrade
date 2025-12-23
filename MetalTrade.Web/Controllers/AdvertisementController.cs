@@ -1,10 +1,8 @@
 using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
-using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -202,9 +200,7 @@ public class AdvertisementController : Controller
             }
         }
         var productDtos = await _productService.GetAllAsync();
-        var tempAdsDto = await _adsService.GetAsync(model.Id);
-        if (tempAdsDto != null)
-            model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
+        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
 
         return View(model);
     }

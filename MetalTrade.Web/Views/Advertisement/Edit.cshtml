@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-5">
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id"/>
             <input type="hidden" asp-for="UserId"/>
@@ -56,47 +56,9 @@
                 <span asp-validation-for="ProductId" class="text-danger"></span>
             </div>
             <div class="form-group mt-3">
-                <label class="control-label">Добавить фото</label>
-                <div class="d-flex align-items-start gap-2">
-                    <button type="button" id="addPhotoBtn">+</button>
-                    <div id="photoContainer"></div>
-                </div>
-                <div id="hiddenPhotoFileInputs"></div>
-                <span asp-validation-for="PhotoFiles" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-3">
                 <input type="submit" value="Редактировать" class="btn btn-primary" />
             </div>
         </form>
-    </div>
-    <div class="col-md-6">
-        <h4>Фото объявления</h4>
-        <hr />
-        @if (Model.Photoes != null && Model.Photoes.Count > 0)
-        {
-            <div class="photo-list-container">
-                <div class="photo-list">
-                    @foreach (var photo in Model.Photoes)
-                    {
-                        <div class="photo-card" data-photo-id="@photo.Id">
-                            <img src="@photo.PhotoLink" class="photo-card-img" />
-
-                            <button class="photo-delete-btn"
-                                    title="Удалить"
-                                    data-id="@photo.Id"
-                                    data-link="@photo.PhotoLink">
-                                <i class="fas fa-trash"></i>
-                                <span class="tooltip">Удалить фото</span>
-                            </button>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-        else
-        {
-            <p class="text-muted">Фото отсутствуют.</p>
-        }
     </div>
 </div>
 
@@ -107,11 +69,5 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        <script src="~/js/advertisement/ad-photo-preview.js"></script>
-        <link rel="stylesheet" href="~/css/advertisement/ad-photo-preview.css" />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="~/js/advertisement/ad-photo-remove.js"></script>
-        <link rel="stylesheet" href="~/css/advertisement/ad-photo-remove.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     }
 }

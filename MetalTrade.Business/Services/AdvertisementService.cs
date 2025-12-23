@@ -62,20 +62,6 @@ public class AdvertisementService : IAdvertisementService
         var entity = await _repository.GetAsync(adsDto.Id) ?? throw new ArgumentException("Объявление не найдено");
 
         _mapper.Map(adsDto, entity);
-
-        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Count > 0)
-        {
-            var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
-            foreach (var link in photoLinks)
-            {
-                entity.Photoes.Add(new AdvertisementPhoto 
-                { 
-                    PhotoLink = link,
-                    AdvertisementId = entity.Id
-                });
-            }
-        }
-
         await _repository.UpdateAsync(entity);
         await _repository.SaveChangesAsync();
     }
