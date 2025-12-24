@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "admin, moderator, supplier")]
 public class AdvertisementController : Controller
 {
     private readonly IAdvertisementService _adsService;
@@ -101,13 +101,17 @@ public class AdvertisementController : Controller
 
         return PartialView("_AdsGrid", models);
     }
-    
-    [Authorize]
+
+    [AllowAnonymous]
     public async Task<IActionResult> Details(int id)
     {
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null)
             return RedirectToAction("Index");
+        
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return RedirectToAction("Login", "Account",
+                new { returnUrl = Url.Action("Details", new { id }) });
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
@@ -121,9 +125,7 @@ public class AdvertisementController : Controller
 
         return View(model);
     }
-    
-    [HttpGet]
-    [Authorize(Roles = "admin,moderator,supplier")]
+
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
@@ -132,7 +134,6 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -152,7 +153,6 @@ public class AdvertisementController : Controller
     }
 
     [HttpGet("Edit/{id}")]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Edit(int id, string? returnUrl)
     {
         var adsDto = await _adsService.GetAsync(id);
@@ -179,7 +179,6 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost("Edit/{id}")]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -209,8 +208,6 @@ public class AdvertisementController : Controller
         return View(model);
     }
 
-    [HttpGet]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -234,7 +231,6 @@ public class AdvertisementController : Controller
     }
         
     [HttpPost]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -255,7 +251,6 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
     {
         await _adsService.DeleteAdvertisementPhotoAsync(new AdvertisementPhotoDto
