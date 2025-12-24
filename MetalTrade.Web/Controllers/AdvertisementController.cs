@@ -103,12 +103,16 @@ public class AdvertisementController : Controller
         return PartialView("_AdsGrid", models);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     public async Task<IActionResult> Details(int id)
     {
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null)
             return RedirectToAction("Index");
+        
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return RedirectToAction("Login", "Account",
+                new { returnUrl = Url.Action("Details", new { id }) });
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
@@ -122,8 +126,6 @@ public class AdvertisementController : Controller
 
         return View(model);
     }
-
-
 
     public async Task<IActionResult> Create()
     {
