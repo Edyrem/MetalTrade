@@ -102,6 +102,7 @@ public class AdvertisementController : Controller
         return PartialView("_AdsGrid", models);
     }
     
+    [Authorize]
     public async Task<IActionResult> Details(int id)
     {
         var adsDto = await _adsService.GetAsync(id);
@@ -120,6 +121,9 @@ public class AdvertisementController : Controller
 
         return View(model);
     }
+    
+    [HttpGet]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
@@ -128,6 +132,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Create(CreateAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -147,6 +152,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpGet("Edit/{id}")]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Edit(int id, string? returnUrl)
     {
         var adsDto = await _adsService.GetAsync(id);
@@ -173,6 +179,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost("Edit/{id}")]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Edit(EditAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -202,6 +209,8 @@ public class AdvertisementController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -225,6 +234,7 @@ public class AdvertisementController : Controller
     }
         
     [HttpPost]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> Delete(DeleteAdvertisementViewModel model)
     {
         var user = await _userService.GetCurrentUserAsync(HttpContext);
@@ -245,6 +255,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "admin,moderator,supplier")]
     public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
     {
         await _adsService.DeleteAdvertisementPhotoAsync(new AdvertisementPhotoDto
