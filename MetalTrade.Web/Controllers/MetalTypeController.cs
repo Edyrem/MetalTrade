@@ -4,6 +4,8 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.ViewModels.MetalType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Xml.Linq;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -36,13 +38,21 @@ public class MetalTypeController : Controller
          return RedirectToAction("Index");
      }
 
-     public async Task<IActionResult> Index()
+     public async Task<IActionResult> Index(string? name, string? sort, int page = 1)
      {
-         List<MetalTypeDto> metalDtos = await _metalService.GetAllAsync();
+        var filter = new MetalTypeFilterDto
+        {
+            Name = name,
+            Sort = sort,
+            Page = page
+        };
+
+        ViewBag.Filter = filter;
+        List<MetalTypeDto> metalDtos = await _metalService.GetFilteredAsync(filter);
+
+        List<MetalTypeViewModel> models = _mapper.Map<List<MetalTypeViewModel>>(metalDtos);
          
-         List<MetalTypeViewModel> models = _mapper.Map<List<MetalTypeViewModel>>(metalDtos);
-         
-         return View(models);
+        return View(models);
      }
 
      public async Task<IActionResult> Details(int id)

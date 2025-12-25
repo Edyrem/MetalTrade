@@ -13,7 +13,13 @@
         <table class="mt-3 table table-info table-striped-columns" style="width: 100%;">
             <tr>
                 <th>Id</th>
-                <th>Название</th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-name="@ViewBag.Filter?.Name"
+                       asp-route-sort="@(ViewBag.Filter?.Sort == "name_asc" ? "name_desc" : "name_asc")">
+                        Название
+                    </a>
+                </th>
                 <th>Действие</th>
             </tr>
             @foreach (var metal in @Model)

@@ -14,5 +14,9 @@ namespace MetalTrade.DataAccess.Repositories
         public MetalTypeRepository(MetalTradeDbContext context) : base(context)
         {
         }
+        public IQueryable<MetalType> CreateFilter()
+        {
+            return _context.MetalTypes.AsQueryable();
+        }
     }
 }

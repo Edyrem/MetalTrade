@@ -4,6 +4,8 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace MetalTrade.Business.Services;
 
@@ -52,5 +54,29 @@ public class MetalService : IMetalService
     {
         await _repository.DeleteAsync(metalTypeId);
         await _repository.SaveChangesAsync();
+    }
+
+    public async Task<List<MetalTypeDto>> GetFilteredAsync(MetalTypeFilterDto filter)
+    {
+        var query = _repository.CreateFilter(); 
+
+        if (!string.IsNullOrWhiteSpace(filter.Name))
+        {
+            query = query.Where(m => m.Name.Contains(filter.Name));
+        }
+
+        query = filter.Sort switch
+        {
+            "name_asc" => query.OrderBy(m => m.Name),
+            "name_desc" => query.OrderByDescending(m => m.Name),
+            _ => query.OrderBy(m => m.Id)
+        };
+
+        query = query
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize);
+
+        var metals = await query.ToListAsync();
+        return _mapper.Map<List<MetalTypeDto>>(metals);
     }
 }
