@@ -5,98 +5,79 @@
     var isCurrentUserAdmin = User.IsInRole("admin");
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">Все пользователи</h2>
-    <a asp-action="CreateUser" class="btn btn-success">Добавить нового пользователя</a>
-    @if (!Model.Any())
-    {
-        <h4 class="">Пользователей еще нет </h4>
-    }
-    else
-    {
-        <div class="row text-center">
-            <table class="mt-3 table" style="width: 100%;">
-                <tr>
-                    <th>Аватар</th>
-                    <th>Логин</th>
-                    <th>Email</th>
-                    <th>Номер телефона</th>
-                    <th>Роль</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                @foreach (var user in Model)
-                {
-                    <tr>
-                        @if (!string.IsNullOrWhiteSpace(user.Photo))
-                        {
-                            if (user.Photo.StartsWith("http"))
-                            {
-                                <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
-                            }
-                            else
-                            {
-                                user.Photo = user.Photo.Substring(1);                                
-                                <td><img src="~/@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
-                            }
-                        }
-                        else
-                        {
-                            <td></td>    
-                        }
+<div class="row mb-3">
+    <div class="col-md-3">
+        <input id="userName" class="form-control" placeholder="Логин" />
+    </div>
+    <div class="col-md-3">
+        <input id="email" class="form-control" placeholder="Email" />
+    </div>
+    <div class="col-md-3">
+        <input id="phoneNumber" class="form-control" placeholder="Номер телефона" />
+    </div>
 
-                        <td><a asp-action="Details" asp-route-id="@user.Id" class="link-underline-light"><strong>@user.UserName</strong></a></td>
-                        <td>@user.Email</td>
-                        <td>@user.PhoneNumber</td>
-                        @if(user.Roles!=null && user.Roles.Any())
-                        {
-                            @if (user.Roles.Contains("admin"))
-                            {
-                                <td class="text-danger">Админ</td>
-                                <td></td>
-                            }                           
-
-                            if (user.Roles.Contains("supplier"))
-                            {
-                                <td><div class="text-info">Поставщик</div></td>
-                                if (isCurrentUserAdmin)
-                                {
-                                    <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Удалить из поставщиков</a></td>
-                                }                                
-                            }
-                            else
-                            {
-                                <td><div class="text-info">Пользователь</div></td>
-                                if (isCurrentUserAdmin)
-                                {
-                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="supplier" class="btn btn-info">Сделать поставщиком</a></td>
-                                }
-                            }
-                            if (user.Roles.Contains("moderator"))
-                            {
-                                <td><div class="text-primary">Модератор</div></td>
-                                if (isCurrentUserAdmin)
-                                {
-                                    <td><a asp-action="RemoveRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Удалить из модераторов</a></td>
-                                }
-                            }
-                            else
-                            {
-                                <td><div class="text-info"></div></td>
-                                if (isCurrentUserAdmin)
-                                {
-                                    <td><a asp-action="AddRole" asp-route-id="@user.Id" asp-route-role="moderator" class="btn btn-primary">Сделать модератором</a></td>
-                                }
-                            }
-                        }
-
-                        <td><a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Удалить</a></td>
-
-                    </tr>
-                }
-            </table>
-        </div>
-    }
+    <div class="col-md-1">
+        <select class="form-control" onchange="loadUsers()" id="sort">
+            <option value="date_desc">Новые</option>
+            <option value="date_asc">Старые</option>
+        </select>
+    </div>
+    
+    <div class="col-md-2">
+        <button class="btn btn-primary" onclick="loadUsers()">Фильтр</button>
+        <button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button>
+    </div>
 </div>
+
+
+<div id="usersContainer">
+    @await Html.PartialAsync("_UsersPartialView", Model)
+</div>
+
+<form id="antiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<script>    
+    let currentPage = 1;
+    async function loadUsers(page = 1) {
+        currentPage = page;
+        
+        const params = new URLSearchParams({
+            userName: document.getElementById("userName").value,
+            email: document.getElementById("email").value,
+            phoneNumber: document.getElementById("phoneNumber").value,
+            sort: document.getElementById("sort").value,
+            page: page
+        });
+        
+        const response = await fetch(`/User/Filter?${params}`);
+        const html = await response.text();
+        document.getElementById("usersContainer").innerHTML = html;
+    }
+    async function resetFilters() {
+        document.getElementById("userName").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("phoneNumber").value = "";
+        document.getElementById("sort").value = "date_desc";
+        loadUsers();
+    }
+    
+    async function changeRole(userId, role, isAdd) {
+        const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]').value;
+
+        await fetch('/User/ChangeRoleAjax', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ userId, role, isAdd })
+        });
+        
+        loadUsers(currentPage);
+    }
+    
+    document.addEventListener("DOMContentLoaded", loadUsers);
+
+</script>

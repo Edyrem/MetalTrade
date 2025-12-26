@@ -21,19 +21,45 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             _mapper = mapper;
             _userService = userService;
         }
-
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(UserFilterDto filter)
+        {
+            filter.Page = filter.Page <= 0 ? 1 : filter.Page;
+            var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            var users = await _userService.GetFilteredAsync(filter, currentUser);
+            var usersList = _mapper.Map<List<UserViewModel>>(users);
+            
+            return View(usersList);
+        }
+        
+        public async Task<IActionResult> Filter(UserFilterDto filter)
         {
             var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            var users = await _userService.GetFilteredAsync(filter, currentUser);
+            var usersVm = _mapper.Map<List<UserViewModel>>(users);
             
-            var users = await _userService.GetAllUsersWithRolesAsync();
-            if (await _userService.IsInRoleAsync(currentUser, "moderator"))
-            {
-                users = users.Where(u => u.Roles != null && !u.Roles.Contains("moderator")).ToList();
-            }
-            var usersList = _mapper.Map<List<UserViewModel>>(users);
+            var totalUsers = await _userService.GetFilteredCountAsync(filter, currentUser);
+            ViewBag.Page = filter.Page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalUsers / (double)filter.PageSize);
+            
+            return PartialView("_UsersPartialView", usersVm);
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRoleAjax([FromBody] ChangeRoleDto model)
+        {
+            var user = await _userService.GetUserByIdAsync(model.UserId);
+            if (user == null) 
+                return NotFound();
 
-            return View(usersList);
+            if (model.isAdd)
+                await _userService.AddToRoleAsync(user, model.Role);
+            else
+                await _userService.RemoveFromRoleAsync(user, model.Role);
+
+            return Ok();
         }
 
         public async Task<IActionResult> Details(int id)

@@ -5,6 +5,7 @@ using MetalTrade.Web.AdminPanel.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using MetalTrade.Web.ViewModels.User;
 using Moq;
 using System.Security.Claims;
 using Xunit;
@@ -22,59 +23,40 @@ public class UserControllerTests : ControllerTestBase
             new Claim(ClaimTypes.Role, "admin")
         );
 
+        var currentUser = new UserDto();
+
+        UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(currentUser);
+
         var users = new List<UserDto>
         {
-            new UserDto {
-                Id = 1,
-                UserName = "supplier1",
-                Email = "s1@test.com",
-                PhoneNumber = "123456789",
-                WhatsAppNumber = "987654321",
-                PhotoLink = "photo1.jpg",
-                Roles = new List<string> { "Supplier" }
-            },
-            new UserDto {
-                Id = 2,
-                UserName = "moderator1",
-                Email = "m1@test.com",
-                PhoneNumber = "111111111",
-                WhatsAppNumber = "222222222",
-                PhotoLink = "photo2.jpg",
-                Roles = new List<string> { "Moderator" }
-            }
+            new() { Id = 1, UserName = "supplier1", Roles = new() {"Supplier"} },
+            new() { Id = 2, UserName = "moderator1", Roles = new() {"Moderator"} }
         };
 
-        UserMock.Setup(s => s.GetAllUsersWithRolesAsync())
+        UserMock.Setup(s => s.GetFilteredAsync(It.IsAny<UserFilterDto>(), currentUser))
             .ReturnsAsync(users);
 
-        MapperMock.Setup(m => m.Map<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(It.IsAny<List<UserDto>>()))
-            .Returns((List<UserDto> dtos) => dtos.Select(d => new MetalTrade.Web.ViewModels.User.UserViewModel
+        MapperMock.Setup(m => m.Map<List<UserViewModel>>(It.IsAny<List<UserDto>>()))
+            .Returns(users.Select(d => new UserViewModel
             {
                 Id = d.Id,
                 UserName = d.UserName,
-                Email = d.Email,
-                PhoneNumber = d.PhoneNumber,
-                WhatsAppNumber = d.WhatsAppNumber,
-                Photo = d.PhotoLink,
-                Roles = d.Roles ?? new List<string>()
+                Roles = d.Roles
             }).ToList());
 
         // Act
-        var result = await controller.Index();
+        var result = await controller.Index(new UserFilterDto());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
-        var model = Assert.IsType<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(view.Model);
+        var model = Assert.IsType<List<UserViewModel>>(view.Model);
 
         Assert.Equal(2, model.Count);
         Assert.Equal("supplier1", model[0].UserName);
         Assert.Contains("Supplier", model[0].Roles);
-        Assert.Equal("moderator1", model[1].UserName);
-        Assert.Contains("Moderator", model[1].Roles);
-
-        UserMock.Verify(s => s.GetAllUsersWithRolesAsync(), Times.Once);
     }
-
+    
     [Fact]
     public async Task Index_UserWithoutRole_ReturnsEmptyView()
     {
@@ -84,34 +66,26 @@ public class UserControllerTests : ControllerTestBase
             new Claim(ClaimTypes.Role, "user")
         );
 
-        var currentUser = new UserDto { Id = 1 };
+        var currentUser = new UserDto();
 
         UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
-               .ReturnsAsync(currentUser);
+            .ReturnsAsync(currentUser);
 
-        UserMock.Setup(s => s.IsInRoleAsync(currentUser, "admin"))
-               .ReturnsAsync(false);
+        UserMock.Setup(s => s.GetFilteredAsync(It.IsAny<UserFilterDto>(), currentUser))
+            .ReturnsAsync(new List<UserDto>());
 
-        UserMock.Setup(s => s.IsInRoleAsync(currentUser, "moderator"))
-               .ReturnsAsync(false);
-
-        var users = new List<UserDto>();
-
-        UserMock.Setup(s => s.GetAllUsersWithRolesAsync())
-               .ReturnsAsync(users);
-
-        MapperMock.Setup(m => m.Map<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(users))
-               .Returns(new List<MetalTrade.Web.ViewModels.User.UserViewModel>());
+        MapperMock.Setup(m => m.Map<List<UserViewModel>>(It.IsAny<List<UserDto>>()))
+            .Returns(new List<UserViewModel>());
 
         // Act
-        var result = await controller.Index();
+        var result = await controller.Index(new UserFilterDto());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
-        var model = view.Model as List<MetalTrade.Web.ViewModels.User.UserViewModel>;
-        Assert.NotNull(model);
+        var model = Assert.IsType<List<UserViewModel>>(view.Model);
         Assert.Empty(model);
     }
+
 
     [Fact]
     public async Task DeleteConfirmed_AdminDeletesUser_RedirectsToIndex()
@@ -308,7 +282,7 @@ public class UserControllerTests : ControllerTestBase
     }
 
     [Fact]
-    public async Task Index_Moderator_SeesOnlyModerators()
+    public async Task Index_Moderator_ReturnsView()
     {
         // Arrange
         var controller = CreateControllerWithUser(
@@ -321,21 +295,18 @@ public class UserControllerTests : ControllerTestBase
         UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
             .ReturnsAsync(currentUser);
 
-        UserMock.Setup(s => s.IsInRoleAsync(currentUser, "moderator"))
-            .ReturnsAsync(true);
-
-        UserMock.Setup(s => s.GetAllUsersWithRolesAsync())
+        UserMock.Setup(s => s.GetFilteredAsync(It.IsAny<UserFilterDto>(), currentUser))
             .ReturnsAsync(new List<UserDto>
             {
-                new() { Id = 2, Roles = new List<string> { "moderator" } },
-                new() { Id = 3, Roles = new List<string> { "user" } }
+                new() { Id = 2, UserName = "m1" },
+                new() { Id = 3, UserName = "u1" }
             });
 
-        MapperMock.Setup(m => m.Map<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(It.IsAny<List<UserDto>>()))
-            .Returns(new List<MetalTrade.Web.ViewModels.User.UserViewModel>());
+        MapperMock.Setup(m => m.Map<List<UserViewModel>>(It.IsAny<List<UserDto>>()))
+            .Returns(new List<UserViewModel>());
 
         // Act
-        var result = await controller.Index();
+        var result = await controller.Index(new UserFilterDto());
 
         // Assert
         Assert.IsType<ViewResult>(result);
@@ -384,54 +355,26 @@ public class UserControllerTests : ControllerTestBase
         var currentUser = new UserDto { Id = 1 };
 
         UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
-               .ReturnsAsync(currentUser);
-
-        UserMock.Setup(s => s.IsInRoleAsync(currentUser, "supplier"))
-               .ReturnsAsync(true);
+            .ReturnsAsync(currentUser);
 
         var users = new List<UserDto>
         {
-            new UserDto {
-                Id = 1,
-                UserName = "supplier1",
-                Email = "s1@test.com",
-                PhoneNumber = "123456789",
-                WhatsAppNumber = "987654321",
-                PhotoLink = "photo1.jpg",
-                Roles = new List<string> { "Supplier" }
-            },
-            new UserDto {
-                Id = 2,
-                UserName = "admin",
-                Email = "admin@test.com",
-                PhoneNumber = "111111111",
-                WhatsAppNumber = "222222222",
-                PhotoLink = "photo2.jpg",
-                Roles = new List<string> { "Admin" }
-            }
+            new() { Id = 1, UserName = "supplier1" },
+            new() { Id = 2, UserName = "admin" }
         };
 
-        UserMock.Setup(s => s.GetAllUsersWithRolesAsync())
-               .ReturnsAsync(users);
+        UserMock.Setup(s => s.GetFilteredAsync(It.IsAny<UserFilterDto>(), currentUser))
+            .ReturnsAsync(users);
 
-        MapperMock.Setup(m => m.Map<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(users))
-               .Returns(users.Select(d => new MetalTrade.Web.ViewModels.User.UserViewModel
-               {
-                   Id = d.Id,
-                   UserName = d.UserName,
-                   Email = d.Email,
-                   PhoneNumber = d.PhoneNumber,
-                   WhatsAppNumber = d.WhatsAppNumber,
-                   Photo = d.PhotoLink,
-                   Roles = d.Roles
-               }).ToList());
+        MapperMock.Setup(m => m.Map<List<UserViewModel>>(users))
+            .Returns(users.Select(u => new UserViewModel { Id = u.Id, UserName = u.UserName }).ToList());
 
         // Act
-        var result = await controller.Index();
+        var result = await controller.Index(new UserFilterDto());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
-        var model = Assert.IsType<List<MetalTrade.Web.ViewModels.User.UserViewModel>>(view.Model);
+        var model = Assert.IsType<List<UserViewModel>>(view.Model);
         Assert.Equal(2, model.Count);
     }
 
