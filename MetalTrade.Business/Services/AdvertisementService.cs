@@ -17,12 +17,14 @@ public class AdvertisementService : IAdvertisementService
     private readonly IMapper _mapper;
     private readonly IImageUploadService _imageUploadService;
     private AdvertisementStateContext _stateContext;
+    private readonly ICommercialService _commercialService;
 
-    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService)
+    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService, ICommercialService commercialService)
     {
         _repository = new AdvertisementRepository(context);
         _mapper = mapper;
         _imageUploadService = imageUploadService;
+        _commercialService = commercialService;
         _stateContext = new AdvertisementStateContext(_repository);
     }
 
@@ -34,9 +36,30 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task<AdvertisementDto?> GetAsync(int advertisementId)
     {
-        var ads = await _repository.GetAsync(advertisementId);
-        return _mapper.Map<AdvertisementDto>(ads);
+        var ad = await _repository.GetAsync(advertisementId);
+        if (ad == null)
+            return null;
+
+        var hasActive = await _commercialService.HasActiveCommercialAsync(ad.Id);
+
+        if (ad.IsAd != hasActive)
+        {
+            ad.IsAd = hasActive;
+            await _repository.SaveChangesAsync();
+        }
+
+        var dto = _mapper.Map<AdvertisementDto>(ad);
+
+        if (hasActive)
+        {
+            dto.AdEndDate =
+                await _commercialService.GetActiveAdEndDateAsync(ad.Id);
+        }
+
+        return dto;
     }
+
+
 
     public async Task CreateAsync(AdvertisementDto adsDto)
     {
