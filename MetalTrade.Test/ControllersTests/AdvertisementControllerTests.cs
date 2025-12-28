@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Test.Helpers;
 using MetalTrade.Web.ViewModels.Advertisement;
+using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -202,6 +204,19 @@ public class AdvertisementControllerTests : ControllerTestBase
             .Setup(m => m.Map<AdvertisementViewModel>(dto))
             .Returns(new AdvertisementViewModel { Id = 1 });
 
+        AdvertisementController.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(
+                    new ClaimsIdentity(
+                        new[] { new Claim(ClaimTypes.Name, "test") },
+                        "TestAuth"
+                    )
+                )
+            }
+        };
+
         // Act
         var result = await AdvertisementController.Details(1);
 
@@ -209,6 +224,7 @@ public class AdvertisementControllerTests : ControllerTestBase
         var view = Assert.IsType<ViewResult>(result);
         Assert.IsType<AdvertisementViewModel>(view.Model);
     }
+
 
     [Fact]
     public async Task DetailsNotFoundReturnsNotFound()
@@ -746,5 +762,108 @@ public class AdvertisementControllerTests : ControllerTestBase
         await Assert.ThrowsAsync<Exception>(() =>
             AdvertisementController.Delete(model));
     }
+    
+    
+    //тесты для рекламы
+    
+    [Fact]
+    public async Task ActivateCommercial_ValidModel_ReturnsOk()
+    {
+        // Arrange
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 7
+        };
+
+        CommercialMock
+            .Setup(s => s.ActivateAsync(It.IsAny<CommercialDto>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await AdvertisementController.ActivateCommercial(model);
+
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
+        CommercialMock.Verify(s =>
+                s.ActivateAsync(It.Is<CommercialDto>(d =>
+                    d.AdvertisementId == 5 && d.Days == 7)),
+            Times.Once);
+    }
+
+    
+    [Fact]
+    public async Task ActivateCommercial_InvalidModel_ReturnsBadRequest()
+    {
+        var controller = AdvertisementController;
+        // Arrange
+        controller.ModelState.AddModelError("Days", "error");
+
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 0
+        };
+
+        // Act
+        var result = await controller.ActivateCommercial(model);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task ActivateCommercial_WhenAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.ActivateAsync(It.IsAny<CommercialDto>()))
+            .ThrowsAsync(new InvalidOperationException("Реклама уже активна"));
+
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 7
+        };
+
+        // Act
+        var result = await AdvertisementController.ActivateCommercial(model);
+
+        // Assert
+        var bad = Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    
+    [Fact]
+    public async Task DeactivateCommercial_ReturnsOk()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.DeactivateAsync(5))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await AdvertisementController.DeactivateCommercial(5);
+
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
+        CommercialMock.Verify(s => s.DeactivateAsync(5), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeactivateCommercial_WhenNotActive_ReturnsBadRequest()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.DeactivateAsync(It.IsAny<int>()))
+            .ThrowsAsync(new InvalidOperationException("Активная реклама не найдена"));
+
+        // Act
+        var result = await AdvertisementController.DeactivateCommercial(5);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
     
 }
