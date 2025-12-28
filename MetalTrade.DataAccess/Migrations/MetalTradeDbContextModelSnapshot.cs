@@ -106,6 +106,33 @@ namespace MetalTrade.DataAccess.Migrations
                     b.ToTable("AdvertisementPhotos");
                 });
 
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Commercial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AdEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("AdStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("AdvertisementId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertisementId");
+
+                    b.ToTable("Commercials");
+                });
+
             modelBuilder.Entity("MetalTrade.Domain.Entities.MetalType", b =>
                 {
                     b.Property<int>("Id")
@@ -390,6 +417,17 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Navigation("Advertisement");
                 });
 
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Commercial", b =>
+                {
+                    b.HasOne("MetalTrade.Domain.Entities.Advertisement", "Advertisement")
+                        .WithMany("Commercials")
+                        .HasForeignKey("AdvertisementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advertisement");
+                });
+
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
                 {
                     b.HasOne("MetalTrade.Domain.Entities.MetalType", "MetalType")
@@ -454,6 +492,8 @@ namespace MetalTrade.DataAccess.Migrations
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.Advertisement", b =>
                 {
+                    b.Navigation("Commercials");
+
                     b.Navigation("Photoes");
                 });
 
