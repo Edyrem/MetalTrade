@@ -1,4 +1,5 @@
 using AutoMapper;
+using ClosedXML.Excel;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Entities;
@@ -72,6 +73,53 @@ public class AdvertisementController : Controller
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
         return View(models);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Load(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return RedirectToAction("Create");
+
+        var data = new Dictionary<string, string>();
+
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheet(1);
+
+        foreach (var row in worksheet.RowsUsed())
+        {
+            var key = row.Cell(1).GetString()?.Trim();
+            var value = row.Cell(2).GetString()?.Trim();
+
+            if (string.IsNullOrEmpty(key))
+                continue;
+
+            data[key] = value ?? string.Empty;
+        }
+
+        var model = new CreateAdvertisementViewModel
+        {
+            Title = data.GetValueOrDefault("Title") ?? "",
+            Body = data.GetValueOrDefault("Body"),
+            City = data.GetValueOrDefault("City"),
+            PhoneNumber = data.GetValueOrDefault("Phone"),
+            Price = decimal.TryParse(data.GetValueOrDefault("Price"), out var price)
+                ? price
+                : 0
+        };
+
+        model.Products = (await _productService.GetAllAsync())
+            .Select(p => new ProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name
+            })
+            .ToList();
+
+        return View("Create", model);
     }
 
 

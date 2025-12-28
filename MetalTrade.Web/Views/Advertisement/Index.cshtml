@@ -17,6 +17,12 @@
 	<div class="mb-2">
 		<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
 	</div>
+	<form asp-action="Load" method="post" enctype="multipart/form-data" class="mb-3">
+		<input type="file" name="file" accept=".xlsx" class="form-control mb-2" />
+		<button type="submit" class="btn btn-outline-primary">
+			Загрузить Excel
+		</button>
+	</form>
 }
 
 <form method="get" class="mb-4" id="ads-filter-form">
