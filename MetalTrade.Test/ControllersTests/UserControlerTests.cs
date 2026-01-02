@@ -46,7 +46,7 @@ public class UserControllerTests : ControllerTestBase
             }).ToList());
 
         // Act
-        var result = await controller.Index(new UserFilterDto());
+        var result = await controller.Index(new UserFilterViewModel());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
@@ -78,7 +78,7 @@ public class UserControllerTests : ControllerTestBase
             .Returns(new List<UserViewModel>());
 
         // Act
-        var result = await controller.Index(new UserFilterDto());
+        var result = await controller.Index(new UserFilterViewModel());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
@@ -306,7 +306,7 @@ public class UserControllerTests : ControllerTestBase
             .Returns(new List<UserViewModel>());
 
         // Act
-        var result = await controller.Index(new UserFilterDto());
+        var result = await controller.Index(new UserFilterViewModel());
 
         // Assert
         Assert.IsType<ViewResult>(result);
@@ -370,7 +370,7 @@ public class UserControllerTests : ControllerTestBase
             .Returns(users.Select(u => new UserViewModel { Id = u.Id, UserName = u.UserName }).ToList());
 
         // Act
-        var result = await controller.Index(new UserFilterDto());
+        var result = await controller.Index(new UserFilterViewModel());
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);

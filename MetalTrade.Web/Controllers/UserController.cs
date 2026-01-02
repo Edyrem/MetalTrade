@@ -22,9 +22,11 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             _userService = userService;
         }
         
-        public async Task<IActionResult> Index(UserFilterDto filter)
+        public async Task<IActionResult> Index(UserFilterViewModel filterVm)
         {
-            filter.Page = filter.Page <= 0 ? 1 : filter.Page;
+            filterVm.Page = filterVm.Page <= 0 ? 1 : filterVm.Page;
+            var filter = _mapper.Map<UserFilterDto>(filterVm);
+            
             var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
             var users = await _userService.GetFilteredAsync(filter, currentUser);
             var usersList = _mapper.Map<List<UserViewModel>>(users);
@@ -32,8 +34,10 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             return View(usersList);
         }
         
-        public async Task<IActionResult> Filter(UserFilterDto filter)
+        public async Task<IActionResult> Filter(UserFilterViewModel filterVm)
         {
+            var filter = _mapper.Map<UserFilterDto>(filterVm);
+            
             var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
             var users = await _userService.GetFilteredAsync(filter, currentUser);
             var usersVm = _mapper.Map<List<UserViewModel>>(users);
@@ -48,16 +52,17 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         [HttpPost]
         [Authorize(Roles = "admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeRoleAjax([FromBody] ChangeRoleDto model)
+        public async Task<IActionResult> ChangeRoleAjax([FromBody] ChangeRoleViewModel model)
         {
-            var user = await _userService.GetUserByIdAsync(model.UserId);
+            var dto = _mapper.Map<ChangeRoleDto>(model);
+            var user = await _userService.GetUserByIdAsync(dto.UserId);
             if (user == null) 
                 return NotFound();
 
             if (model.isAdd)
-                await _userService.AddToRoleAsync(user, model.Role);
+                await _userService.AddToRoleAsync(user, dto.Role);
             else
-                await _userService.RemoveFromRoleAsync(user, model.Role);
+                await _userService.RemoveFromRoleAsync(user, dto.Role);
 
             return Ok();
         }
