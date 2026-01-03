@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Castle.Core.Logging;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Web.AdminPanel.Controllers;
 using MetalTrade.Web.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 
@@ -17,7 +19,8 @@ namespace MetalTrade.Test.Helpers
         protected Mock<IMapper> MapperMock = new();
         protected Mock<IImageUploadService> ImageUploadMock = new();
         protected Mock<IUserService> UserMock = new();
-        
+        protected Mock<ILogger<AdvertisementController>> LoggerMock = new();
+
 
         protected ProductController ProductController
             => new(ProductMock.Object, MetalMock.Object, MapperMock.Object);
@@ -94,7 +97,8 @@ namespace MetalTrade.Test.Helpers
                     UserMock.Object,
                     ProductMock.Object,
                     MetalMock.Object,
-                    MapperMock.Object
+                    MapperMock.Object,
+                    LoggerMock.Object
                 );
 
                 var identity = false

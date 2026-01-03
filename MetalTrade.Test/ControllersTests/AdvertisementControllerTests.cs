@@ -463,20 +463,66 @@ public class AdvertisementControllerTests : ControllerTestBase
     }
 
     [Fact]
-    public async Task DeleteAdvertisementPhotoRedirectsBackToEdit()
+    public async Task DeleteAdvertisementPhotoAjax_ReturnsSuccessJson()
     {
         // Arrange
-        int advertisementId = 10;
+        int photoId = 1;
+        string photoLink = "link";
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAdvertisementPhotoAsync(It.Is<AdvertisementPhotoDto>(
+                p => p.Id == photoId && p.PhotoLink == photoLink)))
+            .ReturnsAsync(true);
+
+        var controller = AdvertisementController;
 
         // Act
-        var result = await AdvertisementController.DeleteAdvertisementPhoto(1, "link", advertisementId);
+        var result = await controller.DeleteAdvertisementPhotoAjax(photoId, photoLink);
 
         // Assert
-        var redirect = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("Edit", redirect.ActionName);
-        Assert.Equal(advertisementId, redirect.RouteValues["Id"]);
+        var jsonResult = Assert.IsType<JsonResult>(result);
+
+        // Достаем свойство success через reflection
+        var value = jsonResult.Value!;
+        var successProp = value.GetType().GetProperty("success");
+        Assert.NotNull(successProp);
+
+        var successValue = successProp.GetValue(value);
+        Assert.True((bool)successValue);
+
+        AdvertisementMock.Verify(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()), Times.Once);
     }
-    
+
+    [Fact]
+    public async Task DeleteAdvertisementPhotoAjax_WhenThrowsException_ReturnsFalseJson()
+    {
+        // Arrange
+        int photoId = 1;
+        string photoLink = "link";
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        var controller = AdvertisementController;
+
+        // Act
+        var result = await controller.DeleteAdvertisementPhotoAjax(photoId, photoLink);
+
+        // Assert
+        var jsonResult = Assert.IsType<JsonResult>(result);
+
+        // Достаем свойство success через reflection
+        var value = jsonResult.Value!;
+        var successProp = value.GetType().GetProperty("success");
+        Assert.NotNull(successProp);
+
+        var successValue = successProp.GetValue(value);
+        Assert.False((bool)successValue);
+
+        AdvertisementMock.Verify(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()), Times.Once);
+    }
+
     [Fact]
     public async Task ApproveAdvertisementRedirectsToIndex()
     {
