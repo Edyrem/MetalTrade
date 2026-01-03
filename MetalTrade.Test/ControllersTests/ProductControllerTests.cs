@@ -5,6 +5,7 @@ using MetalTrade.Test.Helpers;
 using MetalTrade.Web.Controllers;
 using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
@@ -20,27 +21,49 @@ public class ProductControllerTests: ControllerTestBase
     {
         // Arrange
         var productDtos = new List<ProductDto>
-            {
-                new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
-                new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
-            };
+    {
+        new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
+        new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
+    };
 
         var viewModels = new List<ProductViewModel>
-            {
-                new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
-                new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
-            };
+    {
+        new() { Id = 1, Name = "Сталь", MetalTypeId = 1 },
+        new() { Id = 2, Name = "Железо", MetalTypeId = 2 }
+    };
 
         ProductMock
-            .Setup(p => p.GetAllAsync())
+            .Setup(p => p.GetFilteredAsync(It.IsAny<ProductFilterDto>()))
             .ReturnsAsync(productDtos);
 
         MapperMock
             .Setup(m => m.Map<List<ProductViewModel>>(productDtos))
             .Returns(viewModels);
 
+        var controller = ProductController;
+
+        // Эмулируем HttpContext и Request.Query
+        var query = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+        {
+            ["name"] = "",
+            ["metalTypeId"] = "",
+            ["sort"] = "",
+            ["page"] = "1"
+        });
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                Request =
+            {
+                Query = query
+            }
+            }
+        };
+
         // Act
-        var result = await ProductController.Index();
+        var result = await controller.Index();
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
@@ -49,7 +72,7 @@ public class ProductControllerTests: ControllerTestBase
         Assert.Equal(2, model.Count);
         Assert.Equal("Сталь", model[0].Name);
 
-        ProductMock.Verify(p => p.GetAllAsync(), Times.Once);
+        ProductMock.Verify(p => p.GetFilteredAsync(It.IsAny<ProductFilterDto>()), Times.Once);
         MapperMock.Verify(m => m.Map<List<ProductViewModel>>(productDtos), Times.Once);
     }
 
@@ -215,41 +238,68 @@ public class ProductControllerTests: ControllerTestBase
         
         ProductMock.Verify(s => s.CreateAsync(It.IsAny<ProductDto>()), Times.Never);
     }
-    
+
 
     [Fact]
     public async Task IndexReturnsViewWithProducts()
     {
         // Arrange
-        
         var productDtos = new List<ProductDto>
-        {
-            new ProductDto { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeDto  { Id = 1, Name = "сталь" }},
-            new ProductDto { Id = 2, Name = "арматура" , MetalTypeId = 2, MetalType = new MetalTypeDto  { Id = 1, Name = "железо" }}
-        };
-        
+    {
+        new ProductDto { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeDto  { Id = 1, Name = "сталь" }},
+        new ProductDto { Id = 2, Name = "арматура" , MetalTypeId = 2, MetalType = new MetalTypeDto  { Id = 2, Name = "железо" }}
+    };
+
         var productViewModels = new List<ProductViewModel>
+    {
+        new ProductViewModel { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeViewModel { Id = 1, Name = "сталь" } },
+        new ProductViewModel { Id = 2, Name = "арматура", MetalTypeId = 2, MetalType = new MetalTypeViewModel { Id = 2, Name = "железо" } }
+    };
+
+        // Мокируем GetFilteredAsync, так как Index использует фильтр
+        ProductMock
+            .Setup(p => p.GetFilteredAsync(It.IsAny<ProductFilterDto>()))
+            .ReturnsAsync(productDtos);
+
+        MapperMock
+            .Setup(m => m.Map<List<ProductViewModel>>(productDtos))
+            .Returns(productViewModels);
+
+        var controller = ProductController;
+
+        // Эмулируем Request.Query, чтобы Request != null
+        var query = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
         {
-            new ProductViewModel { Id = 1, Name = "труба", MetalTypeId = 1, MetalType = new MetalTypeViewModel { Id = 1, Name = "сталь" } },
-            new ProductViewModel { Id = 2, Name = "арматура", MetalTypeId = 2, MetalType = new MetalTypeViewModel { Id = 2, Name = "железо" } }
+            ["name"] = "",
+            ["metalTypeId"] = "",
+            ["sort"] = "",
+            ["page"] = "1"
+        });
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                Request =
+            {
+                Query = query
+            }
+            }
         };
-        
-        ProductMock.Setup(p=> p.GetAllAsync()).ReturnsAsync(productDtos);
-        MapperMock.Setup(m => m.Map<List<ProductViewModel>>(productDtos)).Returns(productViewModels);
-        
+
         // Act
-        var result = await ProductController.Index();
+        var result = await controller.Index();
 
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
         var model = Assert.IsType<List<ProductViewModel>>(viewResult.Model);
-        
+
         Assert.Equal(2, model.Count);
         Assert.Equal("труба", model[0].Name);
         Assert.Equal("арматура", model[1].Name);
 
-        ProductMock.Verify(p => p.GetAllAsync());
-        MapperMock.Setup(m => m.Map<List<ProductViewModel>>(productDtos)).Returns(productViewModels);
+        ProductMock.Verify(p => p.GetFilteredAsync(It.IsAny<ProductFilterDto>()), Times.Once);
+        MapperMock.Verify(m => m.Map<List<ProductViewModel>>(productDtos), Times.Once);
     }
 
     [Fact]
