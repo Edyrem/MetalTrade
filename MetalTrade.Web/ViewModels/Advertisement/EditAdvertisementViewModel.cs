@@ -1,5 +1,4 @@
-﻿using MetalTrade.Web.ViewModels.AdvertisementPhoto;
-using MetalTrade.Web.ViewModels.Product;
+﻿using MetalTrade.Web.ViewModels.Product;
 using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement
@@ -28,13 +27,10 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         [Display(Name = "Город")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
         public string? City { get; set; }
-        [Display(Name = "Фото")]
-        public List<IFormFile>? PhotoFiles { get; set; } = [];
         [Display(Name = "Продукт")]
         [Required(ErrorMessage = "Поле Продукт объязательно")]
         public int ProductId { get; set; }
         public List<ProductViewModel> Products { get; set; } = [];
         public int UserId { get; set; }
-        public List<AdvertisementPhotoViewModel> Photoes { get; set; } = [];
     }
 }

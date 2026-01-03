@@ -85,20 +85,6 @@ public class AdvertisementService : IAdvertisementService
         var entity = await _repository.GetAsync(adsDto.Id) ?? throw new ArgumentException("Объявление не найдено");
 
         _mapper.Map(adsDto, entity);
-
-        if (adsDto.PhotoFiles != null && adsDto.PhotoFiles.Count > 0)
-        {
-            var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
-            foreach (var link in photoLinks)
-            {
-                entity.Photoes.Add(new AdvertisementPhoto 
-                { 
-                    PhotoLink = link,
-                    AdvertisementId = entity.Id
-                });
-            }
-        }
-
         await _repository.UpdateAsync(entity);
         await _repository.SaveChangesAsync();
     }
@@ -141,11 +127,14 @@ public class AdvertisementService : IAdvertisementService
         return _mapper.Map<List<AdvertisementDto>>(await _repository.FindAsync(predicate));
     }
 
-    public async Task DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhoto)
+    public async Task<bool> DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhoto)
     {
-        await _imageUploadService.DeleteImageAsync(advertisementPhoto.PhotoLink);
         await _repository.DeleteAdvertisementPhotoAsync(advertisementPhoto.Id);
         await _repository.SaveChangesAsync();
+        var deleted = await _repository.GetAdvertisementPhotoAsync(advertisementPhoto.Id) is null;
+        if (deleted)
+            await _imageUploadService.DeleteImageAsync(advertisementPhoto.PhotoLink);
+        return deleted;
     }
     
     public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilterDto filter)
@@ -202,4 +191,22 @@ public class AdvertisementService : IAdvertisementService
         return _mapper.Map<List<AdvertisementDto>>(ads);
     }
 
+    public async Task<List<AdvertisementPhotoAjaxDto>?> CreateAdvertisementPhotoAsync(AdvertisementDto adsDto)
+    {
+        var entity = await _repository.GetAsync(adsDto.Id) 
+            ?? throw new ArgumentException("Объявление не найдено");
+
+        if (adsDto.PhotoFiles?.Any() != true) return null;
+
+        var newPhotoEntities = new List<AdvertisementPhoto>();
+        var photoLinks = await _imageUploadService.UploadImagesAsync(adsDto.PhotoFiles, "advertisement");
+        newPhotoEntities.AddRange(photoLinks.Select(link => new AdvertisementPhoto { PhotoLink = link }));
+
+        entity.Photoes.AddRange(newPhotoEntities);
+        await _repository.UpdateAsync(entity);
+        await _repository.SaveChangesAsync();
+
+        var photoes = _mapper.Map<List<AdvertisementPhotoAjaxDto>>(newPhotoEntities);
+        return photoes;
+    }
 }

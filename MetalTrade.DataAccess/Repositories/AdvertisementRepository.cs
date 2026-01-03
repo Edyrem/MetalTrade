@@ -53,10 +53,16 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task DeleteAdvertisementPhotoAsync(int advertisementPhotoId)
         {
-            var advertisementPhoto = await _dbSet.FirstOrDefaultAsync(a => a.Id == advertisementPhotoId);
+            var advertisementPhoto = 
+                await _context.AdvertisementPhotos.FirstOrDefaultAsync(p => p.Id == advertisementPhotoId);
             if (advertisementPhoto != null)
                 _context.Remove(advertisementPhoto);
         }        
+
+        public async Task<AdvertisementPhoto?> GetAdvertisementPhotoAsync(int advertisementPhotoId)
+        {
+            return await _context.AdvertisementPhotos.FirstOrDefaultAsync(p => p.Id == advertisementPhotoId);
+        }
         
         public IQueryable<Advertisement> CreateFilter()
         {
@@ -111,6 +117,6 @@ namespace MetalTrade.DataAccess.Repositories
             return query.Where(ad => ad.CreateDate <= dateTo);
         }
 
-
+        
     }
 }

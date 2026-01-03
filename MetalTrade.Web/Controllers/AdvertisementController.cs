@@ -1,7 +1,6 @@
 using AutoMapper;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
@@ -20,6 +19,8 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
+    private readonly ILogger<AdvertisementController> _logger;
+
     private readonly ICommercialService _commercialService;
     
     public AdvertisementController(
@@ -27,6 +28,8 @@ public class AdvertisementController : Controller
         IUserService userService,
         IProductService productService,
         IMetalService metalService,
+        IMapper mapper, 
+        ILogger<AdvertisementController> logger)
         IMapper mapper,
         ICommercialService commercialService)
     {
@@ -35,6 +38,7 @@ public class AdvertisementController : Controller
         _productService = productService;
         _metalService = metalService;
         _mapper = mapper;
+        _logger = logger;
         _commercialService = commercialService;
     }
 
@@ -207,9 +211,7 @@ public class AdvertisementController : Controller
             }
         }
         var productDtos = await _productService.GetAllAsync();
-        var tempAdsDto = await _adsService.GetAsync(model.Id);
-        if (tempAdsDto != null)
-            model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
+        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
 
         return View(model);
     }
@@ -257,14 +259,22 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
+    public async Task<IActionResult> DeleteAdvertisementPhotoAjax(int advertisementPhotoId, string photoLink)
     {
-        await _adsService.DeleteAdvertisementPhotoAsync(new AdvertisementPhotoDto
+        try
         {
-            Id = advertisementPhotoId,
-            PhotoLink = photoLink
-        });
-        return RedirectToAction("Edit", new { Id = advertisementId});
+            var success = await _adsService.DeleteAdvertisementPhotoAsync( new AdvertisementPhotoDto
+            {
+                Id = advertisementPhotoId,
+                PhotoLink = photoLink
+            });
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении фото с id {PhotoId}", advertisementPhotoId);
+            return Json(new { success = false });
+        }
     }
 
     [Authorize(Roles = "admin,moderator")]
@@ -307,6 +317,26 @@ public class AdvertisementController : Controller
             ModelState.AddModelError(string.Empty, e.Message);
         }
         return RedirectToAction("Index");
+    }
+    public async Task<IActionResult> CreatePhoto(int id)
+    {
+        var adsDto = await _adsService.GetAsync(id);
+        var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateAdvertisementPhotoAjax(int advertisementId, List<IFormFile> photos)
+    {
+        if (photos?.Any() != true)
+            return Json(new { success = false });
+
+        var newPhotos = 
+            await _adsService.CreateAdvertisementPhotoAsync(new AdvertisementDto { Id = advertisementId, PhotoFiles = photos });
+
+        if (newPhotos == null || !newPhotos.Any())
+            return Json(new { success = false });
+
+        return Json(new { success = true, photos = newPhotos });
     }
     
     [HttpPost]

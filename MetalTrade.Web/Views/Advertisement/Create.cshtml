@@ -52,9 +52,13 @@
                 </select>
                 <span asp-validation-for="ProductId" class="text-danger"></span>
             </div>
-            <div class="form-group mt-2">
-                <label asp-for="PhotoFiles" class="control-label"></label>
-                <input asp-for="PhotoFiles" class="form-control" type="file" accept="image/*" multiple/>
+            <div class="form-group mt-3">
+                <label class="control-label">Добавить фото</label>
+                <div class="d-flex align-items-start gap-2">
+                    <button type="button" id="addPhotoBtn">+</button>
+                    <div id="photoContainer"></div>
+                </div>
+                <div id="hiddenPhotoFileInputs"></div>
                 <span asp-validation-for="PhotoFiles" class="text-danger"></span>
             </div>
             <div class="form-group mt-3">
@@ -70,4 +74,10 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/advertisement/ad-photo-preview.js"></script>
+    <link rel="stylesheet" href="~/css/advertisement/ad-photo-preview.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/js/toast/toastr-config.js"></script>
 }
