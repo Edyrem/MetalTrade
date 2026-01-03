@@ -9,4 +9,5 @@ public interface IProductService
     Task CreateAsync(ProductDto productDto);
     Task UpdateAsync(ProductDto productDto);
     Task DeleteAsync(int productId);
+    Task<List<ProductDto>> GetFilteredAsync(ProductFilterDto filter);
 }

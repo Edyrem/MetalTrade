@@ -21,6 +21,9 @@ namespace MetalTrade.Test.Helpers
         protected Mock<IUserService> UserMock = new();
         protected Mock<ILogger<AdvertisementController>> LoggerMock = new();
 
+        protected Mock<ICommercialService> CommercialMock = new();
+
+        
 
         protected ProductController ProductController
             => new(ProductMock.Object, MetalMock.Object, MapperMock.Object);
@@ -99,11 +102,13 @@ namespace MetalTrade.Test.Helpers
                     MetalMock.Object,
                     MapperMock.Object,
                     LoggerMock.Object
+                    CommercialMock.Object
                 );
 
-                var identity = false
-                    ? new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "5") }, "mock")
-                    : new ClaimsIdentity();
+                var identity = new ClaimsIdentity(
+                    new[] { new Claim(ClaimTypes.NameIdentifier, "5") },
+                    "mock"
+                );
 
                 controller.ControllerContext = new ControllerContext
                 {
@@ -116,6 +121,7 @@ namespace MetalTrade.Test.Helpers
                 return controller;
             }
         }
+
         
     }
 }
