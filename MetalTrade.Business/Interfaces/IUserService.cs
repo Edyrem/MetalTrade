@@ -23,4 +23,6 @@ public interface IUserService
     Task DeleteUserAsync(int id);
     Task<UserDto?> GetCurrentUserAsync(HttpContext context);
     Task<IdentityResult> ChangePasswordAsync(UserDto user, string currentPassword, string newPassword);
+    Task<List<UserDto>> GetFilteredAsync(UserFilterDto filter, UserDto? currentUser);
+    Task<int> GetFilteredCountAsync(UserFilterDto filter, UserDto? currentUser);
 }
