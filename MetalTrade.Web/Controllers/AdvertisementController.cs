@@ -5,6 +5,7 @@ using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
+using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,19 +20,22 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
+    private readonly ICommercialService _commercialService;
     
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
         IProductService productService,
         IMetalService metalService,
-        IMapper mapper)
+        IMapper mapper,
+        ICommercialService commercialService)
     {
         _adsService = adsService;
         _userService = userService;
         _productService = productService;
         _metalService = metalService;
         _mapper = mapper;
+        _commercialService = commercialService;
     }
 
     [AllowAnonymous]
@@ -108,21 +112,23 @@ public class AdvertisementController : Controller
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null)
             return RedirectToAction("Index");
-        
-        if (!User.Identity?.IsAuthenticated ?? true)
+
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+
+        if (user == null)
             return RedirectToAction("Login", "Account",
                 new { returnUrl = Url.Action("Details", new { id }) });
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-
-        bool isAdmin = user != null &&
-                       await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
+        bool isAdmin = await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
 
         ViewData["IsAdmin"] = isAdmin;
-        ViewData["CurrentUserId"] = user?.Id;
-
+        ViewData["CurrentUserId"] = user.Id;
+        
+        ViewData["AdEndDate"] =
+            await _commercialService.GetActiveAdEndDateAsync(id);
+        
         return View(model);
     }
 
@@ -302,4 +308,62 @@ public class AdvertisementController : Controller
         }
         return RedirectToAction("Index");
     }
+    
+    [HttpPost]
+    [Route("Advertisement/ActivateCommercial")]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ActivateCommercial(CommercialViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var error = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .FirstOrDefault()?.ErrorMessage;
+
+            return BadRequest(new { message = error ?? "Некорректные данные" });
+        }
+
+        try
+        {
+            await _commercialService.ActivateAsync(new CommercialDto
+            {
+                AdvertisementId = model.AdvertisementId,
+                Days = model.Days
+            });
+
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch
+        {
+            return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
+        }
+    }
+
+
+    [HttpPost]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> DeactivateCommercial(int advertisementId)
+    {
+        try
+        {
+            await _commercialService.DeactivateAsync(advertisementId);
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+
+
+
+
+
+
+    
 }

@@ -45,4 +45,7 @@ public class AdvertisementViewModel
     public UserViewModel User { get; set; } = new();
         
     public List<AdvertisementPhotoViewModel> Photoes { get; set; } = [];
+    
+    public DateTime? AdEndDate { get; set; }
+
 }

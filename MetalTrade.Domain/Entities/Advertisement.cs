@@ -21,5 +21,7 @@ public class Advertisement : ISoftDeletable
     public User? User { get; set; }
     public List<AdvertisementPhoto> Photoes { get; set; } = [];
     
+    public ICollection<Commercial> Commercials { get; set; } = new List<Commercial>();
+
     public bool IsDeleted { get; set; }
 }
