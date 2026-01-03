@@ -29,8 +29,7 @@ public class AdvertisementController : Controller
         IProductService productService,
         IMetalService metalService,
         IMapper mapper, 
-        ILogger<AdvertisementController> logger)
-        IMapper mapper,
+        ILogger<AdvertisementController> logger,
         ICommercialService commercialService)
     {
         _adsService = adsService;

@@ -101,7 +101,7 @@ namespace MetalTrade.Test.Helpers
                     ProductMock.Object,
                     MetalMock.Object,
                     MapperMock.Object,
-                    LoggerMock.Object
+                    LoggerMock.Object,
                     CommercialMock.Object
                 );
 
