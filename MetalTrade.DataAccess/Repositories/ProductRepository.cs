@@ -29,4 +29,18 @@ public class ProductRepository : Repository<Product>, IProductRepository
         return await _dbSet.Include(p => p.MetalType)
             .Include(p => p.Advertisements).Where(predicate).ToListAsync();
     }
+    public IQueryable<Product> CreateFilter()
+    {
+        return _context.Products
+            .Include(p => p.MetalType);
+    }
+    public IQueryable<Product> FilterName(IQueryable<Product> query, string name)
+    {
+        return query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
+    }
+    public IQueryable<Product> FilterMetalType(IQueryable<Product> query, int metalTypeId)
+    {
+        return query.Where(p => p.MetalTypeId == metalTypeId);
+    }
+
 }
