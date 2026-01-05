@@ -104,7 +104,6 @@ public class AdvertisementController : Controller
         
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user?.Id;
-        
 
         return PartialView("_AdsGrid", models);
     }
