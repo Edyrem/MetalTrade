@@ -4,6 +4,11 @@
     ViewBag.Title = "Список продуктов";
     var filter = ViewBag.Filter as ProductFilterDto;
 }
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-outline-success">Создать новый продукт</a>
+</div>
+
 <table class="mt-3 table table-info table-striped-columns" style="width: 100%;">
     <tr>
         <th>Id</th>
