@@ -89,23 +89,42 @@ public class AdvertisementController : Controller
         using var workbook = new XLWorkbook(stream);
         var worksheet = workbook.Worksheet(1);
 
-        foreach (var row in worksheet.RowsUsed())
+        var headerRow = worksheet.Row(1);
+        var valueRow = worksheet.Row(2);
+
+        foreach (var cell in headerRow.CellsUsed())
         {
-            var key = row.Cell(1).GetString()?.Trim();
-            var value = row.Cell(2).GetString()?.Trim();
+            var column = cell.WorksheetColumn().ColumnNumber();
+            var key = cell.GetString()?.Trim();
+            var value = valueRow.Cell(column).GetString()?.Trim();
 
-            if (string.IsNullOrEmpty(key))
-                continue;
+            if (!string.IsNullOrEmpty(key))
+            {
+                data[key] = value ?? string.Empty;
+            }
+        }
 
-            data[key] = value ?? string.Empty;
+        if (data.Count == 0)
+        {
+            foreach (var row in worksheet.RowsUsed())
+            {
+                var key = row.Cell(1).GetString()?.Trim();
+                var value = row.Cell(2).GetString()?.Trim();
+
+                if (string.IsNullOrEmpty(key))
+                    continue;
+
+                data[key] = value ?? string.Empty;
+            }
         }
 
         var model = new CreateAdvertisementViewModel
         {
             Title = data.GetValueOrDefault("Title") ?? "",
             Body = data.GetValueOrDefault("Body"),
+            Address = data.GetValueOrDefault("Address"),
             City = data.GetValueOrDefault("City"),
-            PhoneNumber = data.GetValueOrDefault("Phone"),
+            PhoneNumber = data.GetValueOrDefault("Phone", "PhoneNumber"),
             Price = decimal.TryParse(data.GetValueOrDefault("Price"), out var price)
                 ? price
                 : 0
