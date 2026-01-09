@@ -17,6 +17,7 @@ namespace MetalTrade.Test.Helpers
         protected Mock<IMapper> MapperMock = new();
         protected Mock<IImageUploadService> ImageUploadMock = new();
         protected Mock<IUserService> UserMock = new();
+        protected Mock<IAdvertisementImportService> AdvertisementImportMock = new();
         
 
         protected ProductController ProductController
@@ -94,7 +95,9 @@ namespace MetalTrade.Test.Helpers
                     UserMock.Object,
                     ProductMock.Object,
                     MetalMock.Object,
-                    MapperMock.Object
+                    MapperMock.Object,
+                    AdvertisementImportMock.Object
+                    
                 );
 
                 var identity = false
