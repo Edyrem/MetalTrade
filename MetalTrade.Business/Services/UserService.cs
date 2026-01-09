@@ -6,6 +6,7 @@ using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Business;
 
@@ -15,6 +16,7 @@ public class UserService : IUserService
     private readonly IImageUploadService _imageUploadService;
     private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
+    private readonly UserManager<User> _userManager;
 
     public UserService(
         MetalTradeDbContext context, 
@@ -27,6 +29,7 @@ public class UserService : IUserService
         _imageUploadService = imageUploadService;
         _mapper = mapper;
         _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id)
@@ -205,4 +208,68 @@ public class UserService : IUserService
         _mapper.Map<UserDto?>(await _userRepository.GetCurrentUserAsync(context));
     
     
+    public async Task<List<UserDto>> GetFilteredAsync(UserFilterDto filter, UserDto? currentUser)
+    {
+        var query = _userRepository.CreateFilter().Where(u => u.Id != 1);
+
+        if (!string.IsNullOrWhiteSpace(filter.UserName))
+            query = _userRepository.FilterUserName(query, filter.UserName);
+
+        if (!string.IsNullOrWhiteSpace(filter.Email))
+            query = _userRepository.FilterEmail(query, filter.Email);
+
+        if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
+            query = _userRepository.FilterPhoneNumber(query, filter.PhoneNumber);
+        
+        var users = await query.ToListAsync();
+        var rolesLookup = await _userRepository.GetRolesForUsersAsync(users);
+        if (await IsInRoleAsync(currentUser, "moderator"))
+        {
+            users = users.Where(u =>
+                !rolesLookup.ContainsKey(u.Id) || !rolesLookup[u.Id].Contains("moderator")
+            ).ToList();
+        }
+        
+        users = filter.Sort switch
+        {
+            "date_asc" => users.OrderBy(u => u.Id).ToList(),
+            "date_desc" => users.OrderByDescending(u => u.Id).ToList(),
+            _ => users.OrderByDescending(u => u.Id).ToList()
+        };
+        
+        users = users.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize).ToList();
+        var userDtos = _mapper.Map<List<UserDto>>(users);
+
+        foreach (var dto in userDtos)
+        {
+            dto.Roles = rolesLookup.ContainsKey(dto.Id) ? rolesLookup[dto.Id] : new List<string>();
+        }
+        return userDtos;
+    }
+
+    public async Task<int> GetFilteredCountAsync(UserFilterDto filter, UserDto? currentUser)
+    {
+        var query = _userRepository.CreateFilter().Where(u => u.Id != 1);
+
+        if (!string.IsNullOrWhiteSpace(filter.UserName))
+            query = _userRepository.FilterUserName(query, filter.UserName);
+
+        if (!string.IsNullOrWhiteSpace(filter.Email))
+            query = _userRepository.FilterEmail(query, filter.Email);
+
+        if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
+            query = _userRepository.FilterPhoneNumber(query, filter.PhoneNumber);
+
+        var users = await query.ToListAsync();
+        var rolesLookup = await _userRepository.GetRolesForUsersAsync(users);
+
+        if (await IsInRoleAsync(currentUser, "moderator"))
+        {
+            users = users.Where(u =>
+                !rolesLookup.ContainsKey(u.Id) || !rolesLookup[u.Id].Contains("moderator")
+            ).ToList();
+        }
+        return users.Count;
+    }
+
 }

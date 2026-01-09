@@ -1,4 +1,6 @@
 ﻿@using MetalTrade.Domain.Enums
+@using MetalTrade.Web.ViewModels.Commercial
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
 @if (Model == null)
@@ -58,9 +60,9 @@
                     <div class="mb-2">
                         <span class="badge
                             @(Model.Status == (int)AdvertisementStatus.Active ? "bg-success" :
-                                                 Model.Status == (int)AdvertisementStatus.Draft ? "bg-warning text-dark" :
-                                                 Model.Status == (int)AdvertisementStatus.Rejected ? "bg-danger" :
-                                                 "bg-secondary")">
+                            Model.Status == (int)AdvertisementStatus.Draft ? "bg-warning text-dark" :
+                            Model.Status == (int)AdvertisementStatus.Rejected ? "bg-danger" :
+                            "bg-secondary")">
                             @(Model.Status switch
                             {
                                 (int)AdvertisementStatus.Draft => "На рассмотрении",
@@ -121,6 +123,8 @@
                     {
                         <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Редактировать</a>
                         <b> | </b>
+                        <a asp-action="CreatePhoto" class="btn btn-outline-secondary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Добавить фото</a>
+                        <b> | </b>
                         <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
                         <b> | </b>
                         if(isAdmin)
@@ -146,6 +150,50 @@
                     }
                     
                 </div>
+                @if (isOwner && Model.IsAd && Model.AdEndDate.HasValue)
+                {
+                    <div class="alert alert-info">
+                        Ваша реклама активна до
+                        <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                    </div>
+                }
+
+
+                @if (isAdmin || User.IsInRole("moderator"))
+                    {
+                        @if (Model.IsAd)
+                        {
+                            <div class="alert alert-warning">
+                                Реклама активна до:
+                                @if (Model.AdEndDate.HasValue)
+                                {
+                                    <br />
+                                    <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                                }
+                            </div>
+
+                            <button id="deactivateCommercialBtn"
+                                    class="btn btn-danger"
+                                    data-id="@Model.Id">
+                                Убрать рекламу
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="d-flex gap-2 align-items-center">
+                                <button id="toggleCommercialBtn"
+                                        class="btn btn-warning">
+                                    Реклама
+                                </button>
+                            </div>
+
+                            <div id="commercialFormContainer" style="display:none;">
+                                @await Html.PartialAsync("_CommercialForm",
+                                    new CommercialViewModel { AdvertisementId = Model.Id })
+                            </div>
+                        }
+                    }
+                
                 <br/>
                 <div>
                     <a asp-action="Index">Назад к списку</a>
@@ -180,3 +228,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/commercial.js"></script>
+}

@@ -24,6 +24,8 @@ namespace MetalTrade.Business.Common.Mapping
 
             CreateMap<AdvertisementPhotoDto, AdvertisementPhoto>().ReverseMap();
 
+            CreateMap<AdvertisementPhoto, AdvertisementPhotoAjaxDto>();
+
             #region MetalService
             CreateMap<MetalType, MetalTypeDto>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(dest => dest.Name.ToLower()))

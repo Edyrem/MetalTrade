@@ -6,6 +6,7 @@ using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
+using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,9 @@ public class AdvertisementController : Controller
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
     private readonly IAdvertisementImportService _advertisementImportService;
+    private readonly ILogger<AdvertisementController> _logger;
+
+    private readonly ICommercialService _commercialService;
     
     public AdvertisementController(
         IAdvertisementService adsService,
@@ -28,7 +32,9 @@ public class AdvertisementController : Controller
         IProductService productService,
         IMetalService metalService,
         IMapper mapper,
-        IAdvertisementImportService importService)
+        IAdvertisementImportService importService, 
+        ILogger<AdvertisementController> logger,
+        ICommercialService commercialService)
     {
         _adsService = adsService;
         _userService = userService;
@@ -36,6 +42,8 @@ public class AdvertisementController : Controller
         _metalService = metalService;
         _mapper = mapper;
         _advertisementImportService = importService;
+        _logger = logger;
+        _commercialService = commercialService;
     }
 
     [AllowAnonymous]
@@ -129,21 +137,23 @@ public class AdvertisementController : Controller
         var adsDto = await _adsService.GetAsync(id);
         if (adsDto == null)
             return RedirectToAction("Index");
-        
-        if (!User.Identity?.IsAuthenticated ?? true)
+
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+
+        if (user == null)
             return RedirectToAction("Login", "Account",
                 new { returnUrl = Url.Action("Details", new { id }) });
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-
-        bool isAdmin = user != null &&
-                       await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
+        bool isAdmin = await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
 
         ViewData["IsAdmin"] = isAdmin;
-        ViewData["CurrentUserId"] = user?.Id;
-
+        ViewData["CurrentUserId"] = user.Id;
+        
+        ViewData["AdEndDate"] =
+            await _commercialService.GetActiveAdEndDateAsync(id);
+        
         return View(model);
     }
 
@@ -222,9 +232,7 @@ public class AdvertisementController : Controller
             }
         }
         var productDtos = await _productService.GetAllAsync();
-        var tempAdsDto = await _adsService.GetAsync(model.Id);
-        if (tempAdsDto != null)
-            model.Photoes = _mapper.Map<List<AdvertisementPhotoViewModel>>(tempAdsDto.Photoes);
+        model.Products = _mapper.Map<List<ProductViewModel>>(productDtos);
 
         return View(model);
     }
@@ -272,14 +280,22 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteAdvertisementPhoto(int advertisementPhotoId, string photoLink, int advertisementId)
+    public async Task<IActionResult> DeleteAdvertisementPhotoAjax(int advertisementPhotoId, string photoLink)
     {
-        await _adsService.DeleteAdvertisementPhotoAsync(new AdvertisementPhotoDto
+        try
         {
-            Id = advertisementPhotoId,
-            PhotoLink = photoLink
-        });
-        return RedirectToAction("Edit", new { Id = advertisementId});
+            var success = await _adsService.DeleteAdvertisementPhotoAsync( new AdvertisementPhotoDto
+            {
+                Id = advertisementPhotoId,
+                PhotoLink = photoLink
+            });
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении фото с id {PhotoId}", advertisementPhotoId);
+            return Json(new { success = false });
+        }
     }
 
     [Authorize(Roles = "admin,moderator")]
@@ -323,4 +339,82 @@ public class AdvertisementController : Controller
         }
         return RedirectToAction("Index");
     }
+    public async Task<IActionResult> CreatePhoto(int id)
+    {
+        var adsDto = await _adsService.GetAsync(id);
+        var model = _mapper.Map<AdvertisementViewModel>(adsDto);
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateAdvertisementPhotoAjax(int advertisementId, List<IFormFile> photos)
+    {
+        if (photos?.Any() != true)
+            return Json(new { success = false });
+
+        var newPhotos = 
+            await _adsService.CreateAdvertisementPhotoAsync(new AdvertisementDto { Id = advertisementId, PhotoFiles = photos });
+
+        if (newPhotos == null || !newPhotos.Any())
+            return Json(new { success = false });
+
+        return Json(new { success = true, photos = newPhotos });
+    }
+    
+    [HttpPost]
+    [Route("Advertisement/ActivateCommercial")]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ActivateCommercial(CommercialViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var error = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .FirstOrDefault()?.ErrorMessage;
+
+            return BadRequest(new { message = error ?? "Некорректные данные" });
+        }
+
+        try
+        {
+            await _commercialService.ActivateAsync(new CommercialDto
+            {
+                AdvertisementId = model.AdvertisementId,
+                Days = model.Days
+            });
+
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch
+        {
+            return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
+        }
+    }
+
+
+    [HttpPost]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> DeactivateCommercial(int advertisementId)
+    {
+        try
+        {
+            await _commercialService.DeactivateAsync(advertisementId);
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+
+
+
+
+
+
+    
 }

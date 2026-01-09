@@ -1,0 +1,64 @@
+﻿#addPhotoBtn {
+    width: 50px;
+    height: 50px;
+    border: 2px dashed #28a745;
+    border-radius: 8px;
+    background-color: white;
+    color: #28a745;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.2s;
+}
+
+    #addPhotoBtn:hover {
+        background-color: #e6f4ea;
+        transform: scale(1.05);
+    }
+
+#photoContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 110px);
+    gap: 10px;
+    justify-content: start;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.photo-preview {
+    width: 110px;
+    height: 110px;
+    position: relative;
+    text-align: center;
+}
+
+    .photo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .photo-preview .remove-photo {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff3b30;
+        color: white;
+        border: none;
+        font-size: 14px;
+        line-height: 22px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+        box-shadow: 0 0 3px rgba(0,0,0,0.4);
+    }
+        .photo-preview .remove-photo:hover {
+            background: #e22a22;
+        }

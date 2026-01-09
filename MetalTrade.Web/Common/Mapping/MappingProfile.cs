@@ -44,6 +44,9 @@ namespace MetalTrade.Web.Common.Mapping
                 .ReverseMap()
                 .ForMember(dest => dest.PhotoLink, opt => opt.MapFrom(src => src.PhotoPath));
 
+            CreateMap<UserFilterViewModel, UserFilterDto>();
+            CreateMap<ChangeRoleViewModel, ChangeRoleDto>();
+            
             CreateMap<AdvertisementPhotoDto, AdvertisementPhotoViewModel>().ReverseMap();
             CreateMap<CreateAdvertisementViewModel, AdvertisementDto>()
                 .ForMember(dest => dest.PhotoFiles, opt => opt.MapFrom(src => src.PhotoFiles))
