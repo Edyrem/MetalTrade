@@ -141,6 +141,10 @@ public class AdvertisementController : Controller
         return View("Create", model);
     }
 
+    public IActionResult PreviewExcel()
+    {
+        return View();
+    }
 
     [AllowAnonymous]
     public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilterDto filter)

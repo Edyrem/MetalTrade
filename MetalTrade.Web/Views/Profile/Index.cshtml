@@ -9,18 +9,44 @@
             <div class="card shadow-sm p-3 text-center">
                 <img src="@(Model.PhotoPath ?? "/images/default-avatar.png")"
                      class="rounded-circle mx-auto d-block mb-3"
-                     style="width: 120px; height: 120px; object-fit: cover;" alt="Аватар" />
+                     style="width: 120px; height: 120px; object-fit: cover;"
+                     alt="Аватар" />
 
                 <h5>@Model.UserName</h5>
-                
+
                 <p class="form-control-plaintext">Телефон: +996@(Model.PhoneNumber)</p>
-                <p class="form-control-plaintext">WhatsApp +996@(Model.WhatsAppNumber)</p>
+                <p class="form-control-plaintext">WhatsApp: +996@(Model.WhatsAppNumber)</p>
 
                 <div class="d-grid gap-2">
-                    <a href="/Profile/Edit" class="btn btn-outline-primary btn-sm">Изменить профиль</a>
+                    <a href="/Profile/Edit"
+                       class="btn btn-outline-primary btn-sm">
+                        Изменить профиль
+                    </a>
                 </div>
             </div>
-        </div>        
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm p-3">
+                <h5 class="mb-3">Импорт объявлений из Excel</h5>
+
+                <form asp-action="Load"
+                      asp-controller="Advertisement"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <input type="file"
+                           name="file"
+                           accept=".xlsx"
+                           class="form-control mb-3" />
+
+                    <button type="submit"
+                            class="btn btn-outline-primary">
+                        Загрузить Excel
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
     <br />
     <div class="row">
