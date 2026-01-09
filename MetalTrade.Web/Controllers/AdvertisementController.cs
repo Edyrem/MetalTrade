@@ -20,19 +20,22 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
+    private readonly IAdvertisementImportService _advertisementImportService;
     
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
         IProductService productService,
         IMetalService metalService,
-        IMapper mapper)
+        IMapper mapper,
+        IAdvertisementImportService importService)
     {
         _adsService = adsService;
         _userService = userService;
         _productService = productService;
         _metalService = metalService;
         _mapper = mapper;
+        _advertisementImportService = importService;
     }
 
     [AllowAnonymous]
@@ -79,72 +82,19 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Load(IFormFile file)
     {
         if (file == null || file.Length == 0)
-            return RedirectToAction("Create");
+            return RedirectToAction("Index", "Profile");
+        
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null) 
+            return NotFound();
 
-        var data = new Dictionary<string, string>();
+        using var stream = file.OpenReadStream();
+        var created = await _advertisementImportService.ImportFromExcelAsync(stream, user.Id);
 
-        using var stream = new MemoryStream();
-        await file.CopyToAsync(stream);
-
-        using var workbook = new XLWorkbook(stream);
-        var worksheet = workbook.Worksheet(1);
-
-        var headerRow = worksheet.Row(1);
-        var valueRow = worksheet.Row(2);
-
-        foreach (var cell in headerRow.CellsUsed())
-        {
-            var column = cell.WorksheetColumn().ColumnNumber();
-            var key = cell.GetString()?.Trim();
-            var value = valueRow.Cell(column).GetString()?.Trim();
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                data[key] = value ?? string.Empty;
-            }
-        }
-
-        if (data.Count == 0)
-        {
-            foreach (var row in worksheet.RowsUsed())
-            {
-                var key = row.Cell(1).GetString()?.Trim();
-                var value = row.Cell(2).GetString()?.Trim();
-
-                if (string.IsNullOrEmpty(key))
-                    continue;
-
-                data[key] = value ?? string.Empty;
-            }
-        }
-
-        var model = new CreateAdvertisementViewModel
-        {
-            Title = data.GetValueOrDefault("Title") ?? "",
-            Body = data.GetValueOrDefault("Body"),
-            Address = data.GetValueOrDefault("Address"),
-            City = data.GetValueOrDefault("City"),
-            PhoneNumber = data.GetValueOrDefault("Phone", "PhoneNumber"),
-            Price = decimal.TryParse(data.GetValueOrDefault("Price"), out var price)
-                ? price
-                : 0
-        };
-
-        model.Products = (await _productService.GetAllAsync())
-            .Select(p => new ProductViewModel
-            {
-                Id = p.Id,
-                Name = p.Name
-            })
-            .ToList();
-
-        return View("Create", model);
+        TempData["Success"] = $"Загружено объявлений без ошибок: {created}";
+        return RedirectToAction("Index", "Profile");
     }
 
-    public IActionResult PreviewExcel()
-    {
-        return View();
-    }
 
     [AllowAnonymous]
     public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilterDto filter)
