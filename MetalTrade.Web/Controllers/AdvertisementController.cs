@@ -32,18 +32,18 @@ public class AdvertisementController : Controller
         IProductService productService,
         IMetalService metalService,
         IMapper mapper,
-        IAdvertisementImportService importService, 
         ILogger<AdvertisementController> logger,
-        ICommercialService commercialService)
+        ICommercialService commercialService,
+        IAdvertisementImportService importService)
     {
         _adsService = adsService;
         _userService = userService;
         _productService = productService;
         _metalService = metalService;
         _mapper = mapper;
-        _advertisementImportService = importService;
         _logger = logger;
         _commercialService = commercialService;
+        _advertisementImportService = importService;
     }
 
     [AllowAnonymous]

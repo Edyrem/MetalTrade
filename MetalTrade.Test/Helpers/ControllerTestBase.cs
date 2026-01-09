@@ -22,6 +22,7 @@ namespace MetalTrade.Test.Helpers
         protected Mock<ILogger<AdvertisementController>> LoggerMock = new();
 
         protected Mock<ICommercialService> CommercialMock = new();
+        protected Mock<IAdvertisementImportService> AdvertisementImportMock  = new();
 
         
 
@@ -102,7 +103,8 @@ namespace MetalTrade.Test.Helpers
                     MetalMock.Object,
                     MapperMock.Object,
                     LoggerMock.Object,
-                    CommercialMock.Object
+                    CommercialMock.Object,
+                    AdvertisementImportMock.Object
                 );
 
                 var identity = new ClaimsIdentity(
