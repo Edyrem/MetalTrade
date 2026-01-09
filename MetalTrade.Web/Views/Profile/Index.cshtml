@@ -114,9 +114,62 @@
             </div>
 
             <div class="modal-body text-center">
-                <h5 class="mt-3">Название Описание Цена Город Номер телефона Продукт Адрес</h5>
+                <h5 class="mt-3">Название | Описание | Цена | Город | Номер телефона | Продукт | Адрес </h5>
                 <p class="mt-3 text-danger">Столбцы таблицы строго в этом порядке!</p>
+                <p class="mt-3 text-danger">Формат .xlsv</p>
             </div>
+
+
+
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            "Загружено объявлений без ошибок: 0" Что это значит ?
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <strong>Возможжные причины</strong>
+                            <ul>
+                                <li>
+                                    Неправильный формат файла. Убедитесь, что вы загружаете файл в формате .xlsx
+                                </li>
+                                <li>
+                                    Ошибки в данных. Проверьте, что все обязательные поля заполнены корректно и соответствуют требованиям (например, числовые поля содержат только цифры).
+                                </li>
+                                <li>
+                                    Превышение лимитов. Возможно, вы пытаетесь загрузить слишком много записей за один раз. Попробуйте уменьшить количество записей в файле.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            Файл не загружается. Что делать ?
+                        </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <strong>Возможжные причины</strong>
+                            <ul>
+                                <li>
+                                    Проверьте подключение к интернету. Убедитесь, что ваше устройство подключено к стабильной сети.
+                                </li>
+                                <li>
+                                    Возможно сервер временно недоступен. Попробуйте загрузить файл позже.
+                                </li>
+                                <li>
+                                    Убедитесь, что файл содержит необхоимые поля.
+                                </li>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>

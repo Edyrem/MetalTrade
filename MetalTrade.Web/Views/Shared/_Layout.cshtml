@@ -35,10 +35,6 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Пользователи</a>
                             </li>
                         }
-                        else if (User.Identity.IsAuthenticated && (User.IsInRole("supplier")))
-                        {
-                            
-                        }
 
                         <li class="nav-item ms-auto d-flex align-items-center">
                             @if (User.Identity?.IsAuthenticated ?? false)
