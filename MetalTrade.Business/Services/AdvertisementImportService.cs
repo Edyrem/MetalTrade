@@ -3,6 +3,7 @@ using MetalTrade.Business.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,11 +36,18 @@ namespace MetalTrade.Business.Services
             
             foreach (var row in rows)
             {
+                var priceText = row.Cell(3).GetString().Trim();
+                var isValidPrice = decimal.TryParse(priceText, NumberStyles.Any,
+                    CultureInfo.InvariantCulture, out var price);
+                
+                if (!isValidPrice)
+                    continue;
+                
                 var importDto = new AdvertisementImportDto
                 {
                     Title = row.Cell(1).GetString(),
                     Body = row.Cell(2).GetString(),
-                    Price = row.Cell(3).GetValue<decimal>(),
+                    Price = price,
                     City = row.Cell(4).GetString(),
                     PhoneNumber = row.Cell(5).GetString(),
                     ProductName = row.Cell(6).GetString(),
