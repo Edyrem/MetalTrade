@@ -9,5 +9,6 @@ namespace MetalTrade.Domain.Entities
         public string? WhatsAppNumber { get; set; }
         public List<Advertisement> Advertisements { get; set; } = null!;
         public bool IsDeleted { get; set; }
+        public bool IsTop { get; set; } = false;
     }
 }

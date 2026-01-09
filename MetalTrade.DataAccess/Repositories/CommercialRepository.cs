@@ -18,16 +18,16 @@ public class CommercialRepository : ICommercialRepository
     {
         return await _context.Commercials.AnyAsync(c =>
             c.AdvertisementId == advertisementId &&
-            c.AdStartDate <= now &&
-            c.AdEndDate >= now);
+            c.StartDate <= now &&
+            c.EndDate >= now);
     }
 
     public async Task<Commercial?> GetActiveAsync(int advertisementId, DateTime now)
     {
         return await _context.Commercials.FirstOrDefaultAsync(c =>
             c.AdvertisementId == advertisementId &&
-            c.AdStartDate <= now &&
-            c.AdEndDate >= now);
+            c.StartDate <= now &&
+            c.EndDate >= now);
     }
 
     public async Task AddAsync(Commercial commercial)
@@ -39,8 +39,10 @@ public class CommercialRepository : ICommercialRepository
     {
         await _context.SaveChangesAsync();
     }
-    
-    
 
+    public async Task UpdateAsync(Commercial commercial)
+    {
+        _context.Commercials.Update(commercial);
+    }
 }
 

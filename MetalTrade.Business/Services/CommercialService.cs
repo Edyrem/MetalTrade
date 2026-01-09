@@ -33,8 +33,8 @@ public class CommercialService : ICommercialService
         var commercial = new Commercial
         {
             AdvertisementId = dto.AdvertisementId,
-            AdStartDate = now,
-            AdEndDate = now.AddDays(dto.Days),
+            StartDate = now,
+            EndDate = now.AddDays(dto.Days),
             Cost = 0
         };
 
@@ -44,7 +44,7 @@ public class CommercialService : ICommercialService
             "Реклама активирована: AdId={AdId}, Days={Days}, EndDate={EndDate}",
             dto.AdvertisementId,
             dto.Days,
-            commercial.AdEndDate);
+            commercial.EndDate);
     }
     
 
@@ -62,7 +62,7 @@ public class CommercialService : ICommercialService
                                    .GetActiveAsync(advertisementId, now)
                                ?? throw new InvalidOperationException("Активная реклама не найдена");
 
-        activeCommercial.AdEndDate = now;
+        activeCommercial.EndDate = now;
 
         await _repository.SaveChangesAsync();
         _logger.LogInformation(
@@ -82,7 +82,7 @@ public class CommercialService : ICommercialService
         var commercial = await _repository
             .GetActiveAsync(advertisementId, now);
 
-        return commercial?.AdEndDate;
+        return commercial?.EndDate;
     }
     
 
