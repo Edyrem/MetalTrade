@@ -17,6 +17,7 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         public string Body { get; set; } = string.Empty;
         [Display(Name = "Цена")]
         [Required(ErrorMessage = "Поле Цена объязательно")]
+        [Range(1, 1000000, ErrorMessage = "Цена не может быть отрицательной или быть равной нулю!")]
         public decimal Price { get; set; }
         [Display(Name = "Адрес")]
         [StringLength(2000, ErrorMessage = "Можно вводить не более 2000 символов")]
