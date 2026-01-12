@@ -137,8 +137,12 @@
                         <b> | </b>
                         <a asp-action="CreatePhoto" class="btn btn-outline-secondary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Добавить фото</a>
                         <b> | </b>
-                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
-                        <b> | </b>
+                        @if (Model.Status != (int)AdvertisementStatus.Draft)
+                        {
+                            <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
+                            <b> | </b>
+                        }
+                        
                         if(isAdmin)
                         {
                             switch(Model.Status)
