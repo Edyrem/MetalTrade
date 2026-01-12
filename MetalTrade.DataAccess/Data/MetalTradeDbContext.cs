@@ -13,7 +13,9 @@ namespace MetalTrade.DataAccess.Data
         public DbSet<Advertisement> Advertisements { get; set; }
         public DbSet<AdvertisementPhoto> AdvertisementPhotos { get; set; }
         public DbSet<Commercial> Commercials { get; set; }
-        
+        public DbSet<TopAdvertisement> TopAdvertisements { get; set; }
+        public DbSet<TopUser> TopUsers { get; set; }
+
 
         public MetalTradeDbContext(DbContextOptions<MetalTradeDbContext> options) : base(options) { }
         

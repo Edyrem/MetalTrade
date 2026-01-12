@@ -2,6 +2,7 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MetalTrade.DataAccess.Repositories;
 
@@ -30,6 +31,12 @@ public class CommercialRepository : Repository<Commercial>, ICommercialRepositor
     public async Task AddAsync(Commercial commercial)
     {
         await _dbSet.AddAsync(commercial);
+    }
+
+    public async Task<IEnumerable<Commercial>> GetAllActiveAsync()
+    {
+        var now = DateTime.UtcNow;
+        return await _dbSet.Where(x => x.StartDate < now && x.EndDate > now).ToListAsync();
     }
 }
 

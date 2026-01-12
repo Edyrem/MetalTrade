@@ -8,6 +8,8 @@ public interface ICommercialRepository: IRepository<Commercial>
 
     Task<Commercial?> GetActiveAsync(int advertisementId, DateTime now);
 
+    Task<IEnumerable<Commercial>> GetAllActiveAsync();
+
     Task AddAsync(Commercial commercial);
     Task UpdateAsync(Commercial commercial);
 
