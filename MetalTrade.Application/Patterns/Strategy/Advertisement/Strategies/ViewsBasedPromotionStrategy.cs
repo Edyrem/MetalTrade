@@ -24,9 +24,9 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
             var currentTime = DateTime.UtcNow;
             var isInTimeRange = currentTime >= timedPromotion.StartDate && currentTime <= timedPromotion.EndDate;
 
-            return isInTimeRange
+            return await Task.FromResult(isInTimeRange
                 // && topAd.Advertisement.ViewsCount >= _minViews
-                && topAd.Advertisement != null;
+                && topAd.Advertisement != null);
         }
     }
 }

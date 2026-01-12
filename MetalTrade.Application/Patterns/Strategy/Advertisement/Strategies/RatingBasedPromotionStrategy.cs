@@ -9,12 +9,10 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
     {
         public string Name => "RatingBased";
 
-        private readonly IUserManagerRepository _userRepository;
         private readonly int _minRating;
 
         public RatingBasedPromotionStrategy(IUserManagerRepository userRepository, int minViews = 100)
         {
-            _userRepository = userRepository;
             _minRating = minViews;
         }
 
@@ -26,9 +24,9 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
             var currentTime = DateTime.UtcNow;
             var isInTimeRange = currentTime >= timedPromotion.StartDate && currentTime <= timedPromotion.EndDate;
 
-            return isInTimeRange
+            return await Task.FromResult(isInTimeRange
                 // && topUser.User.Rating >= _minRating
-                && topUser.User != null;
+                && topUser.User != null);
         }
     }
 }
