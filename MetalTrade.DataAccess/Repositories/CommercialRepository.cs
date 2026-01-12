@@ -5,18 +5,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.DataAccess.Repositories;
 
-public class CommercialRepository : ICommercialRepository
+public class CommercialRepository : Repository<Commercial>, ICommercialRepository
 {
-    private readonly MetalTradeDbContext _context;
-
-    public CommercialRepository(MetalTradeDbContext context)
+    public CommercialRepository(MetalTradeDbContext context) : base(context)
     {
-        _context = context;
     }
 
     public async Task<bool> HasActiveAsync(int advertisementId, DateTime now)
     {
-        return await _context.Commercials.AnyAsync(c =>
+        return await _dbSet.AnyAsync(c =>
             c.AdvertisementId == advertisementId &&
             c.StartDate <= now &&
             c.EndDate >= now);
@@ -24,7 +21,7 @@ public class CommercialRepository : ICommercialRepository
 
     public async Task<Commercial?> GetActiveAsync(int advertisementId, DateTime now)
     {
-        return await _context.Commercials.FirstOrDefaultAsync(c =>
+        return await _dbSet.FirstOrDefaultAsync(c =>
             c.AdvertisementId == advertisementId &&
             c.StartDate <= now &&
             c.EndDate >= now);
@@ -32,17 +29,7 @@ public class CommercialRepository : ICommercialRepository
 
     public async Task AddAsync(Commercial commercial)
     {
-        await _context.Commercials.AddAsync(commercial);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Commercial commercial)
-    {
-        _context.Commercials.Update(commercial);
+        await _dbSet.AddAsync(commercial);
     }
 }
 
