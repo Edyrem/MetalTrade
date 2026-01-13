@@ -11,7 +11,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
         
         private readonly int _minViews;
 
-        public ViewsBasedPromotionStrategy(IAdvertisementRepository advertisementRepository, int minViews = 100)
+        public ViewsBasedPromotionStrategy(int minViews = 100)
         {
             _minViews = minViews;
         }

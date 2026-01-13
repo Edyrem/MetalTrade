@@ -2,12 +2,6 @@
 using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Abstraction;
-using MetalTrade.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {
@@ -36,7 +30,7 @@ namespace MetalTrade.Business.Services
             _userRepository = userRepository;
         }
 
-        private async Task<bool> UpdatePromotionAsync<T>(T promotion) where T: TimedPromotion
+        private async Task<bool> CheckPromotionAsync<T>(T promotion) where T: TimedPromotion
         {
             if (promotion is null) return false;
 
@@ -55,27 +49,33 @@ namespace MetalTrade.Business.Services
             return true;
         }
 
-        public async Task UpdatePromotionAsync(int advertisementId)
+        public async Task CreatePromotionAsync(int advertisementId)
         {
             var advertisement = await _advertisementRepository.GetAsync(advertisementId);
             if (advertisement is null) return;
 
             var changed = false;
 
-            var commercial = await _commercialRepository.GetAsync(advertisementId);
-            if(await UpdatePromotionAsync(commercial))
+            var commercial = await _commercialRepository.GetLast(advertisementId);
+            if (await CheckPromotionAsync(commercial))
             {
                 changed = true;
+                if(!advertisement.IsAd)
+                    await _commercialRepository.CreateAsync(commercial);
                 advertisement.IsAd = commercial.IsActive;
                 await _commercialRepository.UpdateAsync(commercial);
             }
 
-            var topAd = await _topAdvertisementRepository.GetAsync(advertisementId);
-            if(await UpdatePromotionAsync(topAd))
+            var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
+            if(await CheckPromotionAsync(topAd))
             {
                 changed = true;
+                if(!advertisement.IsTop)
+                    await _topAdvertisementRepository.CreateAsync(topAd);
+                else
+                    await _topAdvertisementRepository.UpdateAsync(topAd);
+
                 advertisement.IsTop = topAd.IsActive;
-                await _topAdvertisementRepository.UpdateAsync(topAd);
             }
 
             if (changed)
@@ -91,7 +91,7 @@ namespace MetalTrade.Business.Services
 
             var changed = false;
 
-            var commercial = await _commercialRepository.GetAsync(advertisementId);
+            var commercial = await _commercialRepository.GetLast(advertisementId);
             if (DeactivatePromotion(commercial))
             {
                 changed = true;
@@ -99,7 +99,7 @@ namespace MetalTrade.Business.Services
                 await _commercialRepository.UpdateAsync(commercial);
             }
 
-            var topAd = await _topAdvertisementRepository.GetAsync(advertisementId);
+            var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
             if (DeactivatePromotion(topAd))
             {
                 changed = true;
@@ -113,19 +113,22 @@ namespace MetalTrade.Business.Services
             }
         }
 
-        public async Task UpdateUserPromotionAsync(int userId)
+        public async Task CreateUserPromotionAsync(int userId)
         {
             var user = await _userRepository.GetAsync(userId);
             if (user is null) return;
 
             var changed = false;
 
-            var topUser = await _topUserRepository.GetAsync(userId);
-            if(await UpdatePromotionAsync(topUser))
+            var topUser = await _topUserRepository.GetLast(userId);
+            if(await CheckPromotionAsync(topUser))
             {
                 changed = true;
+                if(!user.IsTop)
+                    await _topUserRepository.CreateAsync(topUser);
+                else
+                    await _topUserRepository.UpdateAsync(topUser);
                 user.IsTop = topUser.IsActive;
-                await _topUserRepository.UpdateAsync(topUser);
             }
 
             if (changed)

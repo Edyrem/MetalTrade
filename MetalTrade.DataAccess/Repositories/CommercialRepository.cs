@@ -2,7 +2,6 @@ using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace MetalTrade.DataAccess.Repositories;
 
@@ -10,6 +9,11 @@ public class CommercialRepository : Repository<Commercial>, ICommercialRepositor
 {
     public CommercialRepository(MetalTradeDbContext context) : base(context)
     {
+    }
+
+    public async Task<Commercial?> GetLast(int advertisementId)
+    {
+        return await _dbSet.LastOrDefaultAsync(c => c.AdvertisementId == advertisementId);
     }
 
     public async Task<bool> HasActiveAsync(int advertisementId, DateTime now)

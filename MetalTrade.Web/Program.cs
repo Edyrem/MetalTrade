@@ -1,16 +1,19 @@
+using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
+using MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies;
 using MetalTrade.Business;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interceptors;
+using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
-using MetalTrade.DataAccess.Interfaces.Repositories;
-using MetalTrade.DataAccess.Repositories;
 
 namespace MetalTrade.Web
 {
@@ -49,8 +52,8 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
 
-            builder.Services.AddAutoMapper(typeof(MetalTrade.Business.Common.Mapping.MappingProfile));
-            builder.Services.AddAutoMapper(typeof(MetalTrade.Web.Common.Mapping.MappingProfile));
+            builder.Services.AddAutoMapper(typeof(Business.Common.Mapping.MappingProfile));
+            builder.Services.AddAutoMapper(typeof(Web.Common.Mapping.MappingProfile));
 
 
             builder.Services.AddScoped<IMetalService, MetalService>();
@@ -58,9 +61,18 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
             builder.Services.AddScoped<ICommercialService, CommercialService>();
+            
+            var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
+            var minViews = builder.Configuration.GetValue<int>("Promotion:MinViews");
+            var minRating = builder.Configuration.GetValue<decimal>("Promotion:MinRating");
+            builder.Services.AddScoped<IPromotionStrategy>(sp => strategyType switch
+            {
+                "TimeBased" => new TimeBasedPromotionStrategy(),
+                "ViewsBased" => new ViewsBasedPromotionStrategy(minViews),
+                "RatingBased" => new RatingBasedPromotionStrategy(minRating),
+                _ => new TimeBasedPromotionStrategy()
+            });
 
-            
-            
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Events.OnRedirectToAccessDenied = context =>
@@ -75,7 +87,6 @@ namespace MetalTrade.Web
                     return Task.CompletedTask;
                 };
             });
-
 
             var app = builder.Build();
             

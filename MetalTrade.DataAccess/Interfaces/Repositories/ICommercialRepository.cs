@@ -4,6 +4,7 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories;
 
 public interface ICommercialRepository: IRepository<Commercial>
 {
+    Task<Commercial?> GetLast(int advertisementId);
     Task<bool> HasActiveAsync(int advertisementId, DateTime now);
 
     Task<Commercial?> GetActiveAsync(int advertisementId, DateTime now);

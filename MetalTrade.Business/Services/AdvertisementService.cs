@@ -18,14 +18,21 @@ public class AdvertisementService : IAdvertisementService
     private readonly IImageUploadService _imageUploadService;
     private AdvertisementStateContext _stateContext;
     private readonly ICommercialService _commercialService;
+    private readonly IPromotionService _promotionService;
 
-    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService, ICommercialService commercialService)
+    public AdvertisementService(
+        MetalTradeDbContext context, 
+        IMapper mapper, 
+        IImageUploadService imageUploadService, 
+        ICommercialService commercialService,
+        IPromotionService promotionService)
     {
         _repository = new AdvertisementRepository(context);
         _mapper = mapper;
         _imageUploadService = imageUploadService;
         _commercialService = commercialService;
         _stateContext = new AdvertisementStateContext(_repository);
+        _promotionService = promotionService;
     }
 
     public async Task<List<AdvertisementDto>> GetAllAsync()

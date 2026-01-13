@@ -9,11 +9,11 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
     {
         public string Name => "RatingBased";
 
-        private readonly int _minRating;
+        private readonly decimal _minRating;
 
-        public RatingBasedPromotionStrategy(IUserManagerRepository userRepository, int minViews = 100)
+        public RatingBasedPromotionStrategy(decimal minRating = 4.5m)
         {
-            _minRating = minViews;
+            _minRating = minRating;
         }
 
         public async Task<bool> ShouldBeActiveAsync(TimedPromotion timedPromotion)
