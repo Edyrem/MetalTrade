@@ -7,7 +7,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
 {
     public class RatingBasedPromotionStrategy : IPromotionStrategy
     {
-        public string Name => "RatingBased";
+        public string Name => "Rating";
 
         private readonly decimal _minRating;
 

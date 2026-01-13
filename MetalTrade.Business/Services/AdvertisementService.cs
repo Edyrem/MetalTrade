@@ -47,26 +47,11 @@ public class AdvertisementService : IAdvertisementService
         if (ad == null)
             return null;
 
-        var hasActive = await _commercialService.HasActiveCommercialAsync(ad.Id);
-
-        if (ad.IsAd != hasActive)
-        {
-            ad.IsAd = hasActive;
-            await _repository.SaveChangesAsync();
-        }
+        await _promotionService.UpdatePromotionAsync(ad.Id);
 
         var dto = _mapper.Map<AdvertisementDto>(ad);
-
-        if (hasActive)
-        {
-            dto.AdEndDate =
-                await _commercialService.GetActiveAdEndDateAsync(ad.Id);
-        }
-
         return dto;
     }
-
-
 
     public async Task CreateAsync(AdvertisementDto adsDto)
     {

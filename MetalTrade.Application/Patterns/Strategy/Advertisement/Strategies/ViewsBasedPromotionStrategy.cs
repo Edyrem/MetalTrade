@@ -7,7 +7,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
 {
     public class ViewsBasedPromotionStrategy : IPromotionStrategy
     {
-        public string Name => "ViewsBased";
+        public string Name => "Views";
         
         private readonly int _minViews;
 

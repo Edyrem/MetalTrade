@@ -5,7 +5,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
 {
     public class TimeBasedPromotionStrategy : IPromotionStrategy
     {
-        public string Name => "TimeBased";
+        public string Name => "Manual";
 
         public async Task<bool> ShouldBeActiveAsync(TimedPromotion timedPromotion)
         {

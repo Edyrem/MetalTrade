@@ -61,6 +61,7 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
             builder.Services.AddScoped<ICommercialService, CommercialService>();
+            builder.Services.AddScoped<IPromotionService, PromotionService>();
             
             var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
             var minViews = builder.Configuration.GetValue<int>("Promotion:MinViews");
