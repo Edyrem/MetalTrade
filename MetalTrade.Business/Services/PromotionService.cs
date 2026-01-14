@@ -3,6 +3,7 @@ using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Abstraction;
 using MetalTrade.Domain.Entities;
+using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {
@@ -14,6 +15,8 @@ namespace MetalTrade.Business.Services
         private readonly IAdvertisementRepository _advertisementRepository;
         private readonly ITopUserRepository _topUserRepository;
         private readonly IUserManagerRepository _userRepository;
+
+        private readonly HashSet<Func<Task>> _saveChanger = new();
 
         public PromotionService(
             IPromotionStrategy strategy,
@@ -58,8 +61,10 @@ namespace MetalTrade.Business.Services
 
             advertisement.IsActive = true;
             await _commercialRepository.CreateAsync(advertisement);
+            RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
             ad.IsAd = true;
             await _advertisementRepository.UpdateAsync(ad);
+            RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);      
         }
 
         public async Task CreateTopAdvertisementAsync(TopAdvertisement advertisement)
@@ -71,8 +76,10 @@ namespace MetalTrade.Business.Services
             advertisement.IsActive = true;
             advertisement.Reason = _strategy.Name;
             await _topAdvertisementRepository.CreateAsync(advertisement);
+            RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
             ad.IsTop = true;
             await _advertisementRepository.UpdateAsync(ad);
+            RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);
         }
 
         public async Task CreateTopUserAsync(TopUser topUser)
@@ -84,59 +91,71 @@ namespace MetalTrade.Business.Services
             topUser.IsActive = true;
             topUser.Reason = _strategy.Name;
             await _topUserRepository.CreateAsync(topUser);
+            RegisterRepoSaves(_topUserRepository.SaveChangesAsync);
 
             user.IsTop = true;
             await _userRepository.UpdateAsync(user);
+            RegisterRepoSaves(_userRepository.SaveChangesAsync);
         }
 
-        public async Task UpdatePromotionAsync(int advertisementId)
+        public async Task<Advertisement?> UpdatePromotionAsync(int advertisementId)
         {
             var advertisement = await _advertisementRepository.GetAsync(advertisementId);
-            if (advertisement is null) return;
+            if (advertisement is null) return null;
 
             var changed = false;
 
             var commercial = await _commercialRepository.GetLast(advertisementId);
-            if (await CheckPromotionAsync(commercial))
+            if (commercial != null && await CheckPromotionAsync(commercial))
             {
                 changed = true;
                 advertisement.IsAd = commercial.IsActive;
                 await _commercialRepository.UpdateAsync(commercial);
+                RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
             }
 
             var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
-            if (await CheckPromotionAsync(topAd))
+            if (topAd != null && await CheckPromotionAsync(topAd))
             {
                 changed = true;
                 advertisement.IsTop = topAd.IsActive;
                 await _topAdvertisementRepository.UpdateAsync(topAd);
+                RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
             }
 
             if (changed)
             {
                 await _advertisementRepository.UpdateAsync(advertisement);
+                RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);
+                return advertisement;
             }
+            return null;
         }
 
-        public async Task UpdateUserPromotionAsync(int userId)
+        public async Task<User?> UpdateUserPromotionAsync(int userId)
         {
             var user = await _userRepository.GetAsync(userId);
-            if (user is null) return;
+            if (user is null) return null;
 
             var changed = false;
 
             var topUser = await _topUserRepository.GetLast(userId);
-            if (await CheckPromotionAsync(topUser))
+            if (topUser != null && await CheckPromotionAsync(topUser))
             {
                 changed = true;
                 user.IsTop = topUser.IsActive;
                 await _topUserRepository.UpdateAsync(topUser);
+                RegisterRepoSaves(_topUserRepository.SaveChangesAsync);
             }
 
             if (changed)
             {
                 await _userRepository.UpdateAsync(user);
+                RegisterRepoSaves(_userRepository.SaveChangesAsync);
+                return user;
             }
+
+            return null;
         }
 
         public async Task DeactivatePromotionAsync(int advertisementId)
@@ -147,24 +166,27 @@ namespace MetalTrade.Business.Services
             var changed = false;
 
             var commercial = await _commercialRepository.GetLast(advertisementId);
-            if (DeactivatePromotion(commercial))
+            if (commercial != null && DeactivatePromotion(commercial))
             {
                 changed = true;
                 advertisement.IsAd = commercial.IsActive;
                 await _commercialRepository.UpdateAsync(commercial);
+                RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
             }
 
             var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
-            if (DeactivatePromotion(topAd))
+            if (topAd != null && DeactivatePromotion(topAd))
             {
                 changed = true;
                 advertisement.IsTop = topAd.IsActive;
                 await _topAdvertisementRepository.UpdateAsync(topAd);
+                RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
             }
 
             if (changed)
             {
                 await _advertisementRepository.UpdateAsync(advertisement);
+                RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);
             }
         }        
 
@@ -176,32 +198,78 @@ namespace MetalTrade.Business.Services
             var changed = false;
 
             var topUser = await _topUserRepository.GetAsync(userId);
-            if (DeactivatePromotion(topUser))
+            if (topUser != null && DeactivatePromotion(topUser))
             {
                 changed = true;
                 user.IsTop = topUser.IsActive;
                 await _topUserRepository.UpdateAsync(topUser);
+                RegisterRepoSaves(_topUserRepository.SaveChangesAsync);
             }
 
             if (changed)
             {
                 await _userRepository.UpdateAsync(user);
+                RegisterRepoSaves(_userRepository.SaveChangesAsync);
             }
         }
 
-        public async Task SaveCommercialAdvertisementAsync()
+        public async Task<List<Advertisement>> GetAllActiveCommercialsAsync()
         {
-            await _commercialRepository.SaveChangesAsync();
+            var commercials = await _commercialRepository.GetAllActiveAsync();
+            var advertisements = new List<Advertisement>();
+            foreach (var comm in commercials)
+            {
+                var ad = await UpdatePromotionAsync(comm.AdvertisementId);
+                if (ad != null)
+                    advertisements.Add(ad);
+            }
+
+            await SaveAllChangesAsync();
+            return advertisements.Where(x => x.IsAd).ToList();
         }
 
-        public async Task SaveTopAdvertisementAsync()
+        public async Task<List<Advertisement>> GetAllActiveTopAdvertisementsAsync()
         {
-            await _topAdvertisementRepository.SaveChangesAsync();
+            var topAdvertisements = await _topAdvertisementRepository.GetAllActiveAsync();
+            var advertisements = new List<Advertisement>();
+
+            foreach (var topAdvertisement in topAdvertisements)
+            {
+                var ad = await UpdatePromotionAsync(topAdvertisement.AdvertisementId);
+                if(ad != null)
+                    advertisements.Add(ad);
+            }
+
+            await SaveAllChangesAsync();
+            return advertisements.Where(x => x.IsTop).ToList();
         }
 
-        public async Task SaveTopUserAsync()
+        public async Task<List<User>> GetAllActiveTopUsersAsync()
         {
-            await _topUserRepository.SaveChangesAsync();
+            var topUsers = await _topUserRepository.GetAllActiveAsync();
+            var users = new List<User>();
+            foreach (var tUser in topUsers)
+            {
+                var user = await UpdateUserPromotionAsync(tUser.UserId);
+                if(user != null)
+                    users.Add(user);
+            }
+            await SaveAllChangesAsync();
+            return users.Where(x => x.IsTop).ToList();
+        }
+
+        private void RegisterRepoSaves(Func<Task> repoSaver)
+        {
+            _saveChanger.Add(repoSaver);
+        }
+
+        public async Task SaveAllChangesAsync()
+        {
+            if (_saveChanger.Count > 0)
+                foreach (var saver in _saveChanger)
+                    await saver();
+
+            _saveChanger.Clear();
         }
     }
 }

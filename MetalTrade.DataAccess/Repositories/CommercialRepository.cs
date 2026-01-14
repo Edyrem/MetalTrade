@@ -40,7 +40,7 @@ public class CommercialRepository : Repository<Commercial>, ICommercialRepositor
     public async Task<IEnumerable<Commercial>> GetAllActiveAsync()
     {
         var now = DateTime.UtcNow;
-        return await _dbSet.Where(x => x.StartDate < now && x.EndDate > now).ToListAsync();
+        return await _dbSet.Where(x => x.IsActive).ToListAsync();
     }
 }
 

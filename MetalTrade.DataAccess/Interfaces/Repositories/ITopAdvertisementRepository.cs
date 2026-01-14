@@ -10,5 +10,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
     public interface ITopAdvertisementRepository: IRepository<TopAdvertisement>
     {
         Task<TopAdvertisement?> GetLast(int advertisementId);
+        Task<IEnumerable<TopAdvertisement>> GetAllActiveAsync();
     }
 }

@@ -15,5 +15,10 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _dbSet.LastOrDefaultAsync(tu => tu.UserId == userId);
         }
+
+        public async Task<IEnumerable<TopUser>> GetAllActiveAsync()
+        {
+            return await _dbSet.Where(x => x.IsActive).ToListAsync();
+        }
     }
 }
