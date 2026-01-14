@@ -18,7 +18,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<IEnumerable<TopAdvertisement>> GetAllActiveAsync()
         {
-            return await _dbSet.Where(x => x.IsActive).ToListAsync();
+            return await _dbSet.Where(x => x.IsActive).Include(x => x.Advertisement).ToListAsync();
         }
     }
 }
