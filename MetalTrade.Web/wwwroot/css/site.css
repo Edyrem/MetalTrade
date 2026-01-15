@@ -400,7 +400,6 @@ h3 {
     transform: translateY(-5px);
 }
 
-/* ===== ФИЛЬТРЫ ===== */
 #ads-filter-form {
     background: var(--color-aluminum);
     padding: 25px;
@@ -439,7 +438,6 @@ h3 {
             box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.15);
         }
 
-/* ===== СЕТКА ОБЪЯВЛЕНИЙ ===== */
 #ads-grid {
     background: var(--color-aluminum);
     border-radius: 15px;
@@ -447,7 +445,32 @@ h3 {
     border: 2px solid var(--color-border);
 }
 
-/* ===== АНИМАЦИИ ===== */
+.ads-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+/* Планшеты */
+@media (max-width: 992px) {
+    .ads-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Мобильные — 2 КОЛОНКИ */
+@media (max-width: 576px) {
+    .ads-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .ad-card {
+        margin: 0; /* убираем возможные Bootstrap-отступы */
+    }
+}
+
+
 @keyframes metalShine {
     0% {
         background-position: -200px 0;
