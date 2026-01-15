@@ -1,6 +1,8 @@
 using AutoMapper;
+using ClosedXML.Excel;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
@@ -19,6 +21,7 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
+    private readonly IAdvertisementImportService _advertisementImportService;
     private readonly ILogger<AdvertisementController> _logger;
 
     private readonly ICommercialService _commercialService;
@@ -28,9 +31,10 @@ public class AdvertisementController : Controller
         IUserService userService,
         IProductService productService,
         IMetalService metalService,
-        IMapper mapper, 
+        IMapper mapper,
         ILogger<AdvertisementController> logger,
-        ICommercialService commercialService)
+        ICommercialService commercialService,
+        IAdvertisementImportService importService)
     {
         _adsService = adsService;
         _userService = userService;
@@ -39,6 +43,7 @@ public class AdvertisementController : Controller
         _mapper = mapper;
         _logger = logger;
         _commercialService = commercialService;
+        _advertisementImportService = importService;
     }
 
     [AllowAnonymous]
@@ -81,6 +86,23 @@ public class AdvertisementController : Controller
         return View(models);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Load(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return RedirectToAction("Index", "Profile");
+        
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null) 
+            return NotFound();
+
+        using var stream = file.OpenReadStream();
+        var created = await _advertisementImportService.ImportFromExcelAsync(stream, user.Id);
+
+        TempData["Success"] = $"Загружено объявлений без ошибок: {created}";
+        return RedirectToAction("Index", "Profile");
+    }
+
 
     [AllowAnonymous]
     public async Task<IActionResult> PartialList([FromQuery] AdvertisementFilterDto filter)
@@ -90,21 +112,18 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
 
-        bool isAdmin = user != null &&
-                       (await _userService.IsInRoleAsync(user, "admin") ||
-                        await _userService.IsInRoleAsync(user, "moderator"));
+        bool isAdmin = user != null && await _userService.IsInRolesAsync(user, ["admin", "moderator"]);
 
-        if (!isAdmin && user != null)
+        if (!isAdmin)
         {
             models = models.Where(a =>
                 a.Status == (int)AdvertisementStatus.Active ||
-                a.UserId == user.Id
+                (user != null && a.UserId == user.Id)
             ).ToList();
         }
-        
+
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user?.Id;
-        
 
         return PartialView("_AdsGrid", models);
     }

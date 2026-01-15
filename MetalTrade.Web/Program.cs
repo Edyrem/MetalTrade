@@ -60,6 +60,7 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<ICommercialService, CommercialService>();
+
             builder.Services.AddScoped<IPromotionService, PromotionService>();
             
             var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
@@ -72,6 +73,8 @@ namespace MetalTrade.Web
                 "RatingBased" => new RatingBasedPromotionStrategy(minRating),
                 _ => new TimeBasedPromotionStrategy()
             });
+
+            builder.Services.AddScoped<IAdvertisementImportService, AdvertisementImportService>();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
