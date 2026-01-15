@@ -1,6 +1,8 @@
 using AutoMapper;
+using ClosedXML.Excel;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
 using MetalTrade.Web.ViewModels.AdvertisementPhoto;
@@ -19,6 +21,7 @@ public class AdvertisementController : Controller
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IMetalService _metalService;
+    private readonly IAdvertisementImportService _advertisementImportService;
     private readonly ILogger<AdvertisementController> _logger;
 
     private readonly ICommercialService _commercialService;
@@ -28,9 +31,10 @@ public class AdvertisementController : Controller
         IUserService userService,
         IProductService productService,
         IMetalService metalService,
-        IMapper mapper, 
+        IMapper mapper,
         ILogger<AdvertisementController> logger,
-        ICommercialService commercialService)
+        ICommercialService commercialService,
+        IAdvertisementImportService importService)
     {
         _adsService = adsService;
         _userService = userService;
@@ -39,6 +43,7 @@ public class AdvertisementController : Controller
         _mapper = mapper;
         _logger = logger;
         _commercialService = commercialService;
+        _advertisementImportService = importService;
     }
 
     [AllowAnonymous]
@@ -79,6 +84,23 @@ public class AdvertisementController : Controller
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
         return View(models);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Load(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return RedirectToAction("Index", "Profile");
+        
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        if (user == null) 
+            return NotFound();
+
+        using var stream = file.OpenReadStream();
+        var created = await _advertisementImportService.ImportFromExcelAsync(stream, user.Id);
+
+        TempData["Success"] = $"Загружено объявлений без ошибок: {created}";
+        return RedirectToAction("Index", "Profile");
     }
 
 
