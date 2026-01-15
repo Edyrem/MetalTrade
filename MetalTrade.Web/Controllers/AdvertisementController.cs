@@ -90,18 +90,16 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
 
-        bool isAdmin = user != null &&
-                       (await _userService.IsInRoleAsync(user, "admin") ||
-                        await _userService.IsInRoleAsync(user, "moderator"));
+        bool isAdmin = user != null && await _userService.IsInRolesAsync(user, ["admin", "moderator"]);
 
-        if (!isAdmin && user != null)
+        if (!isAdmin)
         {
             models = models.Where(a =>
                 a.Status == (int)AdvertisementStatus.Active ||
-                a.UserId == user.Id
+                (user != null && a.UserId == user.Id)
             ).ToList();
         }
-        
+
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user?.Id;
 
