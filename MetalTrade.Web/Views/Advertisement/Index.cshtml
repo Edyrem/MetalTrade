@@ -7,6 +7,7 @@
 	ViewData["Title"] = "Advertisements";
 
 	var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+	var isSupplier = ViewData["IsSupplier"] as bool? ?? false;
 	var filter = ViewBag.Filter as AdvertisementFilterDto;
 	var metalTypes = ViewBag.MetalTypes as List<MetalTypeDto> ?? new();
 	var products = ViewBag.Products as List<ProductDto> ?? new();
@@ -15,7 +16,7 @@
 <div class="row mb-2 justify-content-between">
 	
 	<div class="col-md-2">
-		@if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
+		@if (isAdmin || isSupplier)
 		{
 			<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
 		}
@@ -131,7 +132,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <div id="ads-grid">
-	@Html.Partial("_AdsGrid", Model)
+	@(await Html.PartialAsync("_AdsGrid", Model))
 </div>
 
 

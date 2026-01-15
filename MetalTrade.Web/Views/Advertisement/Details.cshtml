@@ -95,7 +95,7 @@
                         @Html.DisplayNameFor(model => model.CreateDate)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.CreateDate)
+                        @Model.CreateDate.ToString("dd.MM.yyyy")
                     </dd>
                     <dt class="col-sm-2">
                         @Html.DisplayNameFor(model => model.Address)
@@ -175,7 +175,7 @@
                 }
 
 
-                @if (isAdmin || User.IsInRole("moderator"))
+                @if (isAdmin)
                     {
                         @if (Model.IsAd)
                         {
@@ -194,7 +194,7 @@
                                 Убрать рекламу
                             </button>
                         }
-                        else
+                        else if (Model.Status == (int)AdvertisementStatus.Active)
                         {
                             <div class="d-flex gap-2 align-items-center">
                                 <button id="toggleCommercialBtn"
