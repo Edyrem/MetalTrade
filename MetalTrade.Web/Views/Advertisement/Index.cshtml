@@ -70,19 +70,20 @@
 					       placeholder="Цена до"
 					       value="@filter?.PriceTo" />
 				</div>
+				
+				@{
+				// <div class="col-md-5">
+				// 	<input type="date" class="form-control"
+				// 	       name="dateFrom"
+				// 	       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
+				// </div>
 
-				<div class="col-md-5">
-					<input type="date" class="form-control"
-					       name="dateFrom"
-					       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
-				</div>
-
-				<div class="col-md-5">
-					<input type="date" class="form-control"
-					       name="dateTo"
-					       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
-				</div>
-
+				// <div class="col-md-5">
+				// 	<input type="date" class="form-control"
+				// 	       name="dateTo"
+				// 	       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
+				// </div>
+				}
 				<div class="col-md-5">
 					<select class="form-control" name="metalTypeId" id="metalTypeSelect">
 						<option value="">Тип металла</option>
