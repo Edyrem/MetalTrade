@@ -1,6 +1,8 @@
 @using MetalTrade.Domain.Enums
+@model MetalTrade.Business.Dtos.AdvertisementDto
+
 @{
-    var firstImage = Model.Photoes?.FirstOrDefault()?.PhotoLink;
+    var firstImage = Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "";
 }
 <div class="card h-100 shadow-sm position-relative">
 
