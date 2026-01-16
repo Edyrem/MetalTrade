@@ -86,7 +86,7 @@
 				}
 				<div class="col-md-5">
 					<select class="form-control" name="metalTypeId" id="metalTypeSelect">
-						<option value="">Тип металла</option>
+						<option value="">Тип материала</option>
 						@foreach (var type in metalTypes)
 						{
 						<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
