@@ -14,7 +14,7 @@ public class EditProductViewModel
     [MaxLength(100, ErrorMessage = "Можно вводить не более 100 символов")]
     public string Name { get; set; }
     
-    [Display(Name = "Тип металла")]
-    [Required(ErrorMessage = "Укажите тип металла")]
+    [Display(Name = "Тип материала")]
+    [Required(ErrorMessage = "Укажите тип материала")]
     public int MetalTypeId { get; set; }   
 }
