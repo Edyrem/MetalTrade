@@ -41,7 +41,7 @@
                             {
                                 var currentUser = await UserManager.GetUserAsync(User);
                                 var avatar = string.IsNullOrEmpty(currentUser?.Photo)
-                                ? "/images/default-avatar.png"
+                                ? "/images/default/avatar.jpg"
                                 : currentUser.Photo;
 
                             <li class="nav-item dropdown">
