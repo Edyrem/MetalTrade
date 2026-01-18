@@ -34,5 +34,11 @@ public class CommercialRepository : PromotionRepository<Commercial>, ICommercial
             c.StartDate <= now &&
             c.EndDate >= now);
     }
+
+    public override async Task<IEnumerable<Commercial>> GetAllActiveAsync()
+    {
+        var now = DateTime.UtcNow;
+        return await _dbSet.Where(c => c.IsActive).Include(c => c.Advertisement).ToListAsync();
+    }
 }
 

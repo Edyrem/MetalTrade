@@ -27,5 +27,10 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _dbSet.AnyAsync(t => t.UserId == userId && t.IsActive);
         }
+
+        public override async Task<IEnumerable<TopUser>> GetAllActiveAsync()
+        {
+            return await _dbSet.Where(x => x.IsActive).Include(x => x.User).ToListAsync();
+        }
     }
 }

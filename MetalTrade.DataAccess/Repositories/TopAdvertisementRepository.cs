@@ -31,6 +31,6 @@ namespace MetalTrade.DataAccess.Repositories
         public async Task<bool> HasActiveAsync(int advertisementId)
         {
             return await _dbSet.AnyAsync(t => t.AdvertisementId == advertisementId && t.IsActive);
-        }
+        }       
     }
 }

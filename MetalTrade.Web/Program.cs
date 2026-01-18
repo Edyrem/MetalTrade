@@ -1,3 +1,4 @@
+using MetalTrade.Application.Patterns.Strategy.Advertisement;
 using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
 using MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies;
 using MetalTrade.Business;
@@ -6,6 +7,8 @@ using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interceptors;
+using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -57,9 +60,11 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
             builder.Services.AddScoped<ICommercialService, CommercialService>();
-
             builder.Services.AddScoped<IPromotionService, PromotionService>();
-            
+            builder.Services.AddScoped<IPromotionValidator, PromotionValidator>();
+
+            builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
+
             var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
             var minViews = builder.Configuration.GetValue<int>("Promotion:MinViews");
             var minRating = builder.Configuration.GetValue<decimal>("Promotion:MinRating");

@@ -15,11 +15,13 @@ namespace MetalTrade.Business.Services
         private readonly IAdvertisementRepository _advertisementRepository;
         private readonly ITopUserRepository _topUserRepository;
         private readonly IUserManagerRepository _userRepository;
+        private readonly IPromotionValidator _validator;
 
         private readonly HashSet<Func<Task>> _saveChanger = new();
 
         public PromotionService(
             IPromotionStrategy strategy,
+            IPromotionValidator validator,
             ICommercialRepository commercialRepository,
             ITopAdvertisementRepository topAdvertisementRepository,
             IAdvertisementRepository advertisementRepository,
@@ -27,6 +29,7 @@ namespace MetalTrade.Business.Services
             IUserManagerRepository userRepository)
         {
             _strategy = strategy;
+            _validator = validator;
             _commercialRepository = commercialRepository;
             _topAdvertisementRepository = topAdvertisementRepository;
             _advertisementRepository = advertisementRepository;
@@ -59,9 +62,12 @@ namespace MetalTrade.Business.Services
             if (ad == null)
                 throw new ArgumentException($"Advertisement {ad} not found");
 
+            await _validator.ValidateCanActivateasync<Commercial>(ad.Id);
+
             advertisement.IsActive = true;
             await _commercialRepository.CreateAsync(advertisement);
             RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
+
             ad.IsAd = true;
             await _advertisementRepository.UpdateAsync(ad);
             RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);      
@@ -73,10 +79,13 @@ namespace MetalTrade.Business.Services
             if (ad == null)
                 throw new ArgumentException($"Advertisement {ad} not found");
 
+            await _validator.ValidateCanActivateasync<TopAdvertisement>(ad.Id);
+
             advertisement.IsActive = true;
             advertisement.Reason = _strategy.Name;
             await _topAdvertisementRepository.CreateAsync(advertisement);
             RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
+
             ad.IsTop = true;
             await _advertisementRepository.UpdateAsync(ad);
             RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);
@@ -88,6 +97,8 @@ namespace MetalTrade.Business.Services
             if (user == null)
                 throw new ArgumentException($"Advertisement {user} not found");
 
+            await _validator.ValidateCanActivateasync<TopAdvertisement>(user.Id);
+
             topUser.IsActive = true;
             topUser.Reason = _strategy.Name;
             await _topUserRepository.CreateAsync(topUser);
@@ -98,10 +109,10 @@ namespace MetalTrade.Business.Services
             RegisterRepoSaves(_userRepository.SaveChangesAsync);
         }
 
-        public async Task<Advertisement?> UpdatePromotionAsync(int advertisementId)
+        public async Task UpdatePromotionAsync(int advertisementId)
         {
             var advertisement = await _advertisementRepository.GetAsync(advertisementId);
-            if (advertisement is null) return null;
+            if (advertisement is null) return;
 
             var changed = false;
 
@@ -127,15 +138,13 @@ namespace MetalTrade.Business.Services
             {
                 await _advertisementRepository.UpdateAsync(advertisement);
                 RegisterRepoSaves(_advertisementRepository.SaveChangesAsync);
-                return advertisement;
             }
-            return null;
         }
 
-        public async Task<User?> UpdateUserPromotionAsync(int userId)
+        public async Task UpdateUserPromotionAsync(int userId)
         {
             var user = await _userRepository.GetAsync(userId);
-            if (user is null) return null;
+            if (user is null) return;
 
             var changed = false;
 
@@ -152,10 +161,7 @@ namespace MetalTrade.Business.Services
             {
                 await _userRepository.UpdateAsync(user);
                 RegisterRepoSaves(_userRepository.SaveChangesAsync);
-                return user;
             }
-
-            return null;
         }
 
         public async Task DeactivatePromotionAsync(int advertisementId)
@@ -213,49 +219,56 @@ namespace MetalTrade.Business.Services
             }
         }
 
-        public async Task<List<Advertisement>> GetAllActiveCommercialsAsync()
+        public async Task<IEnumerable<Advertisement>> GetAllActiveCommercialsAsync()
         {
             var commercials = await _commercialRepository.GetAllActiveAsync();
-            var advertisements = new List<Advertisement>();
-            foreach (var comm in commercials)
+            var activeCommercials = new List<Advertisement>();
+            foreach (var commercial in commercials)
             {
-                var ad = await UpdatePromotionAsync(comm.AdvertisementId);
-                if (ad != null)
-                    advertisements.Add(ad);
+                if(commercial.EndDate <= DateTime.UtcNow)
+                {
+                    await DeactivatePromotionAsync(commercial.AdvertisementId);
+                    continue;
+                }
+                if(commercial.Advertisement != null)
+                    activeCommercials.Add(commercial.Advertisement);
             }
-
-            await SaveAllChangesAsync();
-            return advertisements.Where(x => x.IsAd).ToList();
+            return activeCommercials;
         }
 
-        public async Task<List<Advertisement>> GetAllActiveTopAdvertisementsAsync()
+        public async Task<IEnumerable<Advertisement>> GetAllActiveTopAdvertisementsAsync()
         {
             var topAdvertisements = await _topAdvertisementRepository.GetAllActiveAsync();
             var advertisements = new List<Advertisement>();
-
-            foreach (var topAdvertisement in topAdvertisements)
+            foreach (var topAd in topAdvertisements)
             {
-                var ad = await UpdatePromotionAsync(topAdvertisement.AdvertisementId);
-                if(ad != null)
-                    advertisements.Add(ad);
+                if (topAd.EndDate <= DateTime.UtcNow)
+                {
+                    await DeactivatePromotionAsync(topAd.AdvertisementId);
+                    continue;
+                }
+                if (topAd.Advertisement != null)
+                    advertisements.Add(topAd.Advertisement);
             }
-
-            await SaveAllChangesAsync();
-            return advertisements.Where(x => x.IsTop).ToList();
+            return advertisements;
         }
 
-        public async Task<List<User>> GetAllActiveTopUsersAsync()
+        public async Task<IEnumerable<User>> GetAllActiveTopUsersAsync()
         {
             var topUsers = await _topUserRepository.GetAllActiveAsync();
             var users = new List<User>();
-            foreach (var tUser in topUsers)
+
+            foreach (var user in topUsers)
             {
-                var user = await UpdateUserPromotionAsync(tUser.UserId);
-                if(user != null)
-                    users.Add(user);
+                if (user.EndDate <= DateTime.UtcNow)
+                {
+                    await DeactivateUserPromotionAsync(user.UserId);
+                    continue;
+                }
+                if (user.User != null)
+                    users.Add(user.User);
             }
-            await SaveAllChangesAsync();
-            return users.Where(x => x.IsTop).ToList();
+            return users;
         }
 
         private void RegisterRepoSaves(Func<Task> repoSaver)
