@@ -1,15 +1,11 @@
 ﻿using MetalTrade.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetalTrade.DataAccess.Interfaces.Repositories
 {
-    public interface ITopAdvertisementRepository: IRepository<TopAdvertisement>
+    public interface ITopAdvertisementRepository: IPromotionRepository<TopAdvertisement>
     {
+        Task<TopAdvertisement?> GetActiveAsync(int advertisementId);
         Task<TopAdvertisement?> GetLast(int advertisementId);
-        Task<IEnumerable<TopAdvertisement>> GetAllActiveAsync();
+        Task<bool> HasActiveAsync(int advertisementId);
     }
 }

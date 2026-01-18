@@ -1,4 +1,5 @@
-﻿using MetalTrade.DataAccess.Data;
+﻿using MetalTrade.DataAccess.Abstractions;
+using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
 using System;

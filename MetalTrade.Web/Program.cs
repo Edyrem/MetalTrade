@@ -6,13 +6,10 @@ using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interceptors;
-using MetalTrade.DataAccess.Interfaces.Repositories;
-using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 
 namespace MetalTrade.Web

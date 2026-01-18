@@ -3,9 +3,9 @@ using MetalTrade.DataAccess.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace MetalTrade.DataAccess.Repositories
+namespace MetalTrade.DataAccess.Abstractions
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public abstract class Repository<T> : IRepository<T> where T : class
     {
         protected readonly MetalTradeDbContext _context;
         protected readonly DbSet<T> _dbSet;

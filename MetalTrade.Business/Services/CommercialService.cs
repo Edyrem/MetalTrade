@@ -25,7 +25,7 @@ public class CommercialService : ICommercialService
 
         var now = DateTime.UtcNow;
 
-        if (await _repository.HasActiveAsync(dto.AdvertisementId, now))
+        if (await _repository.HasActiveAsync(dto.AdvertisementId))
             throw new InvalidOperationException("Реклама уже активна");
 
         var commercial = new Commercial
@@ -48,16 +48,15 @@ public class CommercialService : ICommercialService
 
     public async Task<bool> IsActiveAsync(int advertisementId)
     {
-        return await _repository.HasActiveAsync(advertisementId, DateTime.UtcNow);
+        return await _repository.HasActiveAsync(advertisementId);
     }
 
     
     public async Task DeactivateAsync(int advertisementId)
     {
         var now = DateTime.UtcNow;
-
         var activeCommercial = await _repository
-                                   .GetActiveAsync(advertisementId, now)
+                                   .GetActiveAsync(advertisementId)
                                ?? throw new InvalidOperationException("Активная реклама не найдена");
 
         activeCommercial.EndDate = now;
@@ -70,15 +69,13 @@ public class CommercialService : ICommercialService
 
     public async Task<bool> HasActiveCommercialAsync(int advertisementId)
     {
-        return await _repository.HasActiveAsync(advertisementId, DateTime.UtcNow);
+        return await _repository.HasActiveAsync(advertisementId);
     }
 
     public async Task<DateTime?> GetActiveAdEndDateAsync(int advertisementId)
     {
-        var now = DateTime.UtcNow;
-
         var commercial = await _repository
-            .GetActiveAsync(advertisementId, now);
+            .GetActiveAsync(advertisementId);
 
         return commercial?.EndDate;
     }
