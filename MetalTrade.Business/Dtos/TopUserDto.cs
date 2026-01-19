@@ -10,7 +10,7 @@ namespace MetalTrade.Business.Dtos
         public bool IsActive { get; set; }
 
         // ID модератора/администратора, который создал промоушен
-        public int CreatedByUserId { get; set; }
+        public int? CreatedByUserId { get; set; }
         // Навигационное свойство к модератору (lazy loading)
         public User? CreatedBy { get; set; }
         public int UserId { get; set; }

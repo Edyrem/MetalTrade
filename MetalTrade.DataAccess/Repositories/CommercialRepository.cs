@@ -14,25 +14,21 @@ public class CommercialRepository : PromotionRepository<Commercial>, ICommercial
 
     public async Task<Commercial?> GetLast(int advertisementId)
     {
-        return await _dbSet.LastOrDefaultAsync(c => c.AdvertisementId == advertisementId);
+        return await _dbSet.OrderBy(c => c.StartDate).LastOrDefaultAsync(c => c.AdvertisementId == advertisementId);
     }
 
     public async Task<bool> HasActiveAsync(int advertisementId)
     {
         var now = DateTime.UtcNow;
         return await _dbSet.AnyAsync(c =>
-            c.AdvertisementId == advertisementId &&
-            c.StartDate <= now &&
-            c.EndDate >= now);
+            c.AdvertisementId == advertisementId && c.IsActive);
     }
 
     public async Task<Commercial?> GetActiveAsync(int advertisementId)
     {
         var now = DateTime.UtcNow;
         return await _dbSet.FirstOrDefaultAsync(c =>
-            c.AdvertisementId == advertisementId &&
-            c.StartDate <= now &&
-            c.EndDate >= now);
+            c.AdvertisementId == advertisementId && c.IsActive);
     }
 
     public override async Task<IEnumerable<Commercial>> GetAllActiveAsync()

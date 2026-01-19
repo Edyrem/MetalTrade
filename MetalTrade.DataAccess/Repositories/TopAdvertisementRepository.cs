@@ -20,7 +20,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<TopAdvertisement?> GetLast(int advertisementId)
         {
-            return await _dbSet.LastOrDefaultAsync(t => t.AdvertisementId == advertisementId);
+            return await _dbSet.OrderBy(t => t.StartDate).LastOrDefaultAsync(t => t.AdvertisementId == advertisementId);
         }
 
         public override async Task<IEnumerable<TopAdvertisement>> GetAllActiveAsync()

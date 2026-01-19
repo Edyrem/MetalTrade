@@ -24,8 +24,9 @@ public class AdvertisementController : Controller
     private readonly IAdvertisementImportService _advertisementImportService;
     private readonly ILogger<AdvertisementController> _logger;
 
-    private readonly ICommercialService _commercialService;
-    
+    //private readonly ICommercialService _commercialService;
+    private readonly IPromotionService _commercialService;
+
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
@@ -33,7 +34,8 @@ public class AdvertisementController : Controller
         IMetalService metalService,
         IMapper mapper,
         ILogger<AdvertisementController> logger,
-        ICommercialService commercialService,
+        IPromotionService commercialService,
+        //ICommercialService commercialService,
         IAdvertisementImportService importService)
     {
         _adsService = adsService;

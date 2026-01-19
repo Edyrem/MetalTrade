@@ -20,7 +20,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<TopUser?> GetLast(int userId)
         {
-            return await _dbSet.LastOrDefaultAsync(tu => tu.TargetUserId == userId);
+            return await _dbSet.OrderBy(tu => tu.StartDate).LastOrDefaultAsync(tu => tu.TargetUserId == userId);
         }
 
         public async Task<bool> HasActiveAsync(int userId)
