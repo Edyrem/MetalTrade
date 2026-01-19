@@ -26,7 +26,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
 
             return await Task.FromResult(isInTimeRange
                 // && topUser.User.Rating >= _minRating
-                && topUser.User != null);
+                && topUser.TargetUser != null);
         }
     }
 }

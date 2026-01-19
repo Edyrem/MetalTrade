@@ -1,8 +1,11 @@
 ﻿using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Abstraction;
 using MetalTrade.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
@@ -10,31 +13,28 @@ namespace MetalTrade.Business.Services
     public class PromotionService : IPromotionService
     {
         private readonly IPromotionStrategy _strategy;
-        private readonly ICommercialRepository _commercialRepository;
-        private readonly ITopAdvertisementRepository _topAdvertisementRepository;
-        private readonly IAdvertisementRepository _advertisementRepository;
-        private readonly ITopUserRepository _topUserRepository;
-        private readonly IUserManagerRepository _userRepository;
+        private readonly CommercialRepository _commercialRepository;
+        private readonly TopAdvertisementRepository _topAdvertisementRepository;
+        private readonly AdvertisementRepository _advertisementRepository;
+        private readonly TopUserRepository _topUserRepository;
+        private readonly UserManagerRepository _userRepository;
         private readonly IPromotionValidator _validator;
 
         private readonly HashSet<Func<Task>> _saveChanger = new();
 
         public PromotionService(
+            MetalTradeDbContext context,
+            UserManager<User> userManager,
             IPromotionStrategy strategy,
-            IPromotionValidator validator,
-            ICommercialRepository commercialRepository,
-            ITopAdvertisementRepository topAdvertisementRepository,
-            IAdvertisementRepository advertisementRepository,
-            ITopUserRepository topUserRepository,
-            IUserManagerRepository userRepository)
+            IPromotionValidator validator)
         {
             _strategy = strategy;
             _validator = validator;
-            _commercialRepository = commercialRepository;
-            _topAdvertisementRepository = topAdvertisementRepository;
-            _advertisementRepository = advertisementRepository;
-            _topUserRepository = topUserRepository;
-            _userRepository = userRepository;
+            _advertisementRepository = new AdvertisementRepository(context);
+            _commercialRepository = new CommercialRepository(context);
+            _topAdvertisementRepository = new TopAdvertisementRepository(context);
+            _topUserRepository = new TopUserRepository(context);
+            _userRepository = new UserManagerRepository(context, userManager);
         }
 
         private async Task<bool> CheckPromotionAsync<T>(T promotion) where T : TimedPromotion
@@ -93,7 +93,7 @@ namespace MetalTrade.Business.Services
 
         public async Task CreateTopUserAsync(TopUser topUser)
         {
-            var user = await _userRepository.GetAsync(topUser.UserId);
+            var user = await _userRepository.GetAsync(topUser.TargetUserId);
             if (user == null)
                 throw new ArgumentException($"Advertisement {user} not found");
 
@@ -262,11 +262,11 @@ namespace MetalTrade.Business.Services
             {
                 if (user.EndDate <= DateTime.UtcNow)
                 {
-                    await DeactivateUserPromotionAsync(user.UserId);
+                    await DeactivateUserPromotionAsync(user.TargetUserId);
                     continue;
                 }
-                if (user.User != null)
-                    users.Add(user.User);
+                if (user.TargetUser != null)
+                    users.Add(user.TargetUser);
             }
             return users;
         }

@@ -14,23 +14,23 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<TopUser?> GetActiveAsync(int userId)
         {
-            return await _dbSet.Include(x => x.User)
-                .FirstOrDefaultAsync(t => t.UserId == userId && t.IsActive);
+            return await _dbSet.Include(x => x.TargetUser)
+                .FirstOrDefaultAsync(t => t.TargetUserId == userId && t.IsActive);
         }
 
         public async Task<TopUser?> GetLast(int userId)
         {
-            return await _dbSet.LastOrDefaultAsync(tu => tu.UserId == userId);
+            return await _dbSet.LastOrDefaultAsync(tu => tu.TargetUserId == userId);
         }
 
         public async Task<bool> HasActiveAsync(int userId)
         {
-            return await _dbSet.AnyAsync(t => t.UserId == userId && t.IsActive);
+            return await _dbSet.AnyAsync(t => t.TargetUserId == userId && t.IsActive);
         }
 
         public override async Task<IEnumerable<TopUser>> GetAllActiveAsync()
         {
-            return await _dbSet.Where(x => x.IsActive).Include(x => x.User).ToListAsync();
+            return await _dbSet.Where(x => x.IsActive).Include(x => x.TargetUser).ToListAsync();
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
-using MetalTrade.DataAccess.Interfaces.Repositories;
+﻿using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Abstraction;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Exceptions;
 
-namespace MetalTrade.Application.Patterns.Strategy.Advertisement
+namespace MetalTrade.Business.Helpers
 {
     public class PromotionValidator: IPromotionValidator
     {

@@ -1,7 +1,7 @@
-using MetalTrade.Application.Patterns.Strategy.Advertisement;
 using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
 using MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies;
 using MetalTrade.Business;
+using MetalTrade.Business.Helpers;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Business.Services;
 using MetalTrade.DataAccess;
@@ -48,22 +48,7 @@ namespace MetalTrade.Web
                 })
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
-            
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
 
-            builder.Services.AddAutoMapper(typeof(Business.Common.Mapping.MappingProfile));
-            builder.Services.AddAutoMapper(typeof(Web.Common.Mapping.MappingProfile));
-
-
-            builder.Services.AddScoped<IMetalService, MetalService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
-            builder.Services.AddScoped<ICommercialService, CommercialService>();
-            builder.Services.AddScoped<IPromotionService, PromotionService>();
-            builder.Services.AddScoped<IPromotionValidator, PromotionValidator>();
-
-            builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
 
             var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
             var minViews = builder.Configuration.GetValue<int>("Promotion:MinViews");
@@ -75,6 +60,26 @@ namespace MetalTrade.Web
                 "RatingBased" => new RatingBasedPromotionStrategy(minRating),
                 _ => new TimeBasedPromotionStrategy()
             });
+                        
+            builder.Services.AddAutoMapper(typeof(Business.Common.Mapping.MappingProfile));
+            builder.Services.AddAutoMapper(typeof(Web.Common.Mapping.MappingProfile));
+
+            builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
+
+            builder.Services.AddScoped<IPromotionService, PromotionService>();
+            builder.Services.AddScoped<IPromotionValidator, PromotionValidator>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+
+
+            builder.Services.AddScoped<IMetalService, MetalService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+
+            builder.Services.AddScoped<ICommercialService, CommercialService>();
+            builder.Services.AddScoped<ITopAdvertisementRepository, TopAdvertisementRepository>();
+            builder.Services.AddScoped<ITopUserRepository, TopUserRepository>();
 
             builder.Services.AddScoped<IAdvertisementImportService, AdvertisementImportService>();
 
