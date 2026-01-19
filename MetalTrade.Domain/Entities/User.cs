@@ -10,5 +10,6 @@ namespace MetalTrade.Domain.Entities
         public List<Advertisement> Advertisements { get; set; } = null!;
         public bool IsDeleted { get; set; }
         public bool IsTop { get; set; } = false;
+        public ICollection<TopUser> TopUsers { get; set; } = new List<TopUser>();
     }
 }

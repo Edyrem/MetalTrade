@@ -26,11 +26,62 @@ namespace MetalTrade.DataAccess.Data
             modelBuilder.Entity<MetalType>().HasQueryFilter(m => !m.IsDeleted);
             modelBuilder.Entity<Advertisement>().HasQueryFilter(a => !a.IsDeleted);
             modelBuilder.Entity<AdvertisementPhoto>().HasQueryFilter(p => !p.IsDeleted);
-            modelBuilder.Entity<Commercial>()
-                .HasOne(c => c.Advertisement)
-                .WithMany(a => a.Commercials)
-                .HasForeignKey(c => c.AdvertisementId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Commercial>(entity =>
+            {
+                entity.HasQueryFilter(c => !c.IsDeleted);
+
+                entity.HasOne(c => c.Advertisement)
+                    .WithMany(a => a.Commercials)
+                    .HasForeignKey(c => c.AdvertisementId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(c => c.Cost)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.HasOne(c => c.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(c => c.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Navigation(c => c.Advertisement).AutoInclude(false);
+                entity.Navigation(c => c.CreatedBy).AutoInclude(false);
+            });
+
+            modelBuilder.Entity<TopAdvertisement>(entity =>
+            {
+                entity.HasQueryFilter(c => !c.IsDeleted);
+
+                entity.HasOne(c => c.Advertisement)
+                    .WithMany(a => a.TopAdvertisements)
+                    .HasForeignKey(c => c.AdvertisementId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(c => c.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Navigation(c => c.Advertisement).AutoInclude(false);
+                entity.Navigation(c => c.CreatedBy).AutoInclude(false);
+            });
+
+            modelBuilder.Entity<TopUser>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.TargetUser)
+                    .WithMany(u => u.TopUsers)
+                    .HasForeignKey(e => e.TargetUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Navigation(e => e.TargetUser).AutoInclude(false);
+                entity.Navigation(e => e.CreatedBy).AutoInclude(false);
+            });
 
             base.OnModelCreating(modelBuilder);
         }
