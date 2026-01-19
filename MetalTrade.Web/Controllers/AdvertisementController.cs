@@ -68,7 +68,8 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         bool isAdmin = user != null && await _userService.IsInRolesAsync(user, ["admin", "moderator"]);
-        
+        bool isSupplier = user != null && await _userService.IsInRoleAsync(user, "supplier");
+
         if (!isAdmin)
         {
             models = models.Where(a =>
@@ -78,12 +79,13 @@ public class AdvertisementController : Controller
         }
         
         ViewData["IsAdmin"] = isAdmin;
+        ViewData["IsSupplier"] = isSupplier;
         ViewBag.Filter = filter;
 
         ViewBag.Products = await _productService.GetAllAsync();
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
-        return View(models);
+        return View(models.OrderByDescending(x => x.IsAd).ToList());
     }
 
     [HttpPost]

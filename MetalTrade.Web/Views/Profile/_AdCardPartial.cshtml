@@ -1,8 +1,12 @@
 @using MetalTrade.Domain.Enums
 @model MetalTrade.Business.Dtos.AdvertisementDto
 
+@{
+    var firstImage = Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "";
+}
 <div class="card h-100 shadow-sm position-relative">
-    <img src="@(Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "/images/no-image.png")"
+
+    <img src="@(string.IsNullOrEmpty(firstImage) ? "/images/default/advertisement.jpg" : firstImage)"
          class="card-img-top"
          style="height:160px; object-fit:cover;" alt="Фото" />
 

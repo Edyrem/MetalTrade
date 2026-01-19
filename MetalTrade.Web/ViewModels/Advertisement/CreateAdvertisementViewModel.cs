@@ -25,12 +25,9 @@ namespace MetalTrade.Web.ViewModels.Advertisement
         public string? Address { get; set; }
         
         [Display(Name = "Номер телефона")]
-        [MaxLength(9, ErrorMessage = "Максимальное количество цифр- 9")]
-        [DataType(DataType.PhoneNumber)]
-        [RegularExpression(@"^(?([0-9]{3}))?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$",
-                    ErrorMessage = "Некорректный ввод номера телефона. Введите 9 цифр. <br/> Пример : (555) (555) (555)")]
         [Required(ErrorMessage = "Поле Номер телефона обязательно")]
-        public string? PhoneNumber { get; set; } = string.Empty;
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "Введите ровно 9 цифр")]
+        public string PhoneNumber { get; set; } = string.Empty;
         
         [Display(Name = "Город")]
         [StringLength(200, ErrorMessage = "Можно вводить не более 200 символов")]
