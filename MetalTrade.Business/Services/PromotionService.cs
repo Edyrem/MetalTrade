@@ -12,20 +12,20 @@ namespace MetalTrade.Business.Services
 {
     public class PromotionService : IPromotionService
     {
-        private readonly IPromotionStrategy _strategy;
         private readonly CommercialRepository _commercialRepository;
         private readonly TopAdvertisementRepository _topAdvertisementRepository;
         private readonly AdvertisementRepository _advertisementRepository;
         private readonly TopUserRepository _topUserRepository;
         private readonly UserManagerRepository _userRepository;
         private readonly IPromotionValidator _validator;
+        private readonly IPromotionStrategyProvider _strategy;
 
         private readonly HashSet<Func<Task>> _saveChanger = new();
 
         public PromotionService(
             MetalTradeDbContext context,
             UserManager<User> userManager,
-            IPromotionStrategy strategy,
+            IPromotionStrategyProvider strategy,
             IPromotionValidator validator)
         {
             _strategy = strategy;
@@ -41,7 +41,7 @@ namespace MetalTrade.Business.Services
         {
             if (promotion is null) return false;
 
-            var shouldBeActive = await _strategy.ShouldBeActiveAsync(promotion);
+            var shouldBeActive = await _strategy.GetStrategy<TimedPromotion>().ShouldBeActiveAsync(promotion);
             if (promotion.IsActive == shouldBeActive) return false;
 
             promotion.IsActive = shouldBeActive;
@@ -82,7 +82,7 @@ namespace MetalTrade.Business.Services
             await _validator.ValidateCanActivateasync<TopAdvertisement>(ad.Id);
 
             advertisement.IsActive = true;
-            advertisement.Reason = _strategy.Name;
+            advertisement.Reason = _strategy.GetStrategy<TopAdvertisement>().Name;
             await _topAdvertisementRepository.CreateAsync(advertisement);
             RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
 
@@ -100,7 +100,7 @@ namespace MetalTrade.Business.Services
             await _validator.ValidateCanActivateasync<TopAdvertisement>(user.Id);
 
             topUser.IsActive = true;
-            topUser.Reason = _strategy.Name;
+            topUser.Reason = _strategy.GetStrategy<TopUser>().Name;
             await _topUserRepository.CreateAsync(topUser);
             RegisterRepoSaves(_topUserRepository.SaveChangesAsync);
 
@@ -225,7 +225,7 @@ namespace MetalTrade.Business.Services
             var activeCommercials = new List<Advertisement>();
             foreach (var commercial in commercials)
             {
-                if(commercial.EndDate <= DateTime.UtcNow)
+                if(commercial.EndDate < DateTime.UtcNow)
                 {
                     await DeactivatePromotionAsync(commercial.AdvertisementId);
                     continue;
@@ -242,7 +242,7 @@ namespace MetalTrade.Business.Services
             var advertisements = new List<Advertisement>();
             foreach (var topAd in topAdvertisements)
             {
-                if (topAd.EndDate <= DateTime.UtcNow)
+                if (topAd.EndDate < DateTime.UtcNow)
                 {
                     await DeactivatePromotionAsync(topAd.AdvertisementId);
                     continue;
@@ -260,7 +260,7 @@ namespace MetalTrade.Business.Services
 
             foreach (var user in topUsers)
             {
-                if (user.EndDate <= DateTime.UtcNow)
+                if (user.EndDate < DateTime.UtcNow)
                 {
                     await DeactivateUserPromotionAsync(user.TargetUserId);
                     continue;

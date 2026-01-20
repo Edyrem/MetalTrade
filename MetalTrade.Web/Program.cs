@@ -48,24 +48,13 @@ namespace MetalTrade.Web
                 })
                 .AddEntityFrameworkStores<MetalTradeDbContext>()
                 .AddDefaultTokenProviders();
-
-
-            var strategyType = builder.Configuration.GetValue<string>("Promotion:Strategy") ?? "TimeBased";
-            var minViews = builder.Configuration.GetValue<int>("Promotion:MinViews");
-            var minRating = builder.Configuration.GetValue<decimal>("Promotion:MinRating");
-            builder.Services.AddScoped<IPromotionStrategy>(sp => strategyType switch
-            {
-                "TimeBased" => new TimeBasedPromotionStrategy(),
-                "ViewsBased" => new ViewsBasedPromotionStrategy(minViews),
-                "RatingBased" => new RatingBasedPromotionStrategy(minRating),
-                _ => new TimeBasedPromotionStrategy()
-            });
                         
             builder.Services.AddAutoMapper(typeof(Business.Common.Mapping.MappingProfile));
             builder.Services.AddAutoMapper(typeof(Web.Common.Mapping.MappingProfile));
 
             builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
 
+            builder.Services.AddScoped<IPromotionStrategyProvider, PromotionStrategyProvider>();
             builder.Services.AddScoped<IPromotionService, PromotionService>();
             builder.Services.AddScoped<IPromotionValidator, PromotionValidator>();
 

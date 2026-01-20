@@ -25,6 +25,8 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _dbSet
                 .Include(a => a.User)
+                .Include(a => a.Commercials.Where(c => c.IsActive))
+                .Include(a => a.TopAdvertisements.Where(t => t.IsActive))
                 .Include(a => a.Photoes)
                 .Include(a => a.Product)
                     .ThenInclude(p => p.MetalType)
@@ -48,8 +50,11 @@ namespace MetalTrade.DataAccess.Repositories
         public async Task SetStatusAsync(int Id, AdvertisementStatus status)
         {
             var ad = await _dbSet.FirstOrDefaultAsync(x => x.Id == Id);
-            ad.Status = (int)status;
-            _dbSet.Update(ad);
+            if(ad != null)
+            {
+                ad.Status = (int)status;
+                _dbSet.Update(ad);
+            }
         }
 
         public async Task DeleteAdvertisementPhotoAsync(int advertisementPhotoId)
@@ -94,7 +99,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public IQueryable<Advertisement> FilterMetalType(IQueryable<Advertisement> query, int metalTypeId)
         {
-            return query.Where(ad => ad.Product.MetalTypeId == metalTypeId);
+            return query.Where(ad => ad.Product != null && ad.Product.MetalTypeId == metalTypeId);
         }
 
         public IQueryable<Advertisement> FilterPriceFrom(IQueryable<Advertisement> query, decimal priceFrom)
