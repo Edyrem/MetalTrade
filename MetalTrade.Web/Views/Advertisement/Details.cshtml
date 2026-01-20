@@ -1,5 +1,5 @@
 ﻿@using MetalTrade.Domain.Enums
-@using MetalTrade.Web.ViewModels.Commercial
+@using MetalTrade.Web.ViewModels.Promotion
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
@@ -24,8 +24,6 @@
     var message = $"Здравствуйте! Пишу по поводу объявления '{Model.Title}' с сайта METALTRADE. " ;
     
 }
-
-
 
 <h1>Детали</h1>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -205,7 +203,7 @@
 
                             <div id="commercialFormContainer" style="display:none;">
                                 @await Html.PartialAsync("_CommercialForm",
-                                    new CommercialViewModel { AdvertisementId = Model.Id })
+                                    new PromotionActivateViewModel { TargetId = Model.Id })
                             </div>
                         }
                     }

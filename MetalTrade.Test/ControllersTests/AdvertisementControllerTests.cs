@@ -1,8 +1,8 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Test.Helpers;
 using MetalTrade.Web.ViewModels.Advertisement;
-using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.Promotion;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -961,16 +961,13 @@ public class AdvertisementControllerTests : ControllerTestBase
             AdvertisementController.Delete(model));
     }
     
-    
-    //тесты для рекламы
-    
     [Fact]
     public async Task ActivateCommercial_ValidModel_ReturnsOk()
     {
         // Arrange
-        var model = new CommercialViewModel
+        var model = new PromotionActivateViewModel
         {
-            AdvertisementId = 5,
+            TargetId = 5,
             Days = 7
         };
 
@@ -985,7 +982,7 @@ public class AdvertisementControllerTests : ControllerTestBase
         var ok = Assert.IsType<OkObjectResult>(result);
         CommercialMock.Verify(s =>
                 s.ActivateAsync(It.Is<CommercialDto>(d =>
-                    d.AdvertisementId == 5 && d.Days == 7)),
+                    d.AdvertisementId == 5 && d.StartDate == DateTime.UtcNow && d.EndDate == DateTime.UtcNow.AddDays(7))),
             Times.Once);
     }
 
@@ -997,9 +994,9 @@ public class AdvertisementControllerTests : ControllerTestBase
         // Arrange
         controller.ModelState.AddModelError("Days", "error");
 
-        var model = new CommercialViewModel
+        var model = new PromotionActivateViewModel
         {
-            AdvertisementId = 5,
+            TargetId = 5,
             Days = 0
         };
 
@@ -1018,9 +1015,9 @@ public class AdvertisementControllerTests : ControllerTestBase
             .Setup(s => s.ActivateAsync(It.IsAny<CommercialDto>()))
             .ThrowsAsync(new InvalidOperationException("Реклама уже активна"));
 
-        var model = new CommercialViewModel
+        var model = new PromotionActivateViewModel
         {
-            AdvertisementId = 5,
+            TargetId = 5,
             Days = 7
         };
 

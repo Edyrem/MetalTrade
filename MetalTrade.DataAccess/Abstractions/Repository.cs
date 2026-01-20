@@ -38,12 +38,12 @@ namespace MetalTrade.DataAccess.Abstractions
 
         public virtual async Task UpdateAsync(T item)
         {
-            _dbSet.Update(item);
+            await Task.Run(() => _dbSet.Update(item));
         }
 
         public virtual async Task DeleteAsync(int id)
         {
-            T entity = await _dbSet.FindAsync(id);
+            T? entity = await _dbSet.FindAsync(id);
             if (entity != null)
             {
                 _dbSet.Remove(entity);

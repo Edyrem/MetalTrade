@@ -1,13 +1,10 @@
 using AutoMapper;
-using ClosedXML.Excel;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
-using MetalTrade.Web.ViewModels.AdvertisementPhoto;
-using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.Promotion;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -151,9 +148,8 @@ public class AdvertisementController : Controller
 
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user.Id;
-        
-        ViewData["AdEndDate"] =
-            await _commercialService.GetActiveAdEndDateAsync(id);
+
+        ViewData["AdEndDate"] = model.Commercials?.LastOrDefault()?.EndDate;
         
         return View(model);
     }
@@ -161,7 +157,9 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         CreateAdvertisementViewModel model = new() { Products = _mapper.Map<List<ProductViewModel>>(productDtos) };
+        ViewBag.UserId = user?.Id;
         return View(model);
     }
 
@@ -364,7 +362,7 @@ public class AdvertisementController : Controller
     [HttpPost]
     [Route("Advertisement/ActivateCommercial")]
     [Authorize(Roles = "admin,moderator")]
-    public async Task<IActionResult> ActivateCommercial(CommercialViewModel model)
+    public async Task<IActionResult> ActivateCommercial(PromotionActivateViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -377,11 +375,21 @@ public class AdvertisementController : Controller
 
         try
         {
-            await _commercialService.ActivateAsync(new CommercialDto
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user == null)
+                return Forbid();
+
+            var viewModel = new CommercialViewModel
             {
-                AdvertisementId = model.AdvertisementId,
-                Days = model.Days
-            });
+                AdvertisementId = model.TargetId,
+                //Days = model.Days,
+                CreatedByUserId = user.Id,                
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(model.Days)
+            };
+            
+            var dto = _mapper.Map<CommercialDto>(model);
+            await _adsService.CreateCommercialAsync(dto);
 
             return Ok(new { success = true });
         }
@@ -402,7 +410,7 @@ public class AdvertisementController : Controller
     {
         try
         {
-            await _commercialService.DeactivateAsync(advertisementId);
+            await _adsService.DeactivatePromotionAsync(advertisementId);
             return Ok(new { success = true });
         }
         catch (InvalidOperationException ex)

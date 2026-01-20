@@ -1,5 +1,6 @@
 ﻿using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.Promotion;
 using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.Advertisement;
@@ -45,7 +46,9 @@ public class AdvertisementViewModel
     public UserViewModel User { get; set; } = new();
         
     public List<AdvertisementPhotoViewModel> Photoes { get; set; } = [];
-    
+    public List<CommercialViewModel> Commercials { get; set; } = [];
+    //public List<TopAdvertisementViewModel> TopAdvertisements { get; set; } = [];
+
     public DateTime? AdEndDate { get; set; }
 
 }

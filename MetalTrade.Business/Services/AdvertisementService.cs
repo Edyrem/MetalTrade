@@ -17,7 +17,6 @@ public class AdvertisementService : IAdvertisementService
     private readonly IMapper _mapper;
     private readonly IImageUploadService _imageUploadService;
     private AdvertisementStateContext _stateContext;
-    private readonly ICommercialService _commercialService;
     private readonly IPromotionService _promotionService;
 
     public AdvertisementService(
@@ -30,7 +29,6 @@ public class AdvertisementService : IAdvertisementService
         _repository = new AdvertisementRepository(context);
         _mapper = mapper;
         _imageUploadService = imageUploadService;
-        _commercialService = commercialService;
         _stateContext = new AdvertisementStateContext(_repository);
         _promotionService = promotionService;
     }
@@ -231,5 +229,11 @@ public class AdvertisementService : IAdvertisementService
     {
         var topAdvertisements = await _promotionService.GetAllActiveTopAdvertisementsAsync();
         return _mapper.Map<List<AdvertisementDto>>(topAdvertisements);
-    }    
+    }
+
+    public async Task DeactivatePromotionAsync(int advertisementId)
+    {
+        await _promotionService.DeactivatePromotionAsync(advertisementId);
+        await _promotionService.SaveAllChangesAsync();
+    }
 }

@@ -20,8 +20,8 @@ public class CommercialService : ICommercialService
 
     public async Task ActivateAsync(CommercialDto dto)
     {
-        if (dto.Days <= 0)
-            throw new InvalidOperationException("Количество дней должно быть больше 0");
+        //if (dto.Days <= 0)
+        //    throw new InvalidOperationException("Количество дней должно быть больше 0");
 
         var now = DateTime.UtcNow;
 
@@ -32,7 +32,7 @@ public class CommercialService : ICommercialService
         {
             AdvertisementId = dto.AdvertisementId,
             StartDate = now,
-            EndDate = now.AddDays(dto.Days),
+            //EndDate = now.AddDays(dto.Days),
             Cost = 0
         };
 
@@ -41,7 +41,7 @@ public class CommercialService : ICommercialService
         _logger.LogInformation(
             "Реклама активирована: AdId={AdId}, Days={Days}, EndDate={EndDate}",
             dto.AdvertisementId,
-            dto.Days,
+            //dto.Days,
             commercial.EndDate);
     }
     

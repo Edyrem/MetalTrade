@@ -65,8 +65,6 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IMetalService, MetalService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
-
-            builder.Services.AddScoped<ICommercialService, CommercialService>();
             builder.Services.AddScoped<ITopAdvertisementRepository, TopAdvertisementRepository>();
             builder.Services.AddScoped<ITopUserRepository, TopUserRepository>();
 

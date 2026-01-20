@@ -103,7 +103,6 @@ namespace MetalTrade.Test.Helpers
                     MetalMock.Object,
                     MapperMock.Object,
                     LoggerMock.Object,
-                    CommercialMock.Object,
                     AdvertisementImportMock.Object
                 );
 
