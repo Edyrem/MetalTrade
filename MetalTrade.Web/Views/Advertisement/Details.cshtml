@@ -3,6 +3,10 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
+@{
+    var endDate = ViewData["AdEndDate"];
+}
+
 @if (Model == null)
 {
     <p class="text-danger">Объявление не найдено.</p>
@@ -164,11 +168,11 @@
                     }
                     
                 </div>
-                @if (isOwner && Model.IsAd && Model.AdEndDate.HasValue)
+                @if (isOwner && Model.IsAd)
                 {
                     <div class="alert alert-info">
                         Ваша реклама активна до
-                        <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                        <b>@endDate</b>
                     </div>
                 }
 
@@ -178,12 +182,7 @@
                         @if (Model.IsAd)
                         {
                             <div class="alert alert-warning">
-                                Реклама активна до:
-                                @if (Model.AdEndDate.HasValue)
-                                {
-                                    <br />
-                                    <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
-                                }
+                                Реклама активна до: <b>@endDate</b>
                             </div>
 
                             <button id="deactivateCommercialBtn"

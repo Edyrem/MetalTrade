@@ -650,7 +650,7 @@ public class AdvertisementControllerTests : ControllerTestBase
         // Assert
         var jsonResult = Assert.IsType<JsonResult>(result);
 
-        // ������� �������� success ����� reflection
+        // Р”РѕСЃС‚Р°РµРј СЃРІРѕР№СЃС‚РІРѕ success С‡РµСЂРµР· reflection
         var value = jsonResult.Value!;
         var successProp = value.GetType().GetProperty("success");
         Assert.NotNull(successProp);
@@ -680,7 +680,7 @@ public class AdvertisementControllerTests : ControllerTestBase
         // Assert
         var jsonResult = Assert.IsType<JsonResult>(result);
 
-        // ������� �������� success ����� reflection
+        // Р”РѕСЃС‚Р°РµРј СЃРІРѕР№СЃС‚РІРѕ success С‡РµСЂРµР· reflection
         var value = jsonResult.Value!;
         var successProp = value.GetType().GetProperty("success");
         Assert.NotNull(successProp);

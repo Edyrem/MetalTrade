@@ -21,9 +21,6 @@ public class AdvertisementController : Controller
     private readonly IAdvertisementImportService _advertisementImportService;
     private readonly ILogger<AdvertisementController> _logger;
 
-    //private readonly ICommercialService _commercialService;
-    private readonly IPromotionService _commercialService;
-
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
@@ -31,8 +28,6 @@ public class AdvertisementController : Controller
         IMetalService metalService,
         IMapper mapper,
         ILogger<AdvertisementController> logger,
-        IPromotionService commercialService,
-        //ICommercialService commercialService,
         IAdvertisementImportService importService)
     {
         _adsService = adsService;
@@ -41,7 +36,6 @@ public class AdvertisementController : Controller
         _metalService = metalService;
         _mapper = mapper;
         _logger = logger;
-        _commercialService = commercialService;
         _advertisementImportService = importService;
     }
 
@@ -146,10 +140,12 @@ public class AdvertisementController : Controller
 
         bool isAdmin = await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
 
+        var date = model.Commercials?.LastOrDefault()?.EndDate;
+
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user.Id;
 
-        ViewData["AdEndDate"] = model.Commercials?.LastOrDefault()?.EndDate;
+        ViewData["AdEndDate"] = model.Commercials?.LastOrDefault()?.EndDate.ToString("dd.MM.yyyy");
         
         return View(model);
     }
@@ -388,7 +384,7 @@ public class AdvertisementController : Controller
                 EndDate = DateTime.UtcNow.AddDays(model.Days)
             };
             
-            var dto = _mapper.Map<CommercialDto>(model);
+            var dto = _mapper.Map<CommercialDto>(viewModel);
             await _adsService.CreateCommercialAsync(dto);
 
             return Ok(new { success = true });
@@ -397,8 +393,9 @@ public class AdvertisementController : Controller
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch
+        catch (Exception ex)
         {
+            var message = ex.Message + ex.InnerException;
             return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
         }
     }

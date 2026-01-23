@@ -1,5 +1,7 @@
-﻿using MetalTrade.DataAccess.Interfaces.Repositories;
-using MetalTrade.Business.Interfaces;
+﻿using MetalTrade.Business.Interfaces;
+using MetalTrade.DataAccess.Data;
+using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Abstraction;
 using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Exceptions;
@@ -8,18 +10,16 @@ namespace MetalTrade.Business.Helpers
 {
     public class PromotionValidator: IPromotionValidator
     {
-        private readonly ICommercialRepository _commercialRepository;
-        private readonly ITopAdvertisementRepository _topAdvertisementRepository;
-        private readonly ITopUserRepository _topUserRepository;
+        private readonly CommercialRepository _commercialRepository;
+        private readonly TopAdvertisementRepository _topAdvertisementRepository;
+        private readonly TopUserRepository _topUserRepository;
 
         public PromotionValidator(
-            ICommercialRepository commercialRepository,
-            ITopAdvertisementRepository topAdvertisementRepository,
-            ITopUserRepository topUserRepository)
+            MetalTradeDbContext context)
         {
-            _commercialRepository = commercialRepository;
-            _topAdvertisementRepository = topAdvertisementRepository;
-            _topUserRepository = topUserRepository;
+            _commercialRepository = new CommercialRepository(context);
+            _topAdvertisementRepository = new TopAdvertisementRepository(context);
+            _topUserRepository = new TopUserRepository(context);
         }
 
         public async Task ValidateCanActivateasync<T>(int entityId) where T : TimedPromotion

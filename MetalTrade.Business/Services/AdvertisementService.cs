@@ -22,8 +22,7 @@ public class AdvertisementService : IAdvertisementService
     public AdvertisementService(
         MetalTradeDbContext context, 
         IMapper mapper, 
-        IImageUploadService imageUploadService, 
-        ICommercialService commercialService,
+        IImageUploadService imageUploadService,
         IPromotionService promotionService)
     {
         _repository = new AdvertisementRepository(context);

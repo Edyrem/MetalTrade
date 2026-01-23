@@ -52,8 +52,6 @@ namespace MetalTrade.Web
             builder.Services.AddAutoMapper(typeof(Business.Common.Mapping.MappingProfile));
             builder.Services.AddAutoMapper(typeof(Web.Common.Mapping.MappingProfile));
 
-            builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
-
             builder.Services.AddScoped<IPromotionStrategyProvider, PromotionStrategyProvider>();
             builder.Services.AddScoped<IPromotionService, PromotionService>();
             builder.Services.AddScoped<IPromotionValidator, PromotionValidator>();

@@ -1,12 +1,9 @@
-﻿using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
-using MetalTrade.Business.Interfaces;
+﻿using MetalTrade.Business.Interfaces;
 using MetalTrade.DataAccess.Data;
-using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.DataAccess.Repositories;
 using MetalTrade.Domain.Abstraction;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
 
 namespace MetalTrade.Business.Services
 {
@@ -41,7 +38,7 @@ namespace MetalTrade.Business.Services
         {
             if (promotion is null) return false;
 
-            var shouldBeActive = await _strategy.GetStrategy<TimedPromotion>().ShouldBeActiveAsync(promotion);
+            var shouldBeActive = await _strategy.GetStrategy<T>().ShouldBeActiveAsync(promotion);
             if (promotion.IsActive == shouldBeActive) return false;
 
             promotion.IsActive = shouldBeActive;

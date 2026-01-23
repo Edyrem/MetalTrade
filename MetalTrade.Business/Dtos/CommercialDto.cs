@@ -14,6 +14,6 @@ public class CommercialDto
     // Навигационное свойство к модератору (lazy loading)
     public UserDto? CreatedBy { get; set; }
     public int AdvertisementId { get; set; }
-    public Advertisement Advertisement { get; set; } = null!;
+    public AdvertisementDto Advertisement { get; set; } = null!;
     public decimal Cost { get; set; } = 0;
 }

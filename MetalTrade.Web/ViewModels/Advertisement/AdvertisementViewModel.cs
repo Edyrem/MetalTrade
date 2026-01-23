@@ -47,7 +47,7 @@ public class AdvertisementViewModel
         
     public List<AdvertisementPhotoViewModel> Photoes { get; set; } = [];
     public List<CommercialViewModel> Commercials { get; set; } = [];
-    //public List<TopAdvertisementViewModel> TopAdvertisements { get; set; } = [];
+    public List<TopAdvertisementViewModel> TopAdvertisements { get; set; } = [];
 
     public DateTime? AdEndDate { get; set; }
 

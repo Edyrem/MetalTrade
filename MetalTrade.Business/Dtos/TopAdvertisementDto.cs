@@ -14,7 +14,7 @@ namespace MetalTrade.Business.Dtos
         // Навигационное свойство к модератору (lazy loading)
         public User? CreatedBy { get; set; }
         public int AdvertisementId { get; set; }
-        public Advertisement Advertisement { get; set; } = null!;
+        public AdvertisementDto Advertisement { get; set; } = null!;
         public string Reason { get; set; } = string.Empty;
     }
 }
