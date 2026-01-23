@@ -1,0 +1,27 @@
+@using MetalTrade.Web.ViewModels.Promotion
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PromotionActivateViewModel
+
+<form id="commercialForm"
+      data-url="@Url.Action("ActivateTop", "Advertisement")">
+
+    <input type="hidden" asp-for="TargetId" />
+
+    <div class="mb-2 d-flex gap-2">
+        <span class="text-muted align-self-center">Быстро:</span>
+
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-days="3">+3 дня</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-days="7">+7 дней</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-days="30">+30 дней</button>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Days">Срок нахождения в топе (в днях)</label>
+        <input asp-for="Days" type="number" min="1" class="form-control" />
+        <span asp-validation-for="Days" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Добавить в топ
+    </button>
+</form>

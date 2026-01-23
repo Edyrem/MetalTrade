@@ -146,6 +146,7 @@ public class AdvertisementController : Controller
         ViewData["CurrentUserId"] = user.Id;
 
         ViewData["AdEndDate"] = model.Commercials?.LastOrDefault()?.EndDate.ToString("dd.MM.yyyy");
+        ViewData["TopEndDate"] = model.TopAdvertisements?.LastOrDefault()?.EndDate.ToString("dd.MM.yyyy");
         
         return View(model);
     }
@@ -386,6 +387,51 @@ public class AdvertisementController : Controller
             
             var dto = _mapper.Map<CommercialDto>(viewModel);
             await _adsService.CreateCommercialAsync(dto);
+
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            var message = ex.Message + ex.InnerException;
+            return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
+        }
+    }
+
+    [HttpPost]
+    [Route("Advertisement/ActivateTop")]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ActivateTop(PromotionActivateViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var error = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .FirstOrDefault()?.ErrorMessage;
+
+            return BadRequest(new { message = error ?? "Некорректные данные" });
+        }
+
+        try
+        {
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user == null)
+                return Forbid();
+
+            var viewModel = new TopAdvertisementViewModel
+            {
+                AdvertisementId = model.TargetId,
+                //Days = model.Days,
+                CreatedByUserId = user.Id,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(model.Days)
+            };
+
+            var dto = _mapper.Map<TopAdvertisementDto>(viewModel);
+            await _adsService.CreateTopAdvertisementAsync(dto);
 
             return Ok(new { success = true });
         }

@@ -4,7 +4,8 @@
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
 @{
-    var endDate = ViewData["AdEndDate"];
+    var adEndDate = ViewData["AdEndDate"];
+    var topEndDate = ViewData["TopEndDate"];
 }
 
 @if (Model == null)
@@ -172,7 +173,7 @@
                 {
                     <div class="alert alert-info">
                         Ваша реклама активна до
-                        <b>@endDate</b>
+                        <b>@adEndDate</b>
                     </div>
                 }
 
@@ -182,7 +183,7 @@
                         @if (Model.IsAd)
                         {
                             <div class="alert alert-warning">
-                                Реклама активна до: <b>@endDate</b>
+                                Реклама активна до: <b>@adEndDate</b>
                             </div>
 
                             <button id="deactivateCommercialBtn"
@@ -203,9 +204,35 @@
                             <div id="commercialFormContainer" style="display:none;">
                                 @await Html.PartialAsync("_CommercialForm",
                                     new PromotionActivateViewModel { TargetId = Model.Id })
-                            </div>
+                            </div>                            
                         }
+                    @if (Model.IsTop)
+                    {
+                        <div class="alert alert-warning">
+                            Объявление в топе до: <b>@topEndDate</b>
+                        </div>
+
+                        <button id="deactivateCommercialBtn"
+                                class="btn btn-danger"
+                                data-id="@Model.Id">
+                            Убрать из топа
+                        </button>
                     }
+                    else if (Model.Status == (int)AdvertisementStatus.Active)
+                    {
+                        <div class="d-flex gap-2 align-items-center">
+                            <button id="toggleCommercialBtn"
+                                    class="btn btn-warning">
+                                Топ
+                            </button>
+                        </div>
+
+                        <div id="commercialFormContainer" style="display:none;">
+                            @await Html.PartialAsync("_TopForm",
+                            new PromotionActivateViewModel { TargetId = Model.Id })
+                        </div>
+                    }
+                }
                 
                 <br/>
                 <div>
