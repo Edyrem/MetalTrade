@@ -25,6 +25,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
             var isInTimeRange = currentTime >= timedPromotion.StartDate && currentTime <= timedPromotion.EndDate;
 
             return await Task.FromResult(isInTimeRange
+                && !timedPromotion.IsActive
                 // && topUser.User.Rating >= _minRating
                 && topUser.TargetUser != null);
         }

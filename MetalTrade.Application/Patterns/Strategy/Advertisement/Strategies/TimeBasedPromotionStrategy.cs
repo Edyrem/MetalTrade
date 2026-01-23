@@ -10,7 +10,7 @@ namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies
         public async Task<bool> ShouldBeActiveAsync(TimedPromotion timedPromotion)
         {
             var currentTime = DateTime.UtcNow;
-            var isInTimeRange = currentTime >= timedPromotion.StartDate && currentTime <= timedPromotion.EndDate;
+            var isInTimeRange = timedPromotion.IsActive && (currentTime >= timedPromotion.StartDate && currentTime <= timedPromotion.EndDate);
             return await Task.FromResult(isInTimeRange);
         }
     }
