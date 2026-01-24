@@ -29,6 +29,9 @@
     </div>
 </div>
 
+<div class="mb-2">
+    <a asp-action="CreateUser" class="btn btn-outline-success">Создать Новый Пользователя</a>
+</div>
 
 <div id="usersContainer">
     @await Html.PartialAsync("_UsersPartialView", Model)
