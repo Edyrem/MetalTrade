@@ -1,13 +1,14 @@
-@using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.RegisterViewModel
-@inject IViewLocalizer Localizer
 
-<h2>@Localizer["Register"]</h2> <form asp-action="Register" method="post" enctype="multipart/form-data"> @Html.AntiForgeryToken() <div asp-validation-summary="All" class="text-danger"></div>
+<h2>@Localizer["Register"]</h2> 
+<form asp-action="Register" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label asp-for="UserName" class="control-label">@Localizer["User Name"]</label>
+                <label asp-for="UserName" class="control-label">@Localizer["UserName"]</label>
                 <input asp-for="UserName" class="form-control" />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
@@ -23,7 +24,7 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label">@Localizer["Phone Number"]</label>
+                <label asp-for="PhoneNumber" class="control-label">@Localizer["PhoneNumber"]</label>
                 <div class="input-group">
                     <span class="input-group-text">+996</span>
                     <input asp-for="PhoneNumber" class="form-control" id="PhoneNumber" placeholder="700700700" inputmode="numeric" />
@@ -34,11 +35,11 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                <label asp-for="WhatsAppNumber" class="control-label">@Localizer["WhatsApp Number"]</label>
+                <label asp-for="WhatsAppNumber" class="control-label">@Localizer["WhatsAppNumber"]</label>
                 <div class="input-group">
                     <span class="input-group-text">+996</span>
                     <input asp-for="WhatsAppNumber" class="form-control" id="WhatsAppNumber" placeholder="700700700" inputmode="numeric" />
-                    <button id="waSyncRestore" type="button" class="btn btn-outline-secondary" title="Вставить номер телефона">↺</button>
+                    <button id="waSyncRestore" type="button" class="btn btn-outline-secondary" title="@Localizer["WhatsAppNumBtn"]">↺</button>
                 </div>
                 <span asp-validation-for="WhatsAppNumber" class="text-danger"></span>
             </div>
@@ -47,7 +48,7 @@
 
         <div class="col-md-12">
             <div class="form-group">
-                <label asp-for="Photo" class="control-label">@Localizer["Photo"]</label>
+                <label asp-for="Photo" class="control-label">@Localizer["PhotoAvatar"]</label>
                 <input asp-for="Photo" class="form-control" type="file" id="Photo" accept="image/*" />
                 <img id="photoPreview" src="" alt="Превью" style="max-width:150px;display:none;margin-top:10px;border-radius:8px;" />
                 <input type="hidden" id="PhotoUrl" name="PhotoUrl" />
@@ -74,7 +75,7 @@
 
         <div class="col-md-7">
             <div class="form-group">
-                <label asp-for="PasswordConfirm" class="control-label">@Localizer["Confirm Password"]</label>
+                <label asp-for="PasswordConfirm" class="control-label">@Localizer["ConfirmPassword"]</label>
 
                 <div class="input-group">
                     <input asp-for="PasswordConfirm" class="form-control" type="password"  id="repeat"/>
@@ -91,7 +92,7 @@
         </div>
 
         <div class="col-12 mt-3">
-            <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
+            <button type="submit" class="btn btn-primary">@Localizer["RegisterBtn"]</button>
         </div>
     </div>
 
