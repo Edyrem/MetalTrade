@@ -80,7 +80,7 @@ namespace MetalTrade.Web
 
             var app = builder.Build();
             
-            var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru"), new CultureInfo("kg") };
+            var supportedCultures = new[] { new CultureInfo("ru"), new CultureInfo("ky-KG") };
             var localizationOptions = new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("ru"),
