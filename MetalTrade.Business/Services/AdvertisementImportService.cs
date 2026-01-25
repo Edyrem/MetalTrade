@@ -22,26 +22,35 @@ namespace MetalTrade.Business.Services
             _productService = productService;
         }
         
-        public async Task<int> ImportFromExcelAsync(Stream excelStream, int userId)
+        public async Task<AdvertisementImportResultDto> ImportFromExcelAsync(Stream excelStream, int userId)
         {
-            int createdCount = 0;
+            var result = new AdvertisementImportResultDto();
+
             var products = await _productService.GetAllAsync();
             var productsDictionary = products.ToDictionary(
-                p  => p.Name.Trim().ToLower(),
-                p=>p.Id);
-            
+                p => p.Name.Trim().ToLower(),
+                p => p.Id
+            );
+
             using var workbook = new XLWorkbook(excelStream);
             var ws = workbook.Worksheet(1);
-            var rows = ws.RangeUsed().RowsUsed().Skip(1);
-            
+            var rows = ws.RangeUsed().RowsUsed();
+
+            int rowNumber = 0;
+
             foreach (var row in rows)
             {
-                var priceText = row.Cell(3).GetString().Trim();
-                var isValidPrice = decimal.TryParse(priceText, NumberStyles.Any,
-                    CultureInfo.InvariantCulture, out var price);
+                rowNumber++;
+                var errors = new List<string>();
                 
-                if (!isValidPrice)
-                    continue;
+                var priceText = row.Cell(3).GetString().Trim();
+                if (!decimal.TryParse(priceText.Replace(',', '.'),
+                        NumberStyles.Any,
+                        CultureInfo.InvariantCulture,
+                        out var price))
+                {
+                    errors.Add("Цена имеет неверный формат!");
+                }
                 
                 var importDto = new AdvertisementImportDto
                 {
@@ -53,15 +62,23 @@ namespace MetalTrade.Business.Services
                     ProductName = row.Cell(6).GetString(),
                     Address = row.Cell(7).GetString()
                 };
-
-                if (!IsValid(importDto))
+                
+                var validationErrors = Validate(importDto);
+                errors.AddRange(validationErrors);
+                
+                var productKey = importDto.ProductName.Trim().ToLower();
+                if (!productsDictionary.TryGetValue(productKey, out int productId))
+                {
+                    errors.Add($"Продукт '{importDto.ProductName}' не найден!");
+                }
+                
+                if (errors.Any())
+                {
+                    result.Errors[rowNumber] = errors;
                     continue;
-
-                var importDtoProduct = importDto.ProductName.Trim().ToLower();
-                if (!productsDictionary.TryGetValue(importDtoProduct, out int productId))
-                    continue;
-
-                var advertisementDto = new AdvertisementDto()
+                }
+                
+                var advertisementDto = new AdvertisementDto
                 {
                     Title = importDto.Title,
                     Body = importDto.Body,
@@ -72,18 +89,23 @@ namespace MetalTrade.Business.Services
                     Address = importDto.Address,
                     UserId = userId
                 };
+
                 await _advertisementService.CreateAsync(advertisementDto);
-                createdCount++;
+                result.CreatedCount++;
             }
 
-            return createdCount;
+            return result;
         }
         
-        private bool IsValid(object model)
+        
+        private List<string> Validate(object model)
         {
             var context = new ValidationContext(model);
             var results = new List<ValidationResult>();
-            return Validator.TryValidateObject(model, context, results, true);
+            Validator.TryValidateObject(model, context, results, true);
+            
+            return results.Select(r => r.ErrorMessage ?? "Ошибка валидации").ToList(); 
         }
+
     }
 }
