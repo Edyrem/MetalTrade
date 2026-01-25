@@ -1,28 +1,28 @@
 @model MetalTrade.Web.ViewModels.Product.EditProductViewModel
 
 @{
-    ViewBag.Title = "Редактирование продукта ";
+    ViewBag.Title = Localizer["ViewBagTitle"];
 }
 
-<h2>Изменение продукта </h2>
+<h2>@Localizer["Header_2"]</h2>
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Edit" method="post" >
             <div class="form_row mt-3">
-                <label for="name">Название продукта</label>
+                <label asp-for="Name">@Localizer["LabelProductName"]</label>
                 <input asp-for="Name" type="text" id="name" class="form-control">
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="form-group mt-2">
-                <label asp-for="MetalTypeId" class="control-label"></label>
+                <label asp-for="MetalTypeId" class="control-label">@Localizer["LabelMetalType"]</label>
                 <select asp-for="MetalTypeId" class="form-control" asp-items="@ViewBag.MetalTypes">
-                    <option value="" selected disabled>-- Выберите материал --</option>
+                    <option value="" selected disabled>-- @Localizer["OptionNoteLabel"] --</option>
                 </select>
                 <span asp-validation-for="MetalTypeId" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-success mt-4 text-center">Сохранить</button>
+            <button type="submit" class="btn btn-success mt-4 text-center">@Localizer["BtnSave"]</button>
         </form>
     </div>
 </div>
