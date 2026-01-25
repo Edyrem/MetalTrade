@@ -15,6 +15,8 @@ namespace MetalTrade.Web.ViewModels.User
         public string WhatsAppNumber { get; set; }
         [Display(Name = "Фото профиля")]
         public string? Photo { get; set; }
+        [Display(Name = "Топовый пользователь")]
+        public bool IsTop { get; set; }
         [Display(Name = "Роли")]
         public List<string>? Roles { get; set; }
     }

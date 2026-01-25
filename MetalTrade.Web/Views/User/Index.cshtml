@@ -29,7 +29,9 @@
     </div>
 </div>
 
-
+<div class="col-md-3">
+    <a asp-action="CreateUser" asp-controller="User" class="btn btn-success">Создать нового пользователя</a>
+</div>
 <div id="usersContainer">
     @await Html.PartialAsync("_UsersPartialView", Model)
 </div>

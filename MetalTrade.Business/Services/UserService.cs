@@ -14,6 +14,7 @@ public class UserService : IUserService
 {
     private readonly UserManagerRepository _userRepository;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IPromotionService _promotionService;
     private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
@@ -23,10 +24,12 @@ public class UserService : IUserService
         UserManager<User> userManager,
         SignInManager<User> signInManager, 
         IImageUploadService imageUploadService,
+        IPromotionService promotionService,
         IMapper mapper)
     {
         _userRepository = new UserManagerRepository(context, userManager);
         _imageUploadService = imageUploadService;
+        _promotionService = promotionService;
         _mapper = mapper;
         _signInManager = signInManager;
         _userManager = userManager;
@@ -60,7 +63,7 @@ public class UserService : IUserService
         var users = await _userRepository.GetAllAsync();
         var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
         return userDtos;
-    }
+    }    
 
     public async Task<bool> AddToRoleAsync(UserDto userDto, string role)
     {
@@ -270,6 +273,27 @@ public class UserService : IUserService
             ).ToList();
         }
         return users.Count;
+    }
+
+    public async Task CreateTopUserAsync(TopUserDto topUserDto)
+    {
+        var topUser = _mapper.Map<TopUser>(topUserDto);
+        await _promotionService.CreateTopUserAsync(topUser);
+        await _promotionService.SaveAllChangesAsync();
+    }
+
+    public async Task<IEnumerable<UserDto>> GetAllTopUsersAsync()
+    {
+        var topUsers = await _promotionService.GetAllActiveTopUsersAsync();
+        var userDtos = _mapper.Map<IEnumerable<UserDto>>(topUsers);
+        await _userRepository.SaveChangesAsync();
+        return userDtos;
+    }
+
+    public async Task DeactivateTopUserAsync(int userId)
+    {
+        await _promotionService.DeactivatePromotionAsync(userId);
+        await _promotionService.SaveAllChangesAsync();
     }
 
 }

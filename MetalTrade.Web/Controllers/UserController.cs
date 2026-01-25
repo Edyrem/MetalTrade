@@ -2,6 +2,7 @@
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
 using MetalTrade.Domain.Enums;
+using MetalTrade.Web.ViewModels.Promotion;
 using MetalTrade.Web.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -218,6 +219,66 @@ namespace MetalTrade.Web.AdminPanel.Controllers
                 RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [Route("User/ActivateTop")]
+        [Authorize(Roles = "admin,moderator")]
+        public async Task<IActionResult> ActivateTop(PromotionActivateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .FirstOrDefault()?.ErrorMessage;
+
+                return BadRequest(new { message = error ?? "Некорректные данные" });
+            }
+
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync(HttpContext);
+                if (user == null)
+                    return Forbid();
+
+                var viewModel = new TopUserViewModel
+                {
+                    TargetUserId = model.TargetId,
+                    //Days = model.Days,
+                    CreatedByUserId = user.Id,
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow.AddDays(model.Days)
+                };
+
+                var dto = _mapper.Map<TopUserDto>(viewModel);
+                await _userService.CreateTopUserAsync(dto);
+
+                return Ok(new { success = true });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                var message = ex.Message + ex.InnerException;
+                return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "admin,moderator")]
+        public async Task<IActionResult> DeactivateTop(int userId)
+        {
+            try
+            {
+                await _userService.DeactivateTopUserAsync(userId);
+                return Ok(new { success = true });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
