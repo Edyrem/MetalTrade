@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.DataAccess.Repositories;
+using MetalTrade.Web.Hubs;
 
 namespace MetalTrade.Web
 {
@@ -59,6 +60,9 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
             builder.Services.AddScoped<ICommercialService, CommercialService>();
             builder.Services.AddScoped<IAdvertisementImportService, AdvertisementImportService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
+
+            builder.Services.AddSignalR();
 
             
             
@@ -128,6 +132,9 @@ namespace MetalTrade.Web
                 pattern: "{controller=Advertisement}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
+            app.MapHub<ChatHub>("/chatHub");
+            
+            
             app.Run();
         }
     }
