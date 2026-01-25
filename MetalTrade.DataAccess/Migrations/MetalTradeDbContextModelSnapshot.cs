@@ -106,6 +106,78 @@ namespace MetalTrade.DataAccess.Migrations
                     b.ToTable("AdvertisementPhotos");
                 });
 
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AdvertisementId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertisementId");
+
+                    b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("ChatMessages");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.ChatUser", b =>
+                {
+                    b.Property<int>("ChatId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("ChatId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatUsers");
+                });
+
             modelBuilder.Entity("MetalTrade.Domain.Entities.Commercial", b =>
                 {
                     b.Property<int>("Id")
@@ -202,6 +274,9 @@ namespace MetalTrade.DataAccess.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSeen")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -417,6 +492,54 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Navigation("Advertisement");
                 });
 
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Chat", b =>
+                {
+                    b.HasOne("MetalTrade.Domain.Entities.Advertisement", "Advertisement")
+                        .WithMany()
+                        .HasForeignKey("AdvertisementId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Advertisement");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("MetalTrade.Domain.Entities.Chat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MetalTrade.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.ChatUser", b =>
+                {
+                    b.HasOne("MetalTrade.Domain.Entities.Chat", "Chat")
+                        .WithMany("Users")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MetalTrade.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MetalTrade.Domain.Entities.Commercial", b =>
                 {
                     b.HasOne("MetalTrade.Domain.Entities.Advertisement", "Advertisement")
@@ -495,6 +618,13 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Navigation("Commercials");
 
                     b.Navigation("Photoes");
+                });
+
+            modelBuilder.Entity("MetalTrade.Domain.Entities.Chat", b =>
+                {
+                    b.Navigation("Messages");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.MetalType", b =>
