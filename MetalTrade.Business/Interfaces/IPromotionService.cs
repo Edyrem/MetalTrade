@@ -15,7 +15,7 @@ namespace MetalTrade.Business.Interfaces
         Task UpdateUserPromotionAsync(int userId);
 
         // Deactivate Promotions
-        Task DeactivatePromotionAsync(int advertisementId);
+        Task DeactivatePromotionAsync(int advertisementId, string? type = null);
         Task DeactivateUserPromotionAsync(int userId);
 
 

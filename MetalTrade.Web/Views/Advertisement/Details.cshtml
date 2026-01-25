@@ -194,16 +194,17 @@
                         }
                         else if (Model.Status == (int)AdvertisementStatus.Active)
                         {
-                            <div class="d-flex gap-2 align-items-center">
-                                <button id="toggleCommercialBtn"
-                                        class="btn btn-warning">
-                                    Реклама
-                                </button>
-                            </div>
+                            <div class="toggleParent">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button class="toggleCommercialBtn btn btn-warning">
+                                        Реклама
+                                    </button>
+                                </div>
 
-                            <div id="commercialFormContainer" style="display:none;">
-                                @await Html.PartialAsync("_CommercialForm",
+                                <div class="commercialFormContainer" style="display:none;">
+                                    @await Html.PartialAsync("_CommercialForm",
                                     new PromotionActivateViewModel { TargetId = Model.Id })
+                                </div>
                             </div>                            
                         }
                     @if (Model.IsTop)
@@ -212,7 +213,7 @@
                             Объявление в топе до: <b>@topEndDate</b>
                         </div>
 
-                        <button id="deactivateCommercialBtn"
+                        <button id="deactivateTopBtn"
                                 class="btn btn-danger"
                                 data-id="@Model.Id">
                             Убрать из топа
@@ -220,16 +221,17 @@
                     }
                     else if (Model.Status == (int)AdvertisementStatus.Active)
                     {
-                        <div class="d-flex gap-2 align-items-center">
-                            <button id="toggleCommercialBtn"
-                                    class="btn btn-warning">
-                                Топ
-                            </button>
-                        </div>
+                        <div class="toggleParent">
+                            <div class="d-flex gap-2 align-items-center">
+                                <button class="toggleCommercialBtn btn btn-warning">
+                                    Топ
+                                </button>
+                            </div>
 
-                        <div id="commercialFormContainer" style="display:none;">
-                            @await Html.PartialAsync("_TopForm",
-                            new PromotionActivateViewModel { TargetId = Model.Id })
+                            <div class="commercialFormContainer" style="display:none;">
+                                @await Html.PartialAsync("_TopForm",
+                                new PromotionActivateViewModel { TargetId = Model.Id })
+                            </div>
                         </div>
                     }
                 }

@@ -1,6 +1,4 @@
-﻿
-
-using MetalTrade.Domain.Abstraction;
+﻿using MetalTrade.Domain.Abstraction;
 
 namespace MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces
 {

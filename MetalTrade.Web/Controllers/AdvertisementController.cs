@@ -138,6 +138,9 @@ public class AdvertisementController : Controller
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
+        var topAdvertisementViewModel = model.TopAdvertisements?.LastOrDefault(x => x.IsActive);
+        var commercialViewModel = model.Commercials?.LastOrDefault(x => x.IsActive);
+
         bool isAdmin = await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
 
         var date = model.Commercials?.LastOrDefault()?.EndDate;
@@ -145,8 +148,8 @@ public class AdvertisementController : Controller
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user.Id;
 
-        ViewData["AdEndDate"] = model.Commercials?.LastOrDefault()?.EndDate.ToString("dd.MM.yyyy");
-        ViewData["TopEndDate"] = model.TopAdvertisements?.LastOrDefault()?.EndDate.ToString("dd.MM.yyyy");
+        ViewData["AdEndDate"] = commercialViewModel?.EndDate.ToString("dd.MM.yyyy");
+        ViewData["TopEndDate"] = topAdvertisementViewModel?.EndDate.ToString("dd.MM.yyyy");
         
         return View(model);
     }
@@ -453,7 +456,22 @@ public class AdvertisementController : Controller
     {
         try
         {
-            await _adsService.DeactivatePromotionAsync(advertisementId);
+            await _adsService.DeactivatePromotionAsync(advertisementId, "Commercial");
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> DeactivateTop(int advertisementId)
+    {
+        try
+        {
+            await _adsService.DeactivatePromotionAsync(advertisementId, "TopAdvertisement");
             return Ok(new { success = true });
         }
         catch (InvalidOperationException ex)
@@ -468,5 +486,5 @@ public class AdvertisementController : Controller
 
 
 
-    
+
 }

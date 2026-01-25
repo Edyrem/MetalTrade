@@ -1,5 +1,4 @@
 using MetalTrade.Business.Dtos;
-using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,6 +9,7 @@ public interface IUserService
     Task<UserDto?> GetUserByIdAsync(int id);
     Task<UserDto?> GetUserWithAdvertisementByIdAsync(int id);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
+    Task<IEnumerable<UserDto>> GetAllTopUsersAsync();
     Task<bool> AddToRoleAsync(UserDto user, string role);
     Task<bool> IsInRoleAsync(UserDto user, string role);
     Task<bool> IsInRolesAsync(UserDto user, string[] roles);
@@ -25,4 +25,6 @@ public interface IUserService
     Task<IdentityResult> ChangePasswordAsync(UserDto user, string currentPassword, string newPassword);
     Task<List<UserDto>> GetFilteredAsync(UserFilterDto filter, UserDto? currentUser);
     Task<int> GetFilteredCountAsync(UserFilterDto filter, UserDto? currentUser);
+    Task CreateTopUserAsync(TopUserDto topUserDto);
+    Task DeactivateTopUserAsync(int userId);
 }

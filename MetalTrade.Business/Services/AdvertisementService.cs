@@ -230,9 +230,9 @@ public class AdvertisementService : IAdvertisementService
         return _mapper.Map<List<AdvertisementDto>>(topAdvertisements);
     }
 
-    public async Task DeactivatePromotionAsync(int advertisementId)
+    public async Task DeactivatePromotionAsync(int advertisementId, string? type = null)
     {
-        await _promotionService.DeactivatePromotionAsync(advertisementId);
+        await _promotionService.DeactivatePromotionAsync(advertisementId, type);
         await _promotionService.SaveAllChangesAsync();
     }
 }

@@ -18,7 +18,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<User?> GetByIdAsync(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+            return await _dbSet.Include(x => x.TopUsers.Where(t => t.IsActive)).FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> GetWithAdvertisementsAsync(int id)

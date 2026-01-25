@@ -161,29 +161,35 @@ namespace MetalTrade.Business.Services
             }
         }
 
-        public async Task DeactivatePromotionAsync(int advertisementId)
+        public async Task DeactivatePromotionAsync(int advertisementId, string? type = null)
         {
             var advertisement = await _advertisementRepository.GetAsync(advertisementId);
             if (advertisement is null) return;
 
             var changed = false;
 
-            var commercial = await _commercialRepository.GetLast(advertisementId);
-            if (commercial != null && DeactivatePromotion(commercial))
+            if(type == nameof(Commercial) || type == null)
             {
-                changed = true;
-                advertisement.IsAd = commercial.IsActive;
-                await _commercialRepository.UpdateAsync(commercial);
-                RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
+                var commercial = await _commercialRepository.GetLast(advertisementId);
+                if (commercial != null && DeactivatePromotion(commercial))
+                {
+                    changed = true;
+                    advertisement.IsAd = commercial.IsActive;
+                    await _commercialRepository.UpdateAsync(commercial);
+                    RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
+                }
             }
 
-            var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
-            if (topAd != null && DeactivatePromotion(topAd))
+            if(type == nameof(TopAdvertisement) || type == null)
             {
-                changed = true;
-                advertisement.IsTop = topAd.IsActive;
-                await _topAdvertisementRepository.UpdateAsync(topAd);
-                RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
+                var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
+                if (topAd != null && DeactivatePromotion(topAd))
+                {
+                    changed = true;
+                    advertisement.IsTop = topAd.IsActive;
+                    await _topAdvertisementRepository.UpdateAsync(topAd);
+                    RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
+                }
             }
 
             if (changed)
