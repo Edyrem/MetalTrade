@@ -1,22 +1,22 @@
 @model List<MetalTrade.Web.ViewModels.MetalType.MetalTypeViewModel>
 
 @{
-    ViewBag.Title = "Список типов материалов";
+    ViewBag.Title = Localizer["ViewBagTitle"];
 
     var counter = 1;
 }
 
 
 <div class="mb-2">
-    <a asp-action="Create" class="btn btn-outline-success">Создать новый тип материала</a>
+    <a asp-action="Create" class="btn btn-outline-success">@Localizer["BtnCreate"]</a>
 </div>
 <div class="container mt-4">
     <div class="row text-center">
         <table class="mt-3 table table-info table-striped-columns" style="width: 100%;">
             <tr>
                 <th>#</th>
-                <th>Название</th>
-                <th>Действие</th>
+                <th>@Localizer["TableHeaderName"]</th>
+                <th>@Localizer["TableHeaderAction"]</th>
             </tr>
             @foreach (var metal in @Model)
             {
@@ -24,9 +24,9 @@
                 <td>@(counter++)</td>
                 <td>@metal.Name</td>
                 <td>
-                    @* <a asp-action="Details" asp-route-id="@metal.Id" class="btn btn-success">Детали</a><span> | </span> *@
-                    <a asp-action="Edit" asp-route-id="@metal.Id" class="btn btn-secondary">Редактировать</a><span> | </span>
-                    <a asp-action="Delete" asp-route-id="@metal.Id" class="btn btn-danger">Удалить</a>
+                    @* <a asp-action="Details" asp-route-id="@metal.Id" class="btn btn-success">@Localizer["BtnDetails"]</a><span> | </span> *@
+                    <a asp-action="Edit" asp-route-id="@metal.Id" class="btn btn-secondary">@Localizer["BtnEdit"]</a><span> | </span>
+                    <a asp-action="Delete" asp-route-id="@metal.Id" class="btn btn-danger">@Localizer["BtnDelete"]</a>
                 </td>
             </tr>
             }
