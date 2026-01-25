@@ -193,7 +193,15 @@
                             </div>
                         }
                     }
-                
+                @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.User.UserName)
+                {
+                    <button class="btn btn-primary open-chat-ad"
+                            data-ad-id="@Model.Id">
+                        Написать продавцу
+                    </button>
+                }
+
+
                 <br/>
                 <div>
                     <a asp-action="Index">Назад к списку</a>
@@ -231,4 +239,6 @@
 
 @section Scripts {
     <script src="~/js/commercial.js"></script>
+    <script src="~/js/chat/openChat.js"></script>
 }
+
