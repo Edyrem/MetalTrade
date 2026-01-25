@@ -1,0 +1,10 @@
+
+@* Глобальный счетчик непрочитанных смс *@
+
+@model int
+
+<span id="chatGlobalBadge"
+      class="chat-global-badge"
+      @(Model > 0 ? "" : "hidden")>
+    @(Model > 0 ? Model : "")
+</span>
