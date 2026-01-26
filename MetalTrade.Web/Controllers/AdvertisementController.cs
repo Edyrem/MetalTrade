@@ -10,6 +10,7 @@ using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -101,7 +102,8 @@ public class AdvertisementController : Controller
         using var stream = file.OpenReadStream();
         var created = await _advertisementImportService.ImportFromExcelAsync(stream, user.Id);
 
-        TempData["Success"] = $"Загружено объявлений без ошибок: {created}";
+        TempData["Success"] = $"Успешно загруженных объявлений: {created.CreatedCount}";
+        TempData["Errors"] = JsonConvert.SerializeObject(created.Errors);
         return RedirectToAction("Index", "Profile");
     }
 
