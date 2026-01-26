@@ -13,6 +13,9 @@ namespace MetalTrade.DataAccess.Data
         public DbSet<Advertisement> Advertisements { get; set; }
         public DbSet<AdvertisementPhoto> AdvertisementPhotos { get; set; }
         public DbSet<Commercial> Commercials { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatUser> ChatUsers { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
         
 
         public MetalTradeDbContext(DbContextOptions<MetalTradeDbContext> options) : base(options) { }
@@ -29,6 +32,13 @@ namespace MetalTrade.DataAccess.Data
                 .WithMany(a => a.Commercials)
                 .HasForeignKey(c => c.AdvertisementId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ChatUser>()
+                .HasKey(x => new { x.ChatId, x.UserId });
+            modelBuilder.Entity<Chat>()
+                .HasOne(c => c.Advertisement)
+                .WithMany()
+                .HasForeignKey(c => c.AdvertisementId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

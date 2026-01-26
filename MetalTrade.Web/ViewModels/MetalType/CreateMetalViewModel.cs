@@ -9,8 +9,8 @@ public class CreateMetalViewModel
     public int Id { get; set; }
     
     [Display(Name = "Название")]
-    [Required(ErrorMessage = "Укажите название металла")]
-    [Remote(action:"CheckNameOfMetalType", controller:"Validation", ErrorMessage = "Тип металла с таким названием уже существует!")]
+    [Required(ErrorMessage = "Укажите название материала")]
+    [Remote(action:"CheckNameOfMetalType", controller:"Validation", ErrorMessage = "Тип материала с таким названием уже существует!")]
     [MaxLength(20, ErrorMessage = "Можно вводить не более 20 символов")]
     public string Name { get; set; }
     

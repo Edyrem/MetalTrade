@@ -48,6 +48,7 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
 }
 
+<<<<<<< HEAD
 h1 {
     font-size: 2.5rem;
     font-weight: 700;
@@ -567,3 +568,17 @@ h3 {
 .btn-secondary {
     color: #fff !important;
 }
+=======
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.logo-container {
+    height: 100%;
+}
+
+.main-logo {
+    height: 50px;
+    width: auto;
+}
+>>>>>>> 921e3845334653a44771f729e2c2c7fbac3b5114

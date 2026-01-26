@@ -10,6 +10,7 @@ using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -68,7 +69,8 @@ public class AdvertisementController : Controller
 
         var user = await _userService.GetCurrentUserAsync(HttpContext);
         bool isAdmin = user != null && await _userService.IsInRolesAsync(user, ["admin", "moderator"]);
-        
+        bool isSupplier = user != null && await _userService.IsInRoleAsync(user, "supplier");
+
         if (!isAdmin)
         {
             models = models.Where(a =>
@@ -78,12 +80,13 @@ public class AdvertisementController : Controller
         }
         
         ViewData["IsAdmin"] = isAdmin;
+        ViewData["IsSupplier"] = isSupplier;
         ViewBag.Filter = filter;
 
         ViewBag.Products = await _productService.GetAllAsync();
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
-        return View(models);
+        return View(models.OrderByDescending(x => x.IsAd).ToList());
     }
 
     [HttpPost]
@@ -99,7 +102,8 @@ public class AdvertisementController : Controller
         using var stream = file.OpenReadStream();
         var created = await _advertisementImportService.ImportFromExcelAsync(stream, user.Id);
 
-        TempData["Success"] = $"Загружено объявлений без ошибок: {created}";
+        TempData["Success"] = $"Успешно загруженных объявлений: {created.CreatedCount}";
+        TempData["Errors"] = JsonConvert.SerializeObject(created.Errors);
         return RedirectToAction("Index", "Profile");
     }
 
