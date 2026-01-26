@@ -1,0 +1,20 @@
+
+@* Базовый layout для страниц чата *@
+
+@{
+    Layout = "_Layout";
+}
+
+<script src="~/js/chat/signalr.min.js"></script>
+
+<div class="chat-root">
+    <aside class="chat-sidebar">
+        @RenderSection("Sidebar", required: false)
+    </aside>
+
+    <main class="chat-main">
+        @RenderBody()
+    </main>
+</div>
+
+@RenderSection("Scripts", required: false)

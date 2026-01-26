@@ -13,6 +13,7 @@ namespace MetalTrade.Web.ViewModels.Profile
         public bool IsSupplier { get; set; }
 
         public List<AdvertisementDto>? Advertisements { get; set; }
+        public int UserId { get; set; }
 
         /*public List<AdvertisementDto>? Favorites { get; set; }*/
 

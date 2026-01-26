@@ -209,6 +209,14 @@
                             </div>
                         }
                     }
+                @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.User.UserName)
+                {
+                    <button class="btn btn-primary open-chat-user"
+                            data-user-id="@Model.UserId">
+                        Написать продавцу
+                    </button>
+
+                }
                 
                 <br/>
                 <div>
@@ -280,6 +288,6 @@
 
 @section Scripts {
     <script src="~/js/commercial.js"></script>
+    <script src="~/js/chat/openChat.js"></script>
     <script src="~/js/advertisement/calculator.js"></script>
-
 }
