@@ -58,14 +58,20 @@ else
 								</button>
 							</div>
 						}
-
-						@if(ads.IsAd)
-						{
-							<div class="position-absolute small top-0 end-0 m-1 p-1 bg-primary opacity-75 text-light">
-								Реклама
-							</div>
-						}
-
+						<div class="position-absolute top-0 end-0 m-1 text-end d-flex flex-column">
+							@if(ads.IsAd)
+							{
+								<div class="p-1 small bg-primary opacity-75 text-light">
+									Реклама
+								</div>
+							}
+							@if (ads.IsTop)
+							{
+								<div class="p-1 small bg-info opacity-75 text-light flex-shrink-0">
+									Топ
+								</div>
+							}
+						</div>
 						@if (isAdmin)
 						{
 							<div class="position-absolute small top-0 m-1 p-1 opacity-75 

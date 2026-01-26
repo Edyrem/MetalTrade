@@ -121,6 +121,11 @@ namespace MetalTrade.Business.Services
                 await _commercialRepository.UpdateAsync(commercial);
                 RegisterRepoSaves(_commercialRepository.SaveChangesAsync);
             }
+            else if(commercial != null && !commercial.IsActive && advertisement.IsAd)
+            {
+                advertisement.IsAd = false;
+                changed = true;                
+            }
 
             var topAd = await _topAdvertisementRepository.GetLast(advertisementId);
             if (topAd != null && await CheckPromotionAsync(topAd))
@@ -129,6 +134,11 @@ namespace MetalTrade.Business.Services
                 advertisement.IsTop = topAd.IsActive;
                 await _topAdvertisementRepository.UpdateAsync(topAd);
                 RegisterRepoSaves(_topAdvertisementRepository.SaveChangesAsync);
+            }
+            else if(topAd != null && !topAd.IsActive && advertisement.IsTop)
+            {
+                advertisement.IsTop = false;
+                changed = true;
             }
 
             if (changed)
