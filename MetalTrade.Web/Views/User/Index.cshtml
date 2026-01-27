@@ -5,7 +5,7 @@
     var isCurrentUserAdmin = User.IsInRole("admin");
 }
 
-<div class="row mb-3">
+<div class="row mb-3 mx-4">
     <div class="col-md-3">
         <input id="userName" class="form-control" placeholder="Логин" />
     </div>
@@ -24,7 +24,7 @@
     </div>
     
     <div class="col-md-2">
-        <button class="btn btn-primary" onclick="loadUsers()">Фильтр</button>
+        <button class="btn btn-primary" style="background-color: #2563EB;" onclick="loadUsers()">Фильтр</button>
         <button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button>
     </div>
 </div>
