@@ -1,5 +1,3 @@
-using MetalTrade.Application.Patterns.Strategy.Advertisement.Interfaces;
-using MetalTrade.Application.Patterns.Strategy.Advertisement.Strategies;
 using MetalTrade.Business;
 using MetalTrade.Business.Helpers;
 using MetalTrade.Business.Interfaces;
@@ -14,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using MetalTrade.Web.Hubs;
 
 namespace MetalTrade.Web
 {
@@ -67,6 +66,9 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<ITopUserRepository, TopUserRepository>();
 
             builder.Services.AddScoped<IAdvertisementImportService, AdvertisementImportService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
+
+            builder.Services.AddSignalR();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -133,6 +135,9 @@ namespace MetalTrade.Web
                 pattern: "{controller=Advertisement}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
+            app.MapHub<ChatHub>("/chatHub");
+            
+            
             app.Run();
         }
     }

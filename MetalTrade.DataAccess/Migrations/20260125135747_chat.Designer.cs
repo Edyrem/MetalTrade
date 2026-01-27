@@ -3,6 +3,7 @@ using System;
 using MetalTrade.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MetalTrade.DataAccess.Migrations
 {
     [DbContext(typeof(MetalTradeDbContext))]
-    partial class MetalTradeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260125135747_chat")]
+    partial class chat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -186,32 +189,21 @@ namespace MetalTrade.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("AdEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("AdStartDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("AdvertisementId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AdvertisementId");
-
-                    b.HasIndex("CreatedByUserId");
 
                     b.ToTable("Commercials");
                 });
@@ -261,84 +253,6 @@ namespace MetalTrade.DataAccess.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("MetalTrade.Domain.Entities.TopAdvertisement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdvertisementId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdvertisementId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.ToTable("TopAdvertisements");
-                });
-
-            modelBuilder.Entity("MetalTrade.Domain.Entities.TopUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TargetUserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("TargetUserId");
-
-                    b.ToTable("TopUsers");
-                });
-
             modelBuilder.Entity("MetalTrade.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -362,9 +276,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsTop")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastSeen")
@@ -637,17 +548,10 @@ namespace MetalTrade.DataAccess.Migrations
                     b.HasOne("MetalTrade.Domain.Entities.Advertisement", "Advertisement")
                         .WithMany("Commercials")
                         .HasForeignKey("AdvertisementId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MetalTrade.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Advertisement");
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.Product", b =>
@@ -659,42 +563,6 @@ namespace MetalTrade.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("MetalType");
-                });
-
-            modelBuilder.Entity("MetalTrade.Domain.Entities.TopAdvertisement", b =>
-                {
-                    b.HasOne("MetalTrade.Domain.Entities.Advertisement", "Advertisement")
-                        .WithMany("TopAdvertisements")
-                        .HasForeignKey("AdvertisementId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MetalTrade.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Advertisement");
-
-                    b.Navigation("CreatedBy");
-                });
-
-            modelBuilder.Entity("MetalTrade.Domain.Entities.TopUser", b =>
-                {
-                    b.HasOne("MetalTrade.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MetalTrade.Domain.Entities.User", "TargetUser")
-                        .WithMany("TopUsers")
-                        .HasForeignKey("TargetUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -753,8 +621,6 @@ namespace MetalTrade.DataAccess.Migrations
                     b.Navigation("Commercials");
 
                     b.Navigation("Photoes");
-
-                    b.Navigation("TopAdvertisements");
                 });
 
             modelBuilder.Entity("MetalTrade.Domain.Entities.Chat", b =>
@@ -777,8 +643,6 @@ namespace MetalTrade.DataAccess.Migrations
             modelBuilder.Entity("MetalTrade.Domain.Entities.User", b =>
                 {
                     b.Navigation("Advertisements");
-
-                    b.Navigation("TopUsers");
                 });
 #pragma warning restore 612, 618
         }

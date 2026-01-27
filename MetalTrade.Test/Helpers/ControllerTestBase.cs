@@ -21,7 +21,7 @@ namespace MetalTrade.Test.Helpers
         protected Mock<IUserService> UserMock = new();
         protected Mock<ILogger<AdvertisementController>> LoggerMock = new();
 
-        protected Mock<ICommercialService> CommercialMock = new();
+        //protected Mock<ICommercialService> CommercialMock = new();
         protected Mock<IAdvertisementImportService> AdvertisementImportMock  = new();
 
         

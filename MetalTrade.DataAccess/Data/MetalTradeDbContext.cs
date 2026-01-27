@@ -15,7 +15,10 @@ namespace MetalTrade.DataAccess.Data
         public DbSet<Commercial> Commercials { get; set; }
         public DbSet<TopAdvertisement> TopAdvertisements { get; set; }
         public DbSet<TopUser> TopUsers { get; set; }
-
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatUser> ChatUsers { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+        
 
         public MetalTradeDbContext(DbContextOptions<MetalTradeDbContext> options) : base(options) { }
         
@@ -26,6 +29,7 @@ namespace MetalTrade.DataAccess.Data
             modelBuilder.Entity<MetalType>().HasQueryFilter(m => !m.IsDeleted);
             modelBuilder.Entity<Advertisement>().HasQueryFilter(a => !a.IsDeleted);
             modelBuilder.Entity<AdvertisementPhoto>().HasQueryFilter(p => !p.IsDeleted);
+
             modelBuilder.Entity<Commercial>(entity =>
             {
                 entity.HasQueryFilter(c => !c.IsDeleted);
@@ -82,6 +86,14 @@ namespace MetalTrade.DataAccess.Data
                 entity.Navigation(e => e.TargetUser).AutoInclude(false);
                 entity.Navigation(e => e.CreatedBy).AutoInclude(false);
             });
+
+            modelBuilder.Entity<ChatUser>()
+                .HasKey(x => new { x.ChatId, x.UserId });
+            modelBuilder.Entity<Chat>()
+                .HasOne(c => c.Advertisement)
+                .WithMany()
+                .HasForeignKey(c => c.AdvertisementId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

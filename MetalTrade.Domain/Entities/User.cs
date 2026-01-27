@@ -11,5 +11,6 @@ namespace MetalTrade.Domain.Entities
         public bool IsDeleted { get; set; }
         public bool IsTop { get; set; } = false;
         public ICollection<TopUser> TopUsers { get; set; } = new List<TopUser>();
+        public DateTime? LastSeen { get; set; }
     }
 }

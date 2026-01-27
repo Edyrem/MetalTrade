@@ -139,6 +139,9 @@ public class ProfileController : Controller
         ViewBag.IsOwner = user != null && user.Id == userDto.Id;
         ViewBag.UserId = userDto.Id;
 
+        viewModel.UserId = userDto.Id;
+
+
         return View("UserProfile", viewModel);
     }
 
