@@ -4,8 +4,8 @@
 @inject IViewLocalizer Localizer
 
 <h2>@Localizer["Register"]</h2> <form asp-action="Register" method="post" enctype="multipart/form-data"> @Html.AntiForgeryToken() <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="row">
-        <div class="col-md-6">
+    <div class="row col-md-5">
+        <div>
             <div class="form-group">
                 <label asp-for="UserName" class="control-label">@Localizer["User Name"]</label>
                 <input asp-for="UserName" class="form-control" />
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="col-md-12">
+        <div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label">@Localizer["Email"]</label>
                 <input asp-for="Email" class="form-control" id="Email" />
@@ -45,7 +45,7 @@
         </div>
 
 
-        <div class="col-md-12">
+        <div>
             <div class="form-group">
                 <label asp-for="Photo" class="control-label">@Localizer["Photo"]</label>
                 <input asp-for="Photo" class="form-control" type="file" id="Photo" accept="image/*" />
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label">@Localizer["Password"]</label>
                 <div class="input-group">
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div>
             <div class="form-group">
                 <label asp-for="PasswordConfirm" class="control-label">@Localizer["Confirm Password"]</label>
 

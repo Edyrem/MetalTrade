@@ -1,3 +1,4 @@
+using MetalTrade.DataAccess.Abstractions;
 using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
@@ -5,42 +6,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.DataAccess.Repositories;
 
-public class CommercialRepository : ICommercialRepository
+public class CommercialRepository : PromotionRepository<Commercial>, ICommercialRepository
 {
-    private readonly MetalTradeDbContext _context;
-
-    public CommercialRepository(MetalTradeDbContext context)
+    public CommercialRepository(MetalTradeDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<bool> HasActiveAsync(int advertisementId, DateTime now)
+    public async Task<Commercial?> GetLast(int advertisementId)
     {
-        return await _context.Commercials.AnyAsync(c =>
-            c.AdvertisementId == advertisementId &&
-            c.AdStartDate <= now &&
-            c.AdEndDate >= now);
+        return await _dbSet.OrderBy(c => c.StartDate).LastOrDefaultAsync(c => c.AdvertisementId == advertisementId);
     }
 
-    public async Task<Commercial?> GetActiveAsync(int advertisementId, DateTime now)
+    public async Task<bool> HasActiveAsync(int advertisementId)
     {
-        return await _context.Commercials.FirstOrDefaultAsync(c =>
-            c.AdvertisementId == advertisementId &&
-            c.AdStartDate <= now &&
-            c.AdEndDate >= now);
+        var now = DateTime.UtcNow;
+        return await _dbSet.AnyAsync(c =>
+            c.AdvertisementId == advertisementId && c.IsActive);
     }
 
-    public async Task AddAsync(Commercial commercial)
+    public async Task<Commercial?> GetActiveAsync(int advertisementId)
     {
-        await _context.Commercials.AddAsync(commercial);
+        var now = DateTime.UtcNow;
+        return await _dbSet.FirstOrDefaultAsync(c =>
+            c.AdvertisementId == advertisementId && c.IsActive);
     }
 
-    public async Task SaveChangesAsync()
+    public override async Task<IEnumerable<Commercial>> GetAllActiveAsync()
     {
-        await _context.SaveChangesAsync();
+        var now = DateTime.UtcNow;
+        return await _dbSet.Where(c => c.IsActive).Include(c => c.Advertisement).ToListAsync();
     }
-    
-    
-
 }
 

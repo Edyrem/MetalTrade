@@ -12,6 +12,8 @@ public class UserDto
     public IFormFile? Photo { get; set; }
     public string? PhotoLink { get; set; }
     public string Password { get; set; } = null!;
+    public bool IsTop { get; set; }
     public List<string>? Roles { get; set; }
     public List<AdvertisementDto>? Advertisements { get; set; } = null!;
+    public List<TopUserDto> TopUsers { get; set; } = [];
 }

@@ -1,14 +1,10 @@
+using MetalTrade.Domain.Abstraction;
+
 namespace MetalTrade.Domain.Entities;
 
-public class Commercial
+public class Commercial: TimedPromotion
 {
-    public int Id { get; set; }
-
     public int AdvertisementId { get; set; }
-    public Advertisement Advertisement { get; set; }
-
-    public DateTime AdStartDate { get; set; }
-    public DateTime AdEndDate { get; set; }
-
+    public Advertisement Advertisement { get; set; } = null!;
     public decimal Cost { get; set; } = 0;
 }

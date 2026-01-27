@@ -48,7 +48,6 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
 }
 
-<<<<<<< HEAD
 h1 {
     font-size: 2.5rem;
     font-weight: 700;
@@ -568,7 +567,6 @@ h3 {
 .btn-secondary {
     color: #fff !important;
 }
-=======
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
@@ -581,4 +579,24 @@ h3 {
     height: 50px;
     width: auto;
 }
->>>>>>> 921e3845334653a44771f729e2c2c7fbac3b5114
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-card {
+    background: #ffffff;
+    border-color:  #E5E7EB;
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}

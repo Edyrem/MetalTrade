@@ -6,6 +6,7 @@ using MetalTrade.Web.ViewModels.AdvertisementPhoto;
 using MetalTrade.Web.ViewModels.MetalType;
 using MetalTrade.Web.ViewModels.Product;
 using MetalTrade.Web.ViewModels.Profile;
+using MetalTrade.Web.ViewModels.Promotion;
 using MetalTrade.Web.ViewModels.User;
 
 namespace MetalTrade.Web.Common.Mapping
@@ -57,10 +58,14 @@ namespace MetalTrade.Web.Common.Mapping
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
                 .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes))
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
+                .ForMember(dest => dest.Commercials, opt => opt.MapFrom(src => src.Commercials))
+                .ForMember(dest => dest.TopAdvertisements, opt => opt.MapFrom(src => src.TopAdvertisements))
                 .ReverseMap()
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
                 .ForMember(dest => dest.Photoes, opt => opt.MapFrom(src => src.Photoes))
-                .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product));
+                .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
+                .ForMember(dest => dest.Commercials, opt => opt.MapFrom(src => src.Commercials))
+                .ForMember(dest => dest.TopAdvertisements, opt => opt.MapFrom(src => src.TopAdvertisements));
 
             CreateMap<AdvertisementDto, EditAdvertisementViewModel>()
                 .ReverseMap()
@@ -90,6 +95,10 @@ namespace MetalTrade.Web.Common.Mapping
             CreateMap<ProductDto, ProductViewModel>().ReverseMap();
             CreateMap<ProductDto, CreateProductViewModel>().ReverseMap();
             CreateMap<ProductDto, EditProductViewModel>().ReverseMap();
+
+            CreateMap<CommercialDto, CommercialViewModel>().ReverseMap();
+            CreateMap<TopAdvertisementDto, TopAdvertisementViewModel>().ReverseMap();
+            CreateMap<TopUserDto, TopUserViewModel>().ReverseMap();
         }
     }
 }

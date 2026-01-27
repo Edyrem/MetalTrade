@@ -1,6 +1,4 @@
-﻿
-using MetalTrade.Domain.Enums;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace MetalTrade.Business.Dtos
 {
@@ -22,6 +20,8 @@ namespace MetalTrade.Business.Dtos
         public int UserId { get; set; }
         public UserDto? User { get; set; }
         public List<AdvertisementPhotoDto> Photoes { get; set; } = [];
+        public List<CommercialDto> Commercials { get; set; } = [];
+        public List<TopAdvertisementDto> TopAdvertisements { get; set; } = [];
         public List<IFormFile> PhotoFiles { get; set; } = [];
         public DateTime? AdEndDate { get; set; }
 

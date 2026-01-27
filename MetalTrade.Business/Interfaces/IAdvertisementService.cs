@@ -18,5 +18,8 @@ namespace MetalTrade.Business.Interfaces
         Task<bool> DeleteAdvertisementPhotoAsync(AdvertisementPhotoDto advertisementPhotoDto);
         Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilterDto filter);
         Task<List<AdvertisementPhotoAjaxDto>?> CreateAdvertisementPhotoAsync(AdvertisementDto adsDto);
+        Task CreateCommercialAsync(CommercialDto commercialDto);
+        Task CreateTopAdvertisementAsync(TopAdvertisementDto topAdvertisement);
+        Task DeactivatePromotionAsync(int advertisementId, string? type = null);
     }
 }

@@ -7,6 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="ViewModels\Commercial\**" />
+      <Content Remove="ViewModels\Commercial\**" />
+      <EmbeddedResource Remove="ViewModels\Commercial\**" />
+      <None Remove="ViewModels\Commercial\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="AutoMapper" Version="12.0.1" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
       <PackageReference Include="ClosedXML" Version="0.105.0" />

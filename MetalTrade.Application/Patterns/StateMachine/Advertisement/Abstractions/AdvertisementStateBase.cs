@@ -13,7 +13,7 @@ namespace MetalTrade.Application.Patterns.StateMachine.Advertisement.Abstraction
         }
 
         public abstract AdvertisementStatus Status { get; }
-
+        
         // поведение по умолчанию — запрещено
         public virtual IAdvertisementState MoveToActive()
         {
