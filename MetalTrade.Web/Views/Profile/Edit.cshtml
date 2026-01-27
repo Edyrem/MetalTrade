@@ -1,23 +1,23 @@
     @model MetalTrade.Web.ViewModels.Profile.UserProfileEditViewModel
 
 
-    <h2>Редактирование профиля</h2>
+    <h2>@Localizer["Header_2"]</h2>
 
     <form asp-action="Edit" enctype="multipart/form-data" method="post">
         @Html.HiddenFor(m => m.Id)
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="mb-3">
-            <label class="form-label">Имя пользователя</label>
+            <label class="form-label">@Localizer["LabelUserName"]</label>
             <input asp-for="UserName" class="form-control"/>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Email</label>
+            <label class="form-label">@Localizer["LabelEmail"]</label>
             <input asp-for="Email" class="form-control"/>
         </div>
 
         <div class="mb-3">
-            <label asp-for="PhoneNumber" class="form-label"></label>
+            <label asp-for="PhoneNumber" class="form-label">@Localizer["LabelPhoneNumber"]</label>
             <div class="input-group">
                 <span class="input-group-text">+996</span>
                 <input asp-for="PhoneNumber"class="form-control"id="PhoneNumber"placeholder="700700700"inputmode="numeric"maxlength="9" />
@@ -26,7 +26,7 @@
         </div>
 
         <div class="mb-3">
-            <label asp-for="WhatsAppNumber" class="form-label"></label>
+            <label asp-for="WhatsAppNumber" class="form-label">@Localizer["LabelWhatsAppNumber"]</label>
             <div class="input-group">
                 <span class="input-group-text">+996</span>
                 <input asp-for="WhatsAppNumber"class="form-control"id="WhatsAppNumber"placeholder="700700700"inputmode="numeric"maxlength="9" />
@@ -38,7 +38,7 @@
 
 
         <div class="mb-3">
-            <label class="form-label">Фото</label>
+            <label class="form-label">@Localizer["LabelPhotoAvatar"]</label>
             <input asp-for="Photo" type="file" class="form-control"/>
             @if (!string.IsNullOrEmpty(Model.PhotoPath))
             {
@@ -46,12 +46,12 @@
             }
         </div>
         <div>
-            <a asp-action="ChangePassword" class="btn btn-warning mt-3">Изменить пароль</a>
+            <a asp-action="ChangePassword" class="btn btn-warning mt-3">@Localizer["BtnChangePassword"]</a>
         </div>
         
 
-        <button type="submit" class="btn btn-success">Сохранить</button>
-        <a href="/Profile/Index" class="btn btn-secondary">Отмена</a>
+        <button type="submit" class="btn btn-success">@Localizer["BtnSave"]</button>
+        <a href="/Profile/Index" class="btn btn-secondary">@Localizer["BtnCancel"]</a>
     </form>
 
 
