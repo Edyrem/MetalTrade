@@ -1,0 +1,68 @@
+@{
+    Layout = "_ChatLayout";
+}
+
+@section Sidebar {
+    @await Html.PartialAsync("_ChatSidebarPartial", ViewBag.ChatList, ViewData)
+}
+
+@if (ViewBag.ChatId == null)
+{
+    <div class="chat-empty">
+        <div class="chat-empty-inner">
+            <h3>Выберите чат</h3>
+            <p>Начните диалог, выбрав чат слева</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="chat-container">
+        <!-- HEADER -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <img class="avatar"
+                     src="@(ViewBag.OtherUserPhoto ?? "/img/avatar-placeholder.png")" />
+
+                <div class="chat-header-info">
+                    <a href="@Url.Action("User", "Profile", new { id = ViewBag.OtherUserId })"
+                       class="chat-title chat-title-link">
+                        @ViewBag.OtherUserName
+                    </a>
+
+                    <div class="chat-status" id="onlineStatus"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="chat-messages" id="messagesWrapper"></div>
+
+        <button id="newMessagesBtn" class="new-msg-btn mini" hidden>↓</button>
+
+
+
+        <div class="chat-input">
+            <div class="input-wrap">
+                <textarea id="messageInput" placeholder="Сообщение..." maxlength="5000"></textarea>
+                <div id="charCounter">0 / 5000</div>
+            </div>
+
+            <button id="sendBtn" type="button">➤</button>
+        </div>
+
+
+    </div>
+}
+
+@section Scripts {
+    <script>
+        window.__chat = {
+            chatId: @(ViewBag.ChatId ?? "null"),
+            currentUserName: "@User.Identity!.Name",
+            otherUserId: @(ViewBag.OtherUserId ?? "null")
+        };
+    </script>
+    <script defer src="~/js/chat/chat.js"></script>
+}

@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow-sm p-3 text-center">
-                <img src="@(Model.PhotoPath ?? "/images/default-avatar.png")"
+                <img src="@(string.IsNullOrEmpty(Model.PhotoPath) ? "/images/default/avatar.jpg" : Model.PhotoPath)"
                      class="rounded-circle mx-auto d-block mb-3"
                      style="width: 120px; height: 120px; object-fit: cover;" alt="Аватар" />
 
@@ -21,6 +21,13 @@
                 else
                 {
                     <p class="text-muted">Контакты доступны после входа</p>
+                }
+                @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.UserName)
+                {
+                    <button class="btn btn-primary open-chat-user"
+                            data-user-id="@Model.UserId">
+                        Написать
+                    </button>
                 }
 
             </div>
@@ -55,3 +62,8 @@
     </div>
 </div>
 
+
+
+@section Scripts {
+    <script src="~/js/chat/openChat.js"></script>
+}

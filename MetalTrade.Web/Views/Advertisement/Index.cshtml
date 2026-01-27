@@ -7,151 +7,138 @@
 	ViewData["Title"] = "Advertisements";
 
 	var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+	var isSupplier = ViewData["IsSupplier"] as bool? ?? false;
 	var filter = ViewBag.Filter as AdvertisementFilterDto;
 	var metalTypes = ViewBag.MetalTypes as List<MetalTypeDto> ?? new();
 	var products = ViewBag.Products as List<ProductDto> ?? new();
 }
 
-@if (User.Identity.IsAuthenticated && (User.IsInRole("admin") || User.IsInRole("moderator") || User.IsInRole("supplier")))
-{
-	<div class="mb-2">
-		<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
+<div class="row mb-2 justify-content-between">
+	
+	<div class="col-md-2">
+		@if (isAdmin || isSupplier)
+		{
+			<a asp-action="Create" class="btn btn-outline-success">Создать объявление</a>
+		}
 	</div>
-}
+	<button class="btn btn-outline-primary col-md-2	" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+		Фильтр объявлений <data-bs-target></data-bs-target>
+	</button>
+	
+</div>
 
-<form method="get" class="mb-4" id="ads-filter-form">
-	<div class="row g-2">
 
-		<div class="col-md-3">
-			<input class="form-control"
-			       type="text"
-			       name="title"
-			       placeholder="Название или артикул"
-			       value="@filter?.Title" />
-		</div>
-
-		<div class="col-md-3">
-			<input class="form-control"
-			       type="text"
-			       name="city"
-			       placeholder="Город"
-			       value="@filter?.City" />
-		</div>
-
-		<div class="col-md-3">
-			<input class="form-control"
-			       type="number"
-			       name="priceFrom"
-			       placeholder="Цена от"
-			       value="@filter?.PriceFrom" />
-		</div>
-
-		<div class="col-md-3">
-			<input class="form-control"
-			       type="number"
-			       name="priceTo"
-			       placeholder="Цена до"
-			       value="@filter?.PriceTo" />
-		</div>
-
-		<div class="col-md-3">
-			<input type="date" class="form-control"
-			       name="dateFrom"
-			       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
-		</div>
-
-		<div class="col-md-3">
-			<input type="date" class="form-control"
-			       name="dateTo"
-			       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
-		</div>
-
-		<div class="col-md-3">
-			<select class="form-control" name="metalTypeId" id="metalTypeSelect">
-				<option value="">Тип металла</option>
-				@foreach (var type in metalTypes)
-				{
-					<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
-						@type.Name
-					</option>
-				}
-			</select>
-		</div>
-
-		<div class="col-md-3">
-			<select class="form-control" name="productId" id="productSelect">
-				<option value="">Продукт</option>
-				@foreach (var p in products)
-				{
-					<option value="@p.Id" selected="@(filter?.ProductId == p.Id)">
-						@p.Name
-					</option>
-				}
-			</select>
-		</div>
-
-		<div class="col-md-3">
-			<select class="form-control" name="sort">
-				<option value="" selected="@(string.IsNullOrWhiteSpace(filter?.Sort))">Сортировка</option>
-				<option value="price_asc" selected="@(filter?.Sort == "price_asc")">Цена ↑</option>
-				<option value="price_desc" selected="@(filter?.Sort == "price_desc")">Цена ↓</option>
-				<option value="date_asc" selected="@(filter?.Sort == "date_asc")">Дата ↑</option>
-				<option value="date_desc" selected="@(filter?.Sort == "date_desc")">Дата ↓</option>
-			</select>
-		</div>
-
-		<div class="col-md-3 d-flex">
-			<button class="btn btn-primary w-100 me-1" id="filter-submit">Фильтр</button>
-			<a href="/Advertisement/Index" class="btn btn-secondary w-100">Сбросить</a>
-		</div>
-
+<div class="offcanvas offcanvas-top bg-secondary-subtle" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" style="height:350px;">
+	<div class="offcanvas-header position-relative">
+		<h4 class="offcanvas-title position-absolute start-50 translate-middle-x" id="offcanvasExampleLabel">Фильтр объявлений</h4>
+		<button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 	</div>
-</form>
+	
+	<div class="offcanvas-body">
+
+		<form method="get" class="mb-4" id="ads-filter-form">
+			<div class="row g-2  d-flex justify-content-center">
+
+				<div class="col-md-5">
+					<input class="form-control"
+					       type="text"
+					       name="title"
+					       placeholder="Название или артикул"
+					       value="@filter?.Title" />
+				</div>
+
+				<div class="col-md-5">
+					<input class="form-control"
+					       type="text"
+					       name="city"
+					       placeholder="Город"
+					       value="@filter?.City" />
+				</div>
+
+				<div class="col-md-5">
+					<input class="form-control"
+					       type="number"
+					       name="priceFrom"
+					       placeholder="Цена от"
+					       value="@filter?.PriceFrom" />
+				</div>
+
+				<div class="col-md-5">
+					<input class="form-control"
+					       type="number"
+					       name="priceTo"
+					       placeholder="Цена до"
+					       value="@filter?.PriceTo" />
+				</div>
+				
+				@{
+				// <div class="col-md-5">
+				// 	<input type="date" class="form-control"
+				// 	       name="dateFrom"
+				// 	       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
+				// </div>
+
+				// <div class="col-md-5">
+				// 	<input type="date" class="form-control"
+				// 	       name="dateTo"
+				// 	       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
+				// </div>
+				}
+				<div class="col-md-5">
+					<select class="form-control" name="metalTypeId" id="metalTypeSelect">
+						<option value="">Тип материала</option>
+						@foreach (var type in metalTypes)
+						{
+						<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
+							@type.Name
+						</option>
+						}
+					</select>
+				</div>
+
+				<div class="col-md-5">
+					<select class="form-control" name="productId" id="productSelect">
+						<option value="">Продукт</option>
+						@foreach (var p in products)
+						{
+							<option value="@p.Id" selected="@(filter?.ProductId == p.Id)">
+								@p.Name
+							</option>
+						}
+					</select>
+				</div>
+				
+				<div class="col-md-3">
+					<select class="form-control" name="sort">
+						<option value="" selected="@(string.IsNullOrWhiteSpace(filter?.Sort))">Сортировка</option>
+						<option value="price_asc" selected="@(filter?.Sort == "price_asc")">Цена ↑</option>
+						<option value="price_desc" selected="@(filter?.Sort == "price_desc")">Цена ↓</option>
+						<option value="date_asc" selected="@(filter?.Sort == "date_asc")">Дата ↑</option>
+						<option value="date_desc" selected="@(filter?.Sort == "date_desc")">Дата ↓</option>
+					</select>
+				</div>
+
+				<div class="col-md-3 d-flex">
+					<button class="btn btn-primary w-100 me-1" id="filter-submit">Фильтр</button>
+					<a href="/Advertisement/Index" class="btn btn-secondary w-100">Сбросить</a>
+				</div>
+
+			</div>
+		</form>
+		
+	</div>
+</div>
+
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <div id="ads-grid">
-	@Html.Partial("_AdsGrid", Model)
+	@(await Html.PartialAsync("_AdsGrid", Model))
 </div>
 
+
 @section Scripts {
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			const form = document.getElementById('ads-filter-form');
-			const grid = document.getElementById('ads-grid');
-			const basePartialUrl = '/Advertisement/PartialList';
-
-			if (!form || !grid) return;
-
-			function buildQueryFromForm(formElement) {
-				const params = new URLSearchParams();
-				const fd = new FormData(formElement);
-				for (const [k, v] of fd.entries()) {
-					if (!v) continue;
-					params.append(k, v);
-				}
-				return params.toString();
-			}
-
-			function loadPartialWithParams(queryString, pushUrl = true) {
-				const url = basePartialUrl + (queryString ? '?' + queryString : '');
-				fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-					.then(response => response.text())
-					.then(html => {
-						grid.innerHTML = html;
-						if (pushUrl) {
-							const newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
-							window.history.pushState({}, '', newUrl);
-						}
-					})
-					.catch(err => console.error(err));
-			}
-
-			form.addEventListener('submit', function (e) {
-				e.preventDefault();
-				const qs = buildQueryFromForm(form);
-				loadPartialWithParams(qs, true);
-			});
-		});
-	</script>
+	@{
+		<script src="~/js/advertisement/filter-and-sort-for-advertisement.js"></script>
+	}
 }

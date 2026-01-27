@@ -78,5 +78,47 @@ namespace MetalTrade.DataAccess.Repositories
         {
             return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
         }
+        
+        public IQueryable<User> CreateFilter()
+        {
+            return _context.Users.AsQueryable();
+        }
+        
+        public async Task<Dictionary<int, List<string>>> GetRolesForUsersAsync(List<User> users)
+        {
+            var userIds = users.Select(u => u.Id).ToList();
+
+            // Получаем все роли для этих пользователей
+            var roles = await _context.UserRoles
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(_context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur.UserId, r.Name })
+                .ToListAsync();
+
+            // Группируем по UserId
+            var rolesLookup = roles
+                .GroupBy(r => r.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(r => r.Name).ToList());
+
+            return rolesLookup;
+        }
+
+        public IQueryable<User> FilterUserName(IQueryable<User> query, string userName)
+        {
+            return query.Where(u => u.UserName != null && u.UserName.ToLower().Contains(userName.ToLower()));
+        }
+
+        public IQueryable<User> FilterEmail(IQueryable<User> query, string email)
+        {
+            return query.Where(u => u.Email != null && u.Email.Contains(email));
+        }
+
+        public IQueryable<User> FilterPhoneNumber(IQueryable<User> query, string phoneNumber)
+        {
+            return query.Where(u => u.PhoneNumber != null && u.PhoneNumber.Contains(phoneNumber));
+        }
+
     }
 }

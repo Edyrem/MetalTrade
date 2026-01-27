@@ -9,5 +9,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task<AdvertisementStatus> GetStatusAsync(int Id);
         Task SetStatusAsync(int Id, AdvertisementStatus status);
         Task DeleteAdvertisementPhotoAsync(int advertisementPhotoId);
+        Task<AdvertisementPhoto?> GetAdvertisementPhotoAsync(int advertisementPhotoId);
     }
 }

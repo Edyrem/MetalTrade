@@ -9,12 +9,17 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MetalTrade.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Advertisement" asp-action="Index">METALTRADE.KG</a>
+                <div class="logo-container">
+                    <a class="navbar-brand" asp-area="" asp-controller="Advertisement" asp-action="Index">
+                        <img src="/images/default/logo.png" alt="Alternate Text" class="main-logo" />
+                    </a>
+                </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -26,7 +31,7 @@
                         {
 
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="MetalType" asp-action="Index">Металлы</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="MetalType" asp-action="Index">Материалы</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Продукты</a>
@@ -35,13 +40,22 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Пользователи</a>
                             </li>
                         }
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Chat" asp-action="Index" class="nav-link position-relative">
+                                    Чаты
+                                    @await Component.InvokeAsync("ChatUnread")
+                                </a>
+                            </li>
+                        }
 
                         <li class="nav-item ms-auto d-flex align-items-center">
                             @if (User.Identity?.IsAuthenticated ?? false)
                             {
                                 var currentUser = await UserManager.GetUserAsync(User);
                                 var avatar = string.IsNullOrEmpty(currentUser?.Photo)
-                                ? "/images/default-avatar.png"
+                                ? "/images/default/avatar.jpg"
                                 : currentUser.Photo;
 
                             <li class="nav-item dropdown">
@@ -86,6 +100,13 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/signalr.min.js"></script>
+    <script src="~/js/chat/layout-chat.js" asp-append-version="true"></script>
+    <script>
+        window.__layout = {
+            currentUserName: "@User.Identity?.Name"
+        };
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

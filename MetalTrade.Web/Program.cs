@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using MetalTrade.DataAccess.Interfaces.Repositories;
+using MetalTrade.DataAccess.Repositories;
+using MetalTrade.Web.Hubs;
 
 namespace MetalTrade.Web
 {
@@ -54,6 +57,29 @@ namespace MetalTrade.Web
             builder.Services.AddScoped<IMetalService, MetalService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+            builder.Services.AddScoped<ICommercialRepository, CommercialRepository>();
+            builder.Services.AddScoped<ICommercialService, CommercialService>();
+            builder.Services.AddScoped<IAdvertisementImportService, AdvertisementImportService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
+
+            builder.Services.AddSignalR();
+
+            
+            
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/Advertisement"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    }
+
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+            });
 
 
             var app = builder.Build();
@@ -106,6 +132,9 @@ namespace MetalTrade.Web
                 pattern: "{controller=Advertisement}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
+            app.MapHub<ChatHub>("/chatHub");
+            
+            
             app.Run();
         }
     }

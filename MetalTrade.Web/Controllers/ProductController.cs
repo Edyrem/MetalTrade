@@ -1,10 +1,13 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -25,16 +28,26 @@ public class ProductController : Controller
           _mapper = mapper;
      }
 
-     public async Task<IActionResult> Index()
-     {
-          List<ProductDto> productDtos = await _productService.GetAllAsync();
+    public async Task<IActionResult> Index()
+    {
+        var filter = new ProductFilterDto
+        {
+            Name = Request.Query["name"],
+            MetalTypeId = int.TryParse(Request.Query["metalTypeId"], out var mId) ? mId : null,
+            Sort = Request.Query["sort"],
+            Page = int.TryParse(Request.Query["page"], out var pg) ? pg : 1
+        };
 
-          List<ProductViewModel> models = _mapper.Map<List<ProductViewModel>>(productDtos);
+        List<ProductDto> productDtos = await _productService.GetFilteredAsync(filter);
 
-          return View(models);
-     }
+        List<ProductViewModel> models = _mapper.Map<List<ProductViewModel>>(productDtos);
 
-     public async Task<IActionResult> Create()
+        ViewBag.Filter = filter;
+        ViewBag.MetalTypes = await _metalService.GetAllAsync();
+        return View(models);
+    }
+
+    public async Task<IActionResult> Create()
      {
           var metalTypes = await _metalService.GetAllAsync();
 

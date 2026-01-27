@@ -20,7 +20,17 @@
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label">@Localizer["Password"]</label><br />
-                <input asp-for="Password" class="form-control" />
+                
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control"  id="password"/>
+                    <button type="button" class="btn btn-light " id="eye-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                        </svg>
+                    </button>
+                </div>
+                
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -28,7 +38,7 @@
                 <input asp-for="RememberMe" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Войти" class="btn btn-primary mt-3" />
+                <input type="submit" value="@Localizer["Log In"]" class="btn btn-primary mt-3" />
             </div>
         </form>
     </div>
@@ -36,6 +46,7 @@
 
 
 @section Scripts {
+    <script src="~/js/password.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

@@ -1,12 +1,11 @@
 using MetalTrade.Business.Dtos;
-using MetalTrade.Domain.Entities;
-using MetalTrade.Domain.Enums;
 using MetalTrade.Test.Helpers;
 using MetalTrade.Web.ViewModels.Advertisement;
+using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using Xunit;
 
@@ -77,7 +76,7 @@ public class AdvertisementControllerTests : ControllerTestBase
 
         AdvertisementMock.Verify(s => s.GetFilteredAsync(It.IsAny<AdvertisementFilterDto>()));
     }
-    
+
     [Fact]
     public async Task DetailsWhenFoundReturnsViewWithModel()
     {
@@ -88,18 +87,170 @@ public class AdvertisementControllerTests : ControllerTestBase
         AdvertisementMock
             .Setup(s => s.GetAsync(10))
             .ReturnsAsync(dto);
+
         MapperMock
             .Setup(m => m.Map<AdvertisementViewModel>(dto))
             .Returns(vm);
 
+        // Эмулируем аутентифицированного пользователя
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 1, UserName = "testuser" });
+
+        // Для IsInRolesAsync
+        UserMock
+            .Setup(s => s.IsInRolesAsync(It.IsAny<UserDto>(), It.IsAny<string[]>()))
+            .ReturnsAsync(true);
+
+        // Для AdEndDate
+        CommercialMock
+            .Setup(s => s.GetActiveAdEndDateAsync(10))
+            .ReturnsAsync(DateTime.UtcNow.AddDays(1));
+
+        var controller = AdvertisementController;
+
+        // Мок UrlHelper, чтобы Url.Action не падал
+        var mockUrlHelper = new Mock<IUrlHelper>();
+        mockUrlHelper
+            .Setup(u => u.Action(It.IsAny<UrlActionContext>()))
+            .Returns("/mocked-url");
+
+        controller.Url = mockUrlHelper.Object;
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+
         // Act
-        var result = await AdvertisementController.Details(10);
+        var result = await controller.Details(10);
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal(vm, view.Model);
+        Assert.True((bool)view.ViewData["IsAdmin"]);
+        Assert.Equal(1, view.ViewData["CurrentUserId"]);
+        Assert.NotNull(view.ViewData["AdEndDate"]);
 
-        AdvertisementMock.Verify(s => s.GetAsync(10));
+        AdvertisementMock.Verify(s => s.GetAsync(10), Times.Once);
+    }
+
+    [Fact]
+    public async Task DetailsUserNotAuthenticatedRedirectsToLogin()
+    {
+        // Arrange
+        AdvertisementMock
+            .Setup(s => s.GetAsync(1))
+            .ReturnsAsync(new AdvertisementDto { Id = 1 });
+
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync((UserDto?)null);
+
+        var controller = AdvertisementController;
+
+        // Мок UrlHelper
+        var mockUrlHelper = new Mock<IUrlHelper>();
+        mockUrlHelper
+            .Setup(u => u.Action(It.IsAny<UrlActionContext>()))
+            .Returns("/mocked-url");
+        controller.Url = mockUrlHelper.Object;
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        var result = await controller.Details(1);
+
+        // Assert
+        var redirect = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Login", redirect.ActionName);
+        Assert.Equal("Account", redirect.ControllerName);
+        Assert.NotNull(redirect.RouteValues?["returnUrl"]);
+    }
+
+    [Fact]
+    public async Task DetailsAdminUserSetsIsAdminTrue()
+    {
+        var adsDto = new AdvertisementDto { Id = 1 };
+        var user = new UserDto { Id = 5 };
+
+        AdvertisementMock.Setup(s => s.GetAsync(1)).ReturnsAsync(adsDto);
+        UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+                .ReturnsAsync(user);
+
+        UserMock.Setup(s => s.IsInRolesAsync(user, It.IsAny<string[]>()))
+                .ReturnsAsync(true);
+
+        CommercialMock.Setup(s => s.GetActiveAdEndDateAsync(1))
+                      .ReturnsAsync(DateTime.UtcNow);
+
+        MapperMock.Setup(m => m.Map<AdvertisementViewModel>(adsDto))
+                  .Returns(new AdvertisementViewModel());
+
+        var controller = AdvertisementController;
+
+        var result = await controller.Details(1);
+
+        var view = Assert.IsType<ViewResult>(result);
+        Assert.True((bool)view.ViewData["IsAdmin"]);
+    }
+
+    [Fact]
+    public async Task DetailsSetsCurrentUserId()
+    {
+        var user = new UserDto { Id = 42 };
+
+        AdvertisementMock.Setup(s => s.GetAsync(1))
+            .ReturnsAsync(new AdvertisementDto { Id = 1 });
+
+        UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(user);
+
+        UserMock.Setup(s => s.IsInRolesAsync(user, It.IsAny<string[]>()))
+            .ReturnsAsync(false);
+
+        CommercialMock.Setup(s => s.GetActiveAdEndDateAsync(1))
+            .ReturnsAsync(DateTime.UtcNow);
+
+        MapperMock.Setup(m => m.Map<AdvertisementViewModel>(It.IsAny<AdvertisementDto>()))
+            .Returns(new AdvertisementViewModel());
+
+        var controller = AdvertisementController;
+
+        var result = await controller.Details(1);
+
+        var view = Assert.IsType<ViewResult>(result);
+        Assert.Equal(42, view.ViewData["CurrentUserId"]);
+    }
+
+    [Fact]
+    public async Task DetailsSetsAdEndDate()
+    {
+        var endDate = DateTime.UtcNow.AddDays(10);
+
+        AdvertisementMock.Setup(s => s.GetAsync(1))
+            .ReturnsAsync(new AdvertisementDto { Id = 1 });
+
+        UserMock.Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(new UserDto { Id = 1 });
+
+        UserMock.Setup(s => s.IsInRolesAsync(It.IsAny<UserDto>(), It.IsAny<string[]>()))
+            .ReturnsAsync(false);
+
+        CommercialMock.Setup(s => s.GetActiveAdEndDateAsync(1))
+            .ReturnsAsync(endDate);
+
+        MapperMock.Setup(m => m.Map<AdvertisementViewModel>(It.IsAny<AdvertisementDto>()))
+            .Returns(new AdvertisementViewModel());
+
+        var controller = AdvertisementController;
+
+        var result = await controller.Details(1);
+
+        var view = Assert.IsType<ViewResult>(result);
+        Assert.Equal(endDate, view.ViewData["AdEndDate"]);
     }
 
     [Fact]
@@ -192,23 +343,40 @@ public class AdvertisementControllerTests : ControllerTestBase
     public async Task DetailsFoundReturnsViewWithModel()
     {
         // Arrange
-        var dto = new AdvertisementDto { Id = 1, Title = "Test" };
+        var adsDto = new AdvertisementDto { Id = 1, Title = "Test" };
+        var user = new UserDto { Id = 10 };
 
         AdvertisementMock
             .Setup(s => s.GetAsync(1))
-            .ReturnsAsync(dto);
+            .ReturnsAsync(adsDto);
+
+        UserMock
+            .Setup(s => s.GetCurrentUserAsync(It.IsAny<HttpContext>()))
+            .ReturnsAsync(user);
+
+        UserMock
+            .Setup(s => s.IsInRolesAsync(user, It.IsAny<string[]>()))
+            .ReturnsAsync(false);
+
+        CommercialMock
+            .Setup(s => s.GetActiveAdEndDateAsync(1))
+            .ReturnsAsync(DateTime.UtcNow.AddDays(5));
 
         MapperMock
-            .Setup(m => m.Map<AdvertisementViewModel>(dto))
+            .Setup(m => m.Map<AdvertisementViewModel>(adsDto))
             .Returns(new AdvertisementViewModel { Id = 1 });
 
+        var controller = AdvertisementController;
+
         // Act
-        var result = await AdvertisementController.Details(1);
+        var result = await controller.Details(1);
 
         // Assert
         var view = Assert.IsType<ViewResult>(result);
-        Assert.IsType<AdvertisementViewModel>(view.Model);
+        var model = Assert.IsType<AdvertisementViewModel>(view.Model);
+        Assert.Equal(1, model.Id);
     }
+
 
     [Fact]
     public async Task DetailsNotFoundReturnsNotFound()
@@ -463,20 +631,66 @@ public class AdvertisementControllerTests : ControllerTestBase
     }
 
     [Fact]
-    public async Task DeleteAdvertisementPhotoRedirectsBackToEdit()
+    public async Task DeleteAdvertisementPhotoAjax_ReturnsSuccessJson()
     {
         // Arrange
-        int advertisementId = 10;
+        int photoId = 1;
+        string photoLink = "link";
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAdvertisementPhotoAsync(It.Is<AdvertisementPhotoDto>(
+                p => p.Id == photoId && p.PhotoLink == photoLink)))
+            .ReturnsAsync(true);
+
+        var controller = AdvertisementController;
 
         // Act
-        var result = await AdvertisementController.DeleteAdvertisementPhoto(1, "link", advertisementId);
+        var result = await controller.DeleteAdvertisementPhotoAjax(photoId, photoLink);
 
         // Assert
-        var redirect = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("Edit", redirect.ActionName);
-        Assert.Equal(advertisementId, redirect.RouteValues["Id"]);
+        var jsonResult = Assert.IsType<JsonResult>(result);
+
+        // ������� �������� success ����� reflection
+        var value = jsonResult.Value!;
+        var successProp = value.GetType().GetProperty("success");
+        Assert.NotNull(successProp);
+
+        var successValue = successProp.GetValue(value);
+        Assert.True((bool)successValue);
+
+        AdvertisementMock.Verify(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()), Times.Once);
     }
-    
+
+    [Fact]
+    public async Task DeleteAdvertisementPhotoAjax_WhenThrowsException_ReturnsFalseJson()
+    {
+        // Arrange
+        int photoId = 1;
+        string photoLink = "link";
+
+        AdvertisementMock
+            .Setup(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        var controller = AdvertisementController;
+
+        // Act
+        var result = await controller.DeleteAdvertisementPhotoAjax(photoId, photoLink);
+
+        // Assert
+        var jsonResult = Assert.IsType<JsonResult>(result);
+
+        // ������� �������� success ����� reflection
+        var value = jsonResult.Value!;
+        var successProp = value.GetType().GetProperty("success");
+        Assert.NotNull(successProp);
+
+        var successValue = successProp.GetValue(value);
+        Assert.False((bool)successValue);
+
+        AdvertisementMock.Verify(s => s.DeleteAdvertisementPhotoAsync(It.IsAny<AdvertisementPhotoDto>()), Times.Once);
+    }
+
     [Fact]
     public async Task ApproveAdvertisementRedirectsToIndex()
     {
@@ -746,5 +960,108 @@ public class AdvertisementControllerTests : ControllerTestBase
         await Assert.ThrowsAsync<Exception>(() =>
             AdvertisementController.Delete(model));
     }
+    
+    
+    //тесты для рекламы
+    
+    [Fact]
+    public async Task ActivateCommercial_ValidModel_ReturnsOk()
+    {
+        // Arrange
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 7
+        };
+
+        CommercialMock
+            .Setup(s => s.ActivateAsync(It.IsAny<CommercialDto>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await AdvertisementController.ActivateCommercial(model);
+
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
+        CommercialMock.Verify(s =>
+                s.ActivateAsync(It.Is<CommercialDto>(d =>
+                    d.AdvertisementId == 5 && d.Days == 7)),
+            Times.Once);
+    }
+
+    
+    [Fact]
+    public async Task ActivateCommercial_InvalidModel_ReturnsBadRequest()
+    {
+        var controller = AdvertisementController;
+        // Arrange
+        controller.ModelState.AddModelError("Days", "error");
+
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 0
+        };
+
+        // Act
+        var result = await controller.ActivateCommercial(model);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task ActivateCommercial_WhenAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.ActivateAsync(It.IsAny<CommercialDto>()))
+            .ThrowsAsync(new InvalidOperationException("Реклама уже активна"));
+
+        var model = new CommercialViewModel
+        {
+            AdvertisementId = 5,
+            Days = 7
+        };
+
+        // Act
+        var result = await AdvertisementController.ActivateCommercial(model);
+
+        // Assert
+        var bad = Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    
+    [Fact]
+    public async Task DeactivateCommercial_ReturnsOk()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.DeactivateAsync(5))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await AdvertisementController.DeactivateCommercial(5);
+
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
+        CommercialMock.Verify(s => s.DeactivateAsync(5), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeactivateCommercial_WhenNotActive_ReturnsBadRequest()
+    {
+        // Arrange
+        CommercialMock
+            .Setup(s => s.DeactivateAsync(It.IsAny<int>()))
+            .ThrowsAsync(new InvalidOperationException("Активная реклама не найдена"));
+
+        // Act
+        var result = await AdvertisementController.DeactivateCommercial(5);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
     
 }

@@ -122,6 +122,7 @@ public class ProfileController : Controller
         if (userDto == null) return NotFound();
 
         var viewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
+        viewModel.UserId = userDto.Id;
         viewModel.IsSupplier = await _userService.IsInRoleAsync(userDto, "supplier");
 
         return View("UserProfile", viewModel);

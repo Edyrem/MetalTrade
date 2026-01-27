@@ -1,4 +1,6 @@
 ﻿@using MetalTrade.Domain.Enums
+@using MetalTrade.Web.ViewModels.Commercial
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
 
 @if (Model == null)
@@ -17,6 +19,10 @@
         currentUserId.HasValue &&
         Model != null &&
         Model.UserId == currentUserId.Value;
+    
+    var phoneNumber = "996" + Model.PhoneNumber;
+    var message = $"Здравствуйте! Пишу по поводу объявления '{Model.Title}' с сайта METALTRADE. " ;
+    
 }
 
 
@@ -58,9 +64,9 @@
                     <div class="mb-2">
                         <span class="badge
                             @(Model.Status == (int)AdvertisementStatus.Active ? "bg-success" :
-                                                 Model.Status == (int)AdvertisementStatus.Draft ? "bg-warning text-dark" :
-                                                 Model.Status == (int)AdvertisementStatus.Rejected ? "bg-danger" :
-                                                 "bg-secondary")">
+                            Model.Status == (int)AdvertisementStatus.Draft ? "bg-warning text-dark" :
+                            Model.Status == (int)AdvertisementStatus.Rejected ? "bg-danger" :
+                            "bg-secondary")">
                             @(Model.Status switch
                             {
                                 (int)AdvertisementStatus.Draft => "На рассмотрении",
@@ -89,7 +95,7 @@
                         @Html.DisplayNameFor(model => model.CreateDate)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.CreateDate)
+                        @Model.CreateDate.ToString("dd.MM.yyyy")
                     </dd>
                     <dt class="col-sm-2">
                         @Html.DisplayNameFor(model => model.Address)
@@ -113,7 +119,15 @@
                         @Html.DisplayNameFor(model => model.PhoneNumber)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.PhoneNumber)
+                        +996 @Html.DisplayFor(model => model.PhoneNumber)
+                        
+                        <a class="btn btn-success ms-5" href="https://wa.me/@phoneNumber?text=@message"  target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                            </svg>
+                             Написать в WhatsApp
+                        </a>
+                        
                     </dd>
                 </dl>
                 <div>
@@ -121,8 +135,14 @@
                     {
                         <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Редактировать</a>
                         <b> | </b>
-                        <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
+                        <a asp-action="CreatePhoto" class="btn btn-outline-secondary" asp-route-id="@Model?.Id" asp-route-returnUrl="@Context.Request.Path">Добавить фото</a>
                         <b> | </b>
+                        @if (Model.Status != (int)AdvertisementStatus.Draft)
+                        {
+                            <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model?.Id">Удалить</a>
+                            <b> | </b>
+                        }
+                        
                         if(isAdmin)
                         {
                             switch(Model.Status)
@@ -146,6 +166,58 @@
                     }
                     
                 </div>
+                @if (isOwner && Model.IsAd && Model.AdEndDate.HasValue)
+                {
+                    <div class="alert alert-info">
+                        Ваша реклама активна до
+                        <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                    </div>
+                }
+
+
+                @if (isAdmin)
+                    {
+                        @if (Model.IsAd)
+                        {
+                            <div class="alert alert-warning">
+                                Реклама активна до:
+                                @if (Model.AdEndDate.HasValue)
+                                {
+                                    <br />
+                                    <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                                }
+                            </div>
+
+                            <button id="deactivateCommercialBtn"
+                                    class="btn btn-danger"
+                                    data-id="@Model.Id">
+                                Убрать рекламу
+                            </button>
+                        }
+                        else if (Model.Status == (int)AdvertisementStatus.Active)
+                        {
+                            <div class="d-flex gap-2 align-items-center">
+                                <button id="toggleCommercialBtn"
+                                        class="btn btn-warning">
+                                    Реклама
+                                </button>
+                            </div>
+
+                            <div id="commercialFormContainer" style="display:none;">
+                                @await Html.PartialAsync("_CommercialForm",
+                                    new CommercialViewModel { AdvertisementId = Model.Id })
+                            </div>
+                        }
+                    }
+                @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.User.UserName)
+                {
+                    <button class="btn btn-primary open-chat-user"
+                            data-user-id="@Model.UserId">
+                        Написать продавцу
+                    </button>
+
+                }
+                
                 <br/>
                 <div>
                     <a asp-action="Index">Назад к списку</a>
@@ -176,7 +248,46 @@
                         </button>
                     </div>
                 }
+
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" color="green" width="23" height="23" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
+                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
+                            </svg>
+                            Калькулятор стоимости
+                        </h5>
+
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    class="form-control text-center"
+                                    id="calc-quantity"
+                                    placeholder="Введите количество">
+                                <span class="input-group-text">шт</span>
+                            </div>
+                            
+                            <div id="calc-error" class="text-danger small mt-1 d-none">
+                                Введите число больше 0
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3 d-flex justify-content-between">
+                            <span class="fw-semibold">Итого:</span>
+                            <span class="fs-4 fw-bold text-success" id="calc-total">0</span>
+                        </div>
+
+                        <p id="calc-price" data-price="@Model.Price" hidden></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/commercial.js"></script>
+    <script src="~/js/chat/openChat.js"></script>
+    <script src="~/js/advertisement/calculator.js"></script>
+}
