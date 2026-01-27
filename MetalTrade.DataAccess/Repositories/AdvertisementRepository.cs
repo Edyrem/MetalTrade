@@ -75,6 +75,7 @@ namespace MetalTrade.DataAccess.Repositories
             return _context.Advertisements
                 .Include(ad => ad.Product)
                 .Include(ad => ad.Photoes)
+                .Include(ad => ad.User)
                 .AsQueryable();
         }
 

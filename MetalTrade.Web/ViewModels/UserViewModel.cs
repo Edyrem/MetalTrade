@@ -54,4 +54,6 @@ public class UserViewModel
     [Required(ErrorMessage = "Укажите роль")]
     [Display(Name = "Роль")]
     public UserRole Role { get; set; }
+
+    public bool IsTop { get; set; }
 }

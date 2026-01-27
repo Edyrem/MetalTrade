@@ -3,10 +3,11 @@
 
 @{
 	var isAdmin = ViewData["IsAdmin"] as bool? ?? false;
+	var isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
 }
 
 
-@if (!Model.Any() && User.Identity.IsAuthenticated)
+@if (!Model.Any() && isAuthenticated)
 {
 	<h4 class="">Ничего не найдено! </h4>
 }
@@ -58,16 +59,16 @@ else
 								</button>
 							</div>
 						}
-						<div class="position-absolute top-0 end-0 m-1 text-end d-flex flex-column">
+						<div class="position-absolute top-0 end-0 m-1 text-end">
 							@if(ads.IsAd)
 							{
-								<div class="p-1 small bg-primary opacity-75 text-light">
+								<div class="p-1 small bg-primary opacity-75 text-light mb-1">
 									Реклама
 								</div>
 							}
 							@if (ads.IsTop)
 							{
-								<div class="p-1 small bg-info opacity-75 text-light flex-shrink-0">
+								<div class="p-1 small bg-info opacity-75 text-light d-inline-block">
 									Топ
 								</div>
 							}
@@ -90,14 +91,30 @@ else
 						}
 
 						<div class="card-body">
-							<h5 class="card-title mt-2">@ads.Title</h5>
-							<a asp-action="Details" asp-route-id="@ads.User.Id" class="w-100">@ads.User.UserName</a>
+							<h5 class="card-title">@ads.Title</h5>							
 							<p class="card-text fs-6 text-muted d-inline">Цена: </p>
 							<p class="card-text fw-bold fs-5 d-inline">@ads.Price.ToString("N0")</p>
 
+							<div>
+								Автор: 
+								<a 
+									asp-action="User" 
+									asp-controller="Profile" 
+									asp-route-id="@ads.User.Id" 
+									class="fw-bold link-primary link-underline-opacity-0">
+										@ads.User.UserName
+								</a>
+								@if(ads.User.IsTop)
+								{
+									<strong>(ТОП)</strong>
+								}
+							</div>
+							@if (isAuthenticated)
+							{
+								<div class="card-text">Номер: <b>(+996)@ads.PhoneNumber</b></div>
+							}
 
-							<p class="card-text fw-bold">@ads.PhoneNumber</p>
-							<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary w-100">Подробнее</a>
+							<a asp-action="Details" asp-route-id="@ads.Id" class="btn btn-primary mt-2 w-100">Подробнее</a>
 						</div>
 
 					</div>
