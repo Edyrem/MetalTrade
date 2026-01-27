@@ -137,6 +137,7 @@ public class ProfileController : Controller
         viewModel.IsSupplier = viewModel.Roles.Contains("supplier");
 
         ViewBag.IsOwner = user != null && user.Id == userDto.Id;
+        ViewBag.UserId = userDto.Id;
 
         return View("UserProfile", viewModel);
     }
