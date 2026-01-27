@@ -79,7 +79,10 @@ public class AdvertisementController : Controller
         ViewBag.Products = await _productService.GetAllAsync();
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
-        return View(models.OrderByDescending(x => x.IsAd).ToList());
+        return View(models.OrderByDescending(x => x.IsAd)
+            .ThenBy(x => x.IsTop)
+            .ThenBy(x => x.CreateDate)
+            .ToList());
     }
 
     [HttpPost]
@@ -454,11 +457,11 @@ public class AdvertisementController : Controller
 
     [HttpPost]
     [Authorize(Roles = "admin,moderator")]
-    public async Task<IActionResult> DeactivateCommercial(int advertisementId)
+    public async Task<IActionResult> DeactivateCommercial(int promotionId)
     {
         try
         {
-            await _adsService.DeactivatePromotionAsync(advertisementId, "Commercial");
+            await _adsService.DeactivatePromotionAsync(promotionId, "Commercial");
             return Ok(new { success = true });
         }
         catch (InvalidOperationException ex)
@@ -469,11 +472,11 @@ public class AdvertisementController : Controller
 
     [HttpPost]
     [Authorize(Roles = "admin,moderator")]
-    public async Task<IActionResult> DeactivateTop(int advertisementId)
+    public async Task<IActionResult> DeactivateTop(int promotionId)
     {
         try
         {
-            await _adsService.DeactivatePromotionAsync(advertisementId, "TopAdvertisement");
+            await _adsService.DeactivatePromotionAsync(promotionId, "TopAdvertisement");
             return Ok(new { success = true });
         }
         catch (InvalidOperationException ex)

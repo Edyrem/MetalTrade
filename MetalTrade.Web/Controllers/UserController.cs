@@ -85,7 +85,11 @@ namespace MetalTrade.Web.AdminPanel.Controllers
             }
 
             var userViewModel = _mapper.Map<UserViewModel>(user);
+            var topUserViewModel = userViewModel.TopUsers?.LastOrDefault(x => x.IsActive);
+
             userViewModel.Roles = (List<string>)await _userService.GetUserRolesAsync(user);
+            ViewData["TopEndDate"] = topUserViewModel?.EndDate.ToString("dd.MM.yyyy");
+
             return View(userViewModel);
         }
 
@@ -267,12 +271,13 @@ namespace MetalTrade.Web.AdminPanel.Controllers
         }
 
         [HttpPost]
+        [Route("User/DeactivateTop")]
         [Authorize(Roles = "admin,moderator")]
-        public async Task<IActionResult> DeactivateTop(int userId)
+        public async Task<IActionResult> DeactivateTop(int promotionId)
         {
             try
             {
-                await _userService.DeactivateTopUserAsync(userId);
+                await _userService.DeactivateTopUserAsync(promotionId);
                 return Ok(new { success = true });
             }
             catch (InvalidOperationException ex)

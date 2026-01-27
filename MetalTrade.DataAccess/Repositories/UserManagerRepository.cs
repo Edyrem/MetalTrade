@@ -29,6 +29,7 @@ namespace MetalTrade.DataAccess.Repositories
                 .ThenInclude(c => c.MetalType)
                 .Include(u => u.Advertisements.Where(a => !a.IsDeleted))
                 .ThenInclude(a => a.Photoes.Where(p => !p.IsDeleted))
+                .Include(u => u.TopUsers.Where(t => t.IsActive))
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 

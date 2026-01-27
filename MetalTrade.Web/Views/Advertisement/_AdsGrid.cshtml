@@ -91,6 +91,7 @@ else
 
 						<div class="card-body">
 							<h5 class="card-title mt-2">@ads.Title</h5>
+							<a asp-action="Details" asp-route-id="@ads.User.Id" class="w-100">@ads.User.UserName</a>
 							<p class="card-text fs-6 text-muted d-inline">Цена: </p>
 							<p class="card-text fw-bold fs-5 d-inline">@ads.Price.ToString("N0")</p>
 

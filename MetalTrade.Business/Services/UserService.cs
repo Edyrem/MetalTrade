@@ -78,7 +78,12 @@ public class UserService : IUserService
     {
         if (userDto == null) return false;
         var user = await _userRepository.GetAsync(userDto.Id);
+        
         if (user == null) return false;
+
+        if (role == "supplier")
+            await DeactivateTopUserAsync(userDto.Id);
+
         var result = await _userRepository.RemoveFromRoleAsync(user, role);
         return result.Succeeded;
     }
@@ -172,6 +177,7 @@ public class UserService : IUserService
 
     public async Task DeleteUserAsync(int id)
     {
+        await DeactivateTopUserAsync(id);
         await _userRepository.DeleteAsync(id);
         await _userRepository.SaveChangesAsync();
     }
@@ -292,7 +298,7 @@ public class UserService : IUserService
 
     public async Task DeactivateTopUserAsync(int userId)
     {
-        await _promotionService.DeactivatePromotionAsync(userId);
+        await _promotionService.DeactivateUserPromotionAsync(userId);
         await _promotionService.SaveAllChangesAsync();
     }
 

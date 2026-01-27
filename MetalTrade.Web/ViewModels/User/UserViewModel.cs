@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MetalTrade.Web.ViewModels.Promotion;
+using System.ComponentModel.DataAnnotations;
 
 namespace MetalTrade.Web.ViewModels.User
 {
@@ -19,6 +20,7 @@ namespace MetalTrade.Web.ViewModels.User
         public bool IsTop { get; set; }
         [Display(Name = "Роли")]
         public List<string>? Roles { get; set; }
+        public List<TopUserViewModel> TopUsers { get; set; } = [];
     }
 }
     

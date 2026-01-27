@@ -34,13 +34,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const deactivateCommercialBtn = document.getElementById("deactivateCommercialBtn");
     const deactivateTopBtn = document.getElementById("deactivateTopBtn");
+    const deactivateUserTopBtn = document.getElementById("deactivateUserTopBtn");
 
     if (deactivateCommercialBtn) {
-        deactivateCommercialBtn.addEventListener("click", () => deactivatePromotion(deactivateCommercialBtn, "DeactivateCommercial"));
+        deactivateCommercialBtn.addEventListener("click", () => deactivatePromotion(deactivateCommercialBtn, "/Advertisement/DeactivateCommercial"));
     }
 
     if (deactivateTopBtn) {
-        deactivateTopBtn.addEventListener("click", () => deactivatePromotion(deactivateTopBtn, "DeactivateTop"));
+        deactivateTopBtn.addEventListener("click", () => deactivatePromotion(deactivateTopBtn, "/Advertisement/DeactivateTop"));
+    }
+
+    if (deactivateUserTopBtn) {
+        deactivateUserTopBtn.addEventListener("click", () => deactivatePromotion(deactivateUserTopBtn, "/User/DeactivateTop"));
     }
 
     let formManager = function (form) {
@@ -79,12 +84,14 @@ document.addEventListener("DOMContentLoaded", function () {
     let deactivatePromotion = function (btn, promotionUrl) {
         if (!confirm("Вы уверены, что хотите отключить услугу?")) return;
 
-        const adId = btn.dataset.id;
+        const promoId = btn.dataset.id;
+
+        console.log(promoId);
 
         const formData = new FormData();
-        formData.append("advertisementId", adId);
+        formData.append("promotionId", promoId);
         
-        fetch("/Advertisement/" + promotionUrl, {
+        fetch(promotionUrl, {
             method: "POST",
             body: formData
         })
@@ -96,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!r.ok) {
-                throw new Error(data.message || "Ошибка при отключении рекламы");
+                throw new Error(data.message || "Ошибка при отключении услуги");
             }
 
             location.reload();

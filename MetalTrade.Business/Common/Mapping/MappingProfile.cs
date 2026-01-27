@@ -30,7 +30,7 @@ namespace MetalTrade.Business.Common.Mapping
 
             CreateMap<Commercial, CommercialDto>().ReverseMap();
 
-            CreateMap<User, TopUserDto>().ReverseMap();
+            CreateMap<TopUser, TopUserDto>().ReverseMap();
 
             #region MetalService
             CreateMap<MetalType, MetalTypeDto>()

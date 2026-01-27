@@ -1,11 +1,12 @@
-using MetalTrade.Business.Interfaces;
-using MetalTrade.Business.Dtos;
-using MetalTrade.Web.ViewModels.Profile;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using MetalTrade.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using AutoMapper;
+using MetalTrade.Business.Dtos;
+using MetalTrade.Business.Interfaces;
+using MetalTrade.Domain.Entities;
+using MetalTrade.Web.ViewModels.Profile;
+using MetalTrade.Web.ViewModels.Promotion;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MetalTrade.Web.Controllers;
 
@@ -30,14 +31,21 @@ public class ProfileController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
-        if (user == null) return NotFound();
+        var currentUser = await _userService.GetCurrentUserAsync(HttpContext);        
+        if (currentUser == null) return NotFound();
 
-        var userDto = await _userService.GetUserWithAdvertisementByIdAsync(user.Id);
+        var userDto = await _userService.GetUserWithAdvertisementByIdAsync(currentUser.Id);
             
         var userViewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
-        userViewModel.IsSupplier = await _userService.IsInRoleAsync(userDto!, "supplier");
 
+        var roles = await _userService.GetUserRolesAsync(userDto);
+        userViewModel.Roles = roles.ToList();
+
+        var topUserViewModel = userViewModel.TopUsers?.LastOrDefault(x => x.IsActive);
+        userViewModel.IsSupplier = userViewModel.Roles.Contains("supplier");
+
+
+        ViewData["TopEndDate"] = topUserViewModel?.EndDate.ToString("dd.MM.yyyy");
         return View(userViewModel);
     }
 
@@ -118,11 +126,17 @@ public class ProfileController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> User(int id)
     {
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         var userDto = await _userService.GetUserWithAdvertisementByIdAsync(id);
         if (userDto == null) return NotFound();
 
         var viewModel = _mapper.Map<UserProfileWithAdsViewModel>(userDto);
-        viewModel.IsSupplier = await _userService.IsInRoleAsync(userDto, "supplier");
+        var roles = await _userService.GetUserRolesAsync(userDto);
+
+        viewModel.Roles = roles.ToList();
+        viewModel.IsSupplier = viewModel.Roles.Contains("supplier");
+
+        ViewBag.IsOwner = user != null && user.Id == userDto.Id;
 
         return View("UserProfile", viewModel);
     }

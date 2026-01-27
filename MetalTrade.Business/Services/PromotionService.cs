@@ -94,7 +94,7 @@ namespace MetalTrade.Business.Services
             if (user == null)
                 throw new ArgumentException($"Advertisement {user} not found");
 
-            await _validator.ValidateCanActivateasync<TopAdvertisement>(user.Id);
+            await _validator.ValidateCanActivateasync<TopUser>(user.Id);
 
             topUser.IsActive = true;
             topUser.Reason = _strategy.GetStrategy<TopUser>().Name;
@@ -216,7 +216,7 @@ namespace MetalTrade.Business.Services
 
             var changed = false;
 
-            var topUser = await _topUserRepository.GetAsync(userId);
+            var topUser = await _topUserRepository.GetActiveAsync(userId);
             if (topUser != null && DeactivatePromotion(topUser))
             {
                 changed = true;

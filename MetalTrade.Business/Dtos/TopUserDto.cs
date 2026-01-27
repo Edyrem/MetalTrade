@@ -12,9 +12,9 @@ namespace MetalTrade.Business.Dtos
         // ID модератора/администратора, который создал промоушен
         public int? CreatedByUserId { get; set; }
         // Навигационное свойство к модератору (lazy loading)
-        public User? CreatedBy { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public UserDto? CreatedBy { get; set; }
+        public int TargetUserId { get; set; }
+        public UserDto TargetUser { get; set; } = null!;
         public string Reason { get; set; } = string.Empty;
     }
 }
