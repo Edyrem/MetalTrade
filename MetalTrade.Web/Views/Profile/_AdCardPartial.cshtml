@@ -1,30 +1,33 @@
 @using MetalTrade.Domain.Enums
-@model MetalTrade.Business.Dtos.AdvertisementDto
+@using MetalTrade.Web.ViewModels.Advertisement
+@model AdvertisementViewModel
 
 @{
     var firstImage = Model.Photoes?.FirstOrDefault()?.PhotoLink ?? "";
 }
+
 <div class="card h-100 shadow-sm position-relative">
 
     <img src="@(string.IsNullOrEmpty(firstImage) ? "/images/default/advertisement.jpg" : firstImage)"
          class="card-img-top"
          style="height:160px; object-fit:cover;" alt="Фото" />
 
-    @switch(Model.Status)
-    {
-        case (int)AdvertisementStatus.Draft:
-            <div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
-            break;
-        case (int)AdvertisementStatus.Active:
-            <div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
-            break;
-        case (int)AdvertisementStatus.Archived:
-            <div class="position-absolute small bg-secondary-subtle top-0 m-1 p-1 opacity-75">Деактивированные</div>
-            break;
-        case (int)AdvertisementStatus.Rejected:
-            <div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
-            break;
-    }
+    @if (ViewBag.IsOwner)
+        @switch (Model.Status)
+        {
+            case (int)AdvertisementStatus.Draft:
+                <div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
+                break;
+            case (int)AdvertisementStatus.Active:
+                <div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
+                break;
+            case (int)AdvertisementStatus.Archived:
+                <div class="position-absolute small bg-secondary-subtle top-0 m-1 p-1 opacity-75">Деактивированные</div>
+                break;
+            case (int)AdvertisementStatus.Rejected:
+                <div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
+                break;
+        }
     <div class="card-body">
         <h6 class="card-title text-truncate">@Model.Title</h6>
         <p class="card-text small text-muted">

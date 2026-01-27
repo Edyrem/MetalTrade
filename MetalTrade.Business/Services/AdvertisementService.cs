@@ -17,15 +17,19 @@ public class AdvertisementService : IAdvertisementService
     private readonly IMapper _mapper;
     private readonly IImageUploadService _imageUploadService;
     private AdvertisementStateContext _stateContext;
-    private readonly ICommercialService _commercialService;
+    private readonly IPromotionService _promotionService;
 
-    public AdvertisementService(MetalTradeDbContext context, IMapper mapper, IImageUploadService imageUploadService, ICommercialService commercialService)
+    public AdvertisementService(
+        MetalTradeDbContext context, 
+        IMapper mapper, 
+        IImageUploadService imageUploadService,
+        IPromotionService promotionService)
     {
         _repository = new AdvertisementRepository(context);
         _mapper = mapper;
         _imageUploadService = imageUploadService;
-        _commercialService = commercialService;
         _stateContext = new AdvertisementStateContext(_repository);
+        _promotionService = promotionService;
     }
 
     public async Task<List<AdvertisementDto>> GetAllAsync()
@@ -40,26 +44,12 @@ public class AdvertisementService : IAdvertisementService
         if (ad == null)
             return null;
 
-        var hasActive = await _commercialService.HasActiveCommercialAsync(ad.Id);
-
-        if (ad.IsAd != hasActive)
-        {
-            ad.IsAd = hasActive;
-            await _repository.SaveChangesAsync();
-        }
+        await _promotionService.UpdatePromotionAsync(ad.Id);
+        await _promotionService.SaveAllChangesAsync();
 
         var dto = _mapper.Map<AdvertisementDto>(ad);
-
-        if (hasActive)
-        {
-            dto.AdEndDate =
-                await _commercialService.GetActiveAdEndDateAsync(ad.Id);
-        }
-
         return dto;
     }
-
-
 
     public async Task CreateAsync(AdvertisementDto adsDto)
     {
@@ -91,6 +81,9 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task DeleteAsync(int advertisementId)
     {
+        await _promotionService.DeactivatePromotionAsync(advertisementId);
+        await _promotionService.SaveAllChangesAsync();
+
         await _stateContext.MoveToDeletedAsync(advertisementId);
         await _repository.DeleteAsync(advertisementId);
         await _repository.SaveChangesAsync();
@@ -139,6 +132,8 @@ public class AdvertisementService : IAdvertisementService
     
     public async Task<List<AdvertisementDto>> GetFilteredAsync(AdvertisementFilterDto filter)
     {
+        ArgumentNullException.ThrowIfNull(filter);
+
         var queriableAdvertisements = _repository.CreateFilter();
         if (!string.IsNullOrWhiteSpace(filter.Title))
         {
@@ -153,7 +148,6 @@ public class AdvertisementService : IAdvertisementService
                     .FilterTitle(queriableAdvertisements, filter.Title);
             }
         }
-
         
         if (!string.IsNullOrWhiteSpace(filter.City))
             queriableAdvertisements = _repository.FilterCity(queriableAdvertisements, filter.City);
@@ -208,5 +202,37 @@ public class AdvertisementService : IAdvertisementService
 
         var photoes = _mapper.Map<List<AdvertisementPhotoAjaxDto>>(newPhotoEntities);
         return photoes;
+    }
+
+    public async Task CreateCommercialAsync(CommercialDto commercialDto)
+    {
+        var commercial = _mapper.Map<Commercial>(commercialDto);
+        await _promotionService.CreateCommercialAdvertisementAsync(commercial);
+        await _promotionService.SaveAllChangesAsync();
+    }
+
+    public async Task CreateTopAdvertisementAsync(TopAdvertisementDto topAdvertisementDto)
+    {
+        var topAdvertisement = _mapper.Map<TopAdvertisement>(topAdvertisementDto);
+        await _promotionService.CreateTopAdvertisementAsync(topAdvertisement);
+        await _promotionService.SaveAllChangesAsync();
+    }
+
+    public async Task<List<AdvertisementDto>> GetAllCommercialsAsync()
+    {
+        var commercials = await _promotionService.GetAllActiveCommercialsAsync();
+        return _mapper.Map<List<AdvertisementDto>>(commercials);
+    }
+
+    public async Task<List<AdvertisementDto>> GetAllActiveTopAdvertisementsAsync()
+    {
+        var topAdvertisements = await _promotionService.GetAllActiveTopAdvertisementsAsync();
+        return _mapper.Map<List<AdvertisementDto>>(topAdvertisements);
+    }
+
+    public async Task DeactivatePromotionAsync(int advertisementId, string? type = null)
+    {
+        await _promotionService.DeactivatePromotionAsync(advertisementId, type);
+        await _promotionService.SaveAllChangesAsync();
     }
 }
