@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BtnNoSuccessImportModal" xml:space="preserve">
+    <value>"Ката жок жүктөлгөн жарыялар: 0" Бул эмне дегенди билдирет?</value>
+  </data>
+  <data name="BtnEditProfile" xml:space="preserve">
+    <value>Профилди түзөтүү</value>
+  </data>
+  <data name="BtnImportExcel" xml:space="preserve">
+    <value>Excel жүктөө</value>
+  </data>
+  <data name="BtnModalWatchExample" xml:space="preserve">
+    <value>Мисалды көрүү</value>
+  </data>
+  <data name="BtnShowErrors" xml:space="preserve">
+    <value>Каталарды көрүү</value>
+  </data>
+  <data name="Elem_P_Phone" xml:space="preserve">
+    <value>Телефон:</value>
+  </data>
+  <data name="Elem_P_WhatsApp" xml:space="preserve">
+    <value>WhatsApp:</value>
+  </data>
+  <data name="Header_2_ModalTitle" xml:space="preserve">
+    <value>Жарыяларды Excel файлынан жүктөө форматы</value>
+  </data>
+  <data name="Header_2_Profile" xml:space="preserve">
+    <value>Менин профилим</value>
+  </data>
+  <data name="Header_4_MyAds" xml:space="preserve">
+    <value>Менин жарыяларым</value>
+  </data>
+  <data name="Header_4_SavedAds" xml:space="preserve">
+    <value>Сакталган жарыялар</value>
+  </data>
+  <data name="Header_5_Excel" xml:space="preserve">
+    <value>Excel’ден жарыяларды жүктөө</value>
+  </data>
+  <data name="Header_5_ModalErrorTitle" xml:space="preserve">
+    <value>Импорттун каталары</value>
+  </data>
+  <data name="Header_5_ModalTableHeader" xml:space="preserve">
+    <value>Аталышы | Сипаттамасы | Баасы | Шаары | Телефон номери | Өнүм | Дареги</value>
+  </data>
+  <data name="LiElemModalExampleRow" xml:space="preserve">
+    <value>Рабица тор | Рабица тор тосмолор, тоскоолдуктар үчүн | 500 | Бишкек | 700700700 | тор | Чүй пр. 1</value>
+  </data>
+  <data name="LiStrongErrorLabel" xml:space="preserve">
+    <value>Сап</value>
+  </data>
+  <data name="P_Elem_Ads_Absent" xml:space="preserve">
+    <value>Азырынча сизде жарыялар жок.</value>
+  </data>
+  <data name="P_Elem_FileImpWarning" xml:space="preserve">
+    <value>Таблицадагы тилкелер так ушул тартипте болуусу керек! Файл форматы .xlsv</value>
+  </data>
+  <data name="SpanErrorCountLabel" xml:space="preserve">
+    <value>Туура эмес толтурулган жарыялар:</value>
+  </data>
+  <data name="StrongElemPossibleReason" xml:space="preserve">
+    <value>Мүмкүн болгон себептери:</value>
+  </data>
+  <data name="LiElemErrorFormatDesc" xml:space="preserve">
+    <value>Файл форматы туура эмес. Файлды .xlsx форматында жүктөп жатканыңызды текшериңиз</value>
+  </data>
+  <data name="LiElemErrorDataDesc" xml:space="preserve">
+    <value>Маалыматтарда каталар бар. Бардык милдеттүү талаалар туура толтурулганын жана талаптарга жооп берерин текшериңиз (мисалы, сандык талааларда болгону сандар болушу керек).</value>
+  </data>
+  <data name="LiElemErrorLimitDesc" xml:space="preserve">
+    <value>Чектен ашуу. Мүмкүн, сиз бир эле учурда өтө көп жазууларды жүктөп жатасыз. Файлдагы жазуулар санын азайтып көрүңүз.</value>
+  </data>
+  <data name="BtnFileNoLoadHelp" xml:space="preserve">
+    <value>Файл жүктөлбөй жатат. Эмне кылуу керек?</value>
+  </data>
+  <data name="LiElemConnectionErrorDesc" xml:space="preserve">
+    <value>Интернетке туташууңузду текшериңиз. Сиздин түзмөгүңүз туруктуу тармакка туташканына ынанууңуз керек.</value>
+  </data>
+  <data name="LiElemServerErrorDesc" xml:space="preserve">
+    <value>Сервер убактылуу жеткиликтүү болбой калган болушу мүмкүн. Файлды кийинчерээк жүктөп көрүңүз.</value>
+  </data>
+  <data name="LiElemFileConsistFieldErrorDesc" xml:space="preserve">
+    <value>Файлда керектүү талаалар бар экенине ынанууңуз керек.</value>
+  </data>
+</root>
