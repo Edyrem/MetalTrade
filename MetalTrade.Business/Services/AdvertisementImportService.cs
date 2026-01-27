@@ -34,7 +34,26 @@ namespace MetalTrade.Business.Services
 
             using var workbook = new XLWorkbook(excelStream);
             var ws = workbook.Worksheet(1);
-            var rows = ws.RangeUsed().RowsUsed();
+            
+            if (ws == null)
+            {
+                result.Errors[0] = new List<string>
+                {
+                    "Excel файл не содержит листов"
+                };
+                return result;
+            }
+
+            var range = ws.RangeUsed();
+            if (range == null)
+            {
+                result.Errors[0] = new List<string>
+                {
+                    "Excel файл пуст или не содержит данных"
+                };
+                return result;
+            }
+            var rows = range.RowsUsed();
 
             int rowNumber = 0;
 
