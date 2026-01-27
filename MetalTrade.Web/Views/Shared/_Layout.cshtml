@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MetalTrade.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -37,6 +38,15 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Пользователи</a>
+                            </li>
+                        }
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Chat" asp-action="Index" class="nav-link position-relative">
+                                    Чаты
+                                    @await Component.InvokeAsync("ChatUnread")
+                                </a>
                             </li>
                         }
 
@@ -90,6 +100,13 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/signalr.min.js"></script>
+    <script src="~/js/chat/layout-chat.js" asp-append-version="true"></script>
+    <script>
+        window.__layout = {
+            currentUserName: "@User.Identity?.Name"
+        };
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

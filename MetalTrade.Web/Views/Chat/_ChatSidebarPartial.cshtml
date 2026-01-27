@@ -1,0 +1,46 @@
+
+@* список чатов *@
+
+@model IEnumerable<MetalTrade.Web.ViewModels.Chat.ChatListItemViewModel>
+
+<div class="chat-list">
+    @foreach (var chat in Model)
+    {
+        <div class="chat-item @(ViewBag.ChatId == chat.ChatId ? "active" : "")"
+             data-chat-id="@chat.ChatId">
+
+            <a asp-controller="Chat"
+               asp-action="Index"
+               asp-route-chatId="@chat.ChatId"
+               class="chat-link">
+
+                <div class="chat-avatar">
+                    <img src="@(chat.Photo ?? "/img/avatar-placeholder.png")" />
+                </div>
+
+                <div class="chat-item-content">
+                    <div class="chat-item-name">@chat.Title</div>
+                    <div class="chat-item-message">@chat.LastMessageText</div>
+                </div>
+
+                @if (chat.UnreadCount > 0)
+                {
+                    <span class="chat-badge">@chat.UnreadCount</span>
+                }
+            </a>
+
+            <div class="chat-actions">
+                <button class="chat-menu-btn">⋯</button>
+            </div>
+
+            <!-- меню -->
+            <div class="chat-menu" hidden>
+                <button class="chat-delete-btn"
+                        data-chat-id="@chat.ChatId">
+                    Удалить чат
+                </button>
+            </div>
+        </div>
+
+    }
+</div>

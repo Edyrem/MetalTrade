@@ -9,6 +9,6 @@ namespace MetalTrade.Business.Interfaces
 {
     public interface IAdvertisementImportService
     {
-        Task<int> ImportFromExcelAsync(Stream excelStream, int userId);
+        Task<AdvertisementImportResultDto> ImportFromExcelAsync(Stream excelStream, int userId);
     }
 }
