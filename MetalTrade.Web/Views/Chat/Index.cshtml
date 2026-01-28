@@ -8,21 +8,30 @@
 
 @if (ViewBag.ChatId == null)
 {
-    <div class="chat-empty">
+    <div class="chat-empty desktop-only">
         <div class="chat-empty-inner">
             <h3>Выберите чат</h3>
             <p>Начните диалог, выбрав чат слева</p>
         </div>
     </div>
 }
+
 else
 {
     <div class="chat-container">
-        <!-- HEADER -->
         <div class="chat-header">
+            
+            <button id="chatMenuBtn" class="chat-back-btn">
+                ☰
+            </button>
+
             <div class="chat-header-left">
                 <img class="avatar"
-                     src="@(ViewBag.OtherUserPhoto ?? "/img/avatar-placeholder.png")" />
+                     src="@(string.IsNullOrEmpty(ViewBag.OtherUserPhoto)
+                              ? Url.Content("~/images/default/avatar.jpg")
+                              : Url.Content(ViewBag.OtherUserPhoto))"
+                     onerror="this.src='/images/default/avatar.jpg'"/>
+
 
                 <div class="chat-header-info">
                     <a href="@Url.Action("User", "Profile", new { id = ViewBag.OtherUserId })"
@@ -57,12 +66,32 @@ else
 }
 
 @section Scripts {
+
     <script>
-        window.__chat = {
-            chatId: @(ViewBag.ChatId ?? "null"),
-            currentUserName: "@User.Identity!.Name",
-            otherUserId: @(ViewBag.OtherUserId ?? "null")
-        };
-    </script>
+@if (ViewBag.ChatId == null)
+{
+    <text>
+    document.body.classList.add("chat-list-open");
+    document.body.classList.remove("chat-open");
+</text>
+}
+else
+{
+    <text>
+    document.body.classList.add("chat-open");
+    document.body.classList.remove("chat-list-open");
+</text>
+}
+</script>
+
+    <script>
+    window.__chat = {
+        chatId: @(ViewBag.ChatId ?? "null"),
+        currentUserName: "@User.Identity!.Name",
+        otherUserId: @(ViewBag.OtherUserId ?? "null")
+    };
+</script>
+
     <script defer src="~/js/chat/chat.js"></script>
 }
+
