@@ -24,14 +24,14 @@
 
                 <h5>@Model.UserName</h5>
 
-                <p class="form-control-plaintext">Телефон: +996@(Model.PhoneNumber)</p>
-                <p class="form-control-plaintext">WhatsApp: +996@(Model.WhatsAppNumber)</p>
-                <p class="form-control-plaintext">Статус: @status</p>
+                <p class="form-control-plaintext">@Localizer["Elem_P_Phone"] +996@(Model.PhoneNumber)</p>
+                <p class="form-control-plaintext">@Localizer["Elem_P_WhatsApp"] +996@(Model.WhatsAppNumber)</p>
+                <p class="form-control-plaintext">@Localizer["Elem_P_Status"] @status</p>
                 @if(Model.IsTop)
                 {
                     <div class="alert alert-warning">
-                        <div>Вы являетесь <b>ТОП Поставщиком</b></div>
-                        <div>Ваш статус активен до: <b>@topEndDate</b></div>
+                        <div>@Localizer["StatusTitleTopSup"] <b>@Localizer["StatusContentTopSup"]</b></div>
+                        <div>@Localizer["StatusTopSupLimit"] <b>@topEndDate</b></div>
                     </div>
                 }
                 <div class="d-grid gap-2">

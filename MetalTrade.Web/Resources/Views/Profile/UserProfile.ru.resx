@@ -135,6 +135,9 @@
   <data name="P_Elem_Phone" xml:space="preserve">
     <value>Телефон:</value>
   </data>
+  <data name="P_Elem_Status" xml:space="preserve">
+    <value>Абалы:</value>
+  </data>
   <data name="P_Elem_WhatsApp" xml:space="preserve">
     <value>WhatsApp:</value>
   </data>

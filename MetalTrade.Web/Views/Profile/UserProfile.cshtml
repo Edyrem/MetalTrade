@@ -26,9 +26,9 @@
 
                 @if (User.Identity!.IsAuthenticated)
                 {
-                    <p class="form-control-plaintext">Телефон: <b>+996@(Model.PhoneNumber)</b></p>
-                    <p class="form-control-plaintext">WhatsApp: <b>+996@(Model.WhatsAppNumber)</b></p>
-                    <p class="form-control-plaintext">Статус: <b>@status</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_Phone"] <b>+996@(Model.PhoneNumber)</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_WhatsApp"] <b>+996@(Model.WhatsAppNumber)</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_Status"] <b>@status</b></p>
                 }
                 else
                 {

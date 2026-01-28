@@ -198,4 +198,16 @@
   <data name="LiElemFileConsistFieldErrorDesc" xml:space="preserve">
     <value>Файлда керектүү талаалар бар экенине ынанууңуз керек.</value>
   </data>
+  <data name="Elem_P_Status" xml:space="preserve">
+    <value>Статус:</value>
+  </data>
+  <data name="StatusTitleTopSup" xml:space="preserve">
+    <value>Вы являетесь</value>
+  </data>
+  <data name="StatusContentTopSup" xml:space="preserve">
+    <value>ТОП Поставщиком</value>
+  </data>
+  <data name="StatusTopSupLimit" xml:space="preserve">
+    <value>Ваш статус активен до:</value>
+  </data>
 </root>

@@ -198,4 +198,16 @@
   <data name="LiElemFileConsistFieldErrorDesc" xml:space="preserve">
     <value>Убедитесь, что файл содержит необхоимые поля.</value>
   </data>
+  <data name="Elem_P_Status" xml:space="preserve">
+    <value>Абалы:</value>
+  </data>
+  <data name="StatusTitleTopSup" xml:space="preserve">
+    <value>Сиз</value>
+  </data>
+  <data name="StatusContentTopSup" xml:space="preserve">
+    <value>ТОП жеткирүүчү болуп саналасыз</value>
+  </data>
+  <data name="StatusTopSupLimit" xml:space="preserve">
+    <value>Сиздин статусуңуз төмөнкү күнгө чейин активдүү:</value>
+  </data>
 </root>

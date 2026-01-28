@@ -17,16 +17,16 @@
         @switch (Model.Status)
         {
             case (int)AdvertisementStatus.Draft:
-                <div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">На рассмотрении</div>
+                <div class="position-absolute small bg-warning-subtle top-0 m-1 p-1 opacity-75">@Localizer["CaseAdsStatusUnderReview"]</div>
                 break;
             case (int)AdvertisementStatus.Active:
-                <div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">Активно</div>
+                <div class="position-absolute small bg-success-subtle top-0 m-1 p-1 opacity-75">@Localizer["CaseAdsStatusActive"]</div>
                 break;
             case (int)AdvertisementStatus.Archived:
-                <div class="position-absolute small bg-secondary-subtle top-0 m-1 p-1 opacity-75">Деактивированные</div>
+                <div class="position-absolute small bg-secondary-subtle top-0 m-1 p-1 opacity-75">@Localizer["CaseAdsStatusArchived"]</div>
                 break;
             case (int)AdvertisementStatus.Rejected:
-                <div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">Отклонено</div>
+                <div class="position-absolute small bg-danger-subtle top-0 m-1 p-1 opacity-75">@Localizer["CaseAdsStatusRejected"]</div>
                 break;
         }
     }
