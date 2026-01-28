@@ -1,7 +1,13 @@
-const { chatId, currentUserName, otherUserId } = window.__chat;
-const chatEnabled = chatId !== null;
-const currentChatId = chatId;
+const chatConfig = window.__chat || {
+    chatId: null,
+    currentUserName: null,
+    otherUserId: null
+};
 
+
+const { chatId, currentUserName, otherUserId } = window.__chat;
+const chatEnabled = typeof chatId === "number";
+const currentChatId = chatId;
 
 
 const connection = new signalR.HubConnectionBuilder()
@@ -143,12 +149,6 @@ function renderMyMessage(text, tempId) {
 // кнопка отправки сообщения
 const sendBtn = document.getElementById("sendBtn");
 
-// клик по кнопке → отправка сообщения
-if (sendBtn) {
-    sendBtn.addEventListener("click", () => {
-        sendMessage(window.__chat.chatId);
-    });
-}
 
 
 
@@ -389,6 +389,8 @@ async function startChat(chatId) {
 
 // отправка сообщения
 async function sendMessage(chatId) {
+    console.log("SEND_MESSAGE_CALLED");
+
     if (!chatEnabled) return;
 
     await connectionPromise;
@@ -403,8 +405,11 @@ async function sendMessage(chatId) {
     if (!text || text.length > 5000) return;
 
     sendBtn.disabled = true;
+    setTimeout(() => sendBtn.disabled = false, 0);
 
-    const tempId = crypto.randomUUID();
+
+    const tempId = Date.now() + "_" + Math.random().toString(16).slice(2);
+
 
     renderMyMessage(text, tempId);
 
@@ -430,16 +435,6 @@ async function sendMessage(chatId) {
     sendBtn.disabled = false;
 }
 
-// отправка сообщения по Enter (без Shift)
-document.addEventListener("keydown", e => {
-    if (!chatEnabled) return;
-    if (document.activeElement !== inputEl()) return;
-
-    if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage(window.__chat.chatId);
-    }
-});
 
 
 
@@ -773,7 +768,6 @@ document.addEventListener("click", e => {
         return;
     }
 
-    // клик вне меню — закрываем всё
     document.querySelectorAll(".chat-menu").forEach(m => m.hidden = true);
 });
 
@@ -784,8 +778,7 @@ const globalBadge = document.getElementById("chatGlobalBadge");
 function updateGlobalBadge(delta) {
     if (!globalBadge) return;
 
-    const current = parseInt(globalBadge.textContent || "0");
-    const next = current + delta;
+    const next = getBadgeValue() + delta;
 
     if (next > 0) {
         globalBadge.textContent = next;
@@ -795,3 +788,69 @@ function updateGlobalBadge(delta) {
         globalBadge.hidden = true;
     }
 }
+
+
+
+
+function sendFromUI() {
+    console.log("SEND_FROM_UI");
+
+    if (!chatEnabled) return;
+    if (!sendBtn || sendBtn.disabled) return;
+
+    sendMessage(window.__chat.chatId);
+}
+sendBtn.addEventListener("click", sendFromUI);
+
+
+textarea.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendFromUI();
+    }
+});
+
+
+function updateVh() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    document.documentElement.style.setProperty(
+        '--app-vh',
+        `${vv.height}px`
+    );
+
+    document.documentElement.style.setProperty(
+        '--keyboard-offset',
+        `${vv.offsetTop}px`
+    );
+}
+
+updateVh();
+window.visualViewport?.addEventListener('resize', updateVh);
+window.visualViewport?.addEventListener('scroll', updateVh);
+
+
+
+
+
+
+const chatMenuBtn = document.getElementById("chatMenuBtn");
+
+// ☰ показать список чатов
+chatMenuBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    document.body.classList.remove("chat-open");
+    document.body.classList.add("chat-list-open");
+});
+
+// открыть чат
+document.addEventListener("click", (e) => {
+    const link = e.target.closest(".chat-link");
+    if (!link) return;
+
+    document.body.classList.remove("chat-list-open");
+    document.body.classList.add("chat-open");
+});
+
+
