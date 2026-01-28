@@ -1,4 +1,4 @@
-﻿@using MetalTrade.Business.Dtos
+﻿﻿@using MetalTrade.Business.Dtos
 @using MetalTrade.Web.ViewModels.Advertisement
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<AdvertisementViewModel>
@@ -14,7 +14,7 @@
 }
 
 <div class="row mb-2 justify-content-between">
-	
+
 	<div class="col-md-2">
 		@if (isAdmin || isSupplier)
 		{
@@ -24,7 +24,7 @@
 	<button class="btn btn-outline-primary col-md-2	" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
 		Фильтр объявлений <data-bs-target></data-bs-target>
 	</button>
-	
+
 </div>
 
 
@@ -33,7 +33,7 @@
 		<h3 class="offcanvas-title position-absolute start-50 translate-middle-x" id="offcanvasExampleLabel">Фильтр объявлений</h3>
 		<button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 	</div>
-	
+
 	<div class="offcanvas-body">
 
 		<form method="get" class="mb-4 mx-5" id="ads-filter-form">
@@ -41,18 +41,18 @@
 
 				<div class="col-md-4">
 					<input class="form-control"
-					       type="text"
-					       name="title"
-					       placeholder="Название или артикул"
-					       value="@filter?.Title" />
+						   type="text"
+						   name="title"
+						   placeholder="Название или артикул"
+						   value="@filter?.Title" />
 				</div>
 
 				<div class="col-md-4">
 					<input class="form-control"
-					       type="text"
-					       name="city"
-					       placeholder="Город"
-					       value="@filter?.City" />
+						   type="text"
+						   name="city"
+						   placeholder="Город"
+						   value="@filter?.City" />
 				</div>
 
 				<div class="col-md-4">
@@ -71,18 +71,18 @@
 				
 				<div class="col-md-4">
 					<input class="form-control"
-					       type="number"
-					       name="priceFrom"
-					       placeholder="Цена от"
-					       value="@filter?.PriceFrom" />
+						   type="number"
+						   name="priceFrom"
+						   placeholder="Цена от"
+						   value="@filter?.PriceFrom" />
 				</div>
 
 				<div class="col-md-4">
 					<input class="form-control"
-					       type="number"
-					       name="priceTo"
-					       placeholder="Цена до"
-					       value="@filter?.PriceTo" />
+						   type="number"
+						   name="priceTo"
+						   placeholder="Цена до"
+						   value="@filter?.PriceTo" />
 				</div>
 				
 				<div class="col-md-4">
@@ -90,9 +90,9 @@
 						<option value="">Тип материала</option>
 						@foreach (var type in metalTypes)
 						{
-						<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
-							@type.Name
-						</option>
+							<option value="@type.Id" selected="@(filter?.MetalTypeId == type.Id)">
+								@type.Name
+							</option>
 						}
 					</select>
 				</div>
@@ -116,7 +116,7 @@
 
 			</div>
 		</form>
-		
+
 	</div>
 </div>
 
