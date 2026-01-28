@@ -44,7 +44,7 @@ public class ProfileController : Controller
         var topUserViewModel = userViewModel.TopUsers?.LastOrDefault(x => x.IsActive);
         userViewModel.IsSupplier = userViewModel.Roles.Contains("supplier");
 
-
+        ViewBag.IsOwner = true;
         ViewData["TopEndDate"] = topUserViewModel?.EndDate.ToString("dd.MM.yyyy");
         return View(userViewModel);
     }

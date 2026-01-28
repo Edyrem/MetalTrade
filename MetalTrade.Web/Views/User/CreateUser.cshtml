@@ -4,87 +4,78 @@
     ViewBag.Title = Localizer["ViewBagTitle"];
 }
 
-<div class="container row">
-    <div class="col-5">
-        
-        <h3 class="mb-3">@Localizer["Header_3_Sup_Create"]</h3>
-        <form method="post" asp-controller="User" asp-action="CreateUser" enctype="multipart/form-data">
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelLogin"]</label><br>
-                <input asp-for="UserName" class=" rounded form-control"/>
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelEmail"]</label><br>
-                <input asp-for="Email" class=" rounded form-control"/>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelPhone"]</label><br>
-                <input asp-for="PhoneNumber" class="rounded form-control"/>
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelWhatsApp"]</label><br>
-                <input asp-for="WhatsAppNumber" class="rounded form-control"/>
-                <span asp-validation-for="WhatsAppNumber" class="text-danger"></span>
-            </div>
-        
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelAvatar"]</label><br>
-                <input asp-for="Photo" type="file" class="rounded-end text-center form-control" />
-                <span asp-validation-for="Photo" class="text-danger"></span>
-            </div>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card p-4 metal-border">
+                <h3 class="text-center metal-text mb-4">
+                    @Localizer["Header_3_Sup_Create"]
+                </h3>
 
-            <div class="form-group my-2">
-                <label class="mb-1">@Localizer["FormLabelChooseRole"] </label><br />
-                <select asp-for="Role" class="rounded form-control">
-                    <option value="Supplier">@Localizer["SelectElemOptionSupp"]</option>
-                    <option value="Moderator">@Localizer["SelectElemOptionModerator"]</option>
-                </select>
-                <span asp-validation-for="Role" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelPassword"]</label><br>
-                <div class="input-group">
-                    <input asp-for="Password" class="rounded form-control" id="password"/>
-                    <div class="input-group-append">
-                        <button type="button" class="btn btn-light " id="eye-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                            </svg>
+                <form method="post" asp-controller="User" asp-action="CreateUser" enctype="multipart/form-data">
+
+                    <div class="form-group my-2">
+                        <input asp-for="UserName" placeholder="@Localizer["FormLabelLogin"]" class="form-control text-center" />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group my-2">
+                        <input asp-for="Email" placeholder="@Localizer["FormLabelEmail"]" class="form-control text-center" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group my-2">
+                        <input asp-for="PhoneNumber" placeholder="@Localizer["FormLabelPhone"]" class="form-control text-center" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group my-2">
+                        <input asp-for="WhatsAppNumber" placeholder="@Localizer["FormLabelWhatsApp"]" class="form-control text-center" />
+                        <span asp-validation-for="WhatsAppNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group my-3">
+                        <label class="fw-semibold">@Localizer["FormLabelAvatar"]</label>
+                        <input asp-for="Photo" type="file" class="form-control" />
+                    </div>
+
+                    <div class="form-group my-3">
+                        <label class="fw-semibold">@Localizer["FormLabelChooseRole"] </label><br />
+                        <select asp-for="Role" class="rounded form-control">
+                            <option value="Supplier">@Localizer["SelectElemOptionSupp"]</option>
+                            <option value="Moderator">@Localizer["SelectElemOptionModerator"]</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+@*                     <div class="form-group my-3">
+                        <label class="fw-semibold">Роль</label>
+                        <select asp-for="Role"
+                                class="form-control text-center"
+                                asp-items="Html.GetEnumSelectList<UserRole>()">
+                        </select>
+                    </div> *@
+
+                    <div class="form-group my-3">
+                        <input asp-for="Password" placeholder="@Localizer["FormLabelPassword"]" class="form-control text-center" />
+                    </div>
+
+                    <div class="form-group my-3">
+                        <input asp-for="PasswordConfirm" placeholder="@Localizer["FormLabelPasswordConfirm"]" class="form-control text-center" />
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            @Localizer["BtnFormSave"]
                         </button>
                     </div>
-                </div>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group my-2">
-                <label>@Localizer["FormLabelPasswordConfirm"]</label><br>
-                <div class="input-group">
-                    <input asp-for="PasswordConfirm" class="rounded form-control" id="repeat"/>
-                    <div class="input-group-append">
-                        <button type="button" class="btn btn-light" id="repeat-eye">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
-            </div>
 
-            <div class="my-3">
-                <input type="submit" value="@Localizer["BtnFormSave"]" class="bg-primary rounded text-white text-center btn btn-success" />
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
+
 
 @section Scripts
 {

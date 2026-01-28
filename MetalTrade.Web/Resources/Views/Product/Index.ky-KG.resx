@@ -123,17 +123,11 @@
   <data name="BtnDelete" xml:space="preserve">
     <value>Өчүрүү</value>
   </data>
-  <data name="BtnDetails" xml:space="preserve">
-    <value>Маалыматтар</value>
-  </data>
   <data name="BtnEdit" xml:space="preserve">
     <value>Түзөтүү</value>
   </data>
   <data name="TableHeaderAction" xml:space="preserve">
     <value>Иш-аракет</value>
-  </data>
-  <data name="TableHeaderMetalType" xml:space="preserve">
-    <value>Материалдын түрү</value>
   </data>
   <data name="TableHeaderName" xml:space="preserve">
     <value>Аты</value>

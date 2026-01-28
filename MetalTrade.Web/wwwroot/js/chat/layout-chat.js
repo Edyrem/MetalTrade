@@ -12,21 +12,17 @@
         .catch(console.error);
 
     layoutConnection.on("ChatUpdated", (chatId, userName) => {
-
         if (userName === window.__layout?.currentUserName) return;
 
-        const current = parseInt(globalBadge.textContent || "0");
-
-        globalBadge.textContent = current + 1;
+        const next = getBadgeValue() + 1;
+        globalBadge.textContent = next;
         globalBadge.hidden = false;
     });
 
 
+
     layoutConnection.on("ChatRead", () => {
-        const current = Math.max(
-            0,
-            parseInt(globalBadge.textContent || "0") - 1
-        );
+        const current = Math.max(0, getBadgeValue() - 1);
 
         if (current === 0) {
             globalBadge.textContent = "0";
@@ -35,5 +31,6 @@
             globalBadge.textContent = current;
         }
     });
+
 
 })();

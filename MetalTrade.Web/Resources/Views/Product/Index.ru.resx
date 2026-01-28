@@ -123,17 +123,11 @@
   <data name="BtnDelete" xml:space="preserve">
     <value>Удалить</value>
   </data>
-  <data name="BtnDetails" xml:space="preserve">
-    <value>Детали</value>
-  </data>
   <data name="BtnEdit" xml:space="preserve">
     <value>Редактировать</value>
   </data>
   <data name="TableHeaderAction" xml:space="preserve">
     <value>Действие</value>
-  </data>
-  <data name="TableHeaderMetalType" xml:space="preserve">
-    <value>Тип материала</value>
   </data>
   <data name="TableHeaderName" xml:space="preserve">
     <value>Название</value>
