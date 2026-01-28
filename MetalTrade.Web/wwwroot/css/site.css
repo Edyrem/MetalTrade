@@ -34,6 +34,10 @@ header {
     background: linear-gradient(180deg, var(--color-background) 0%, var(--color-background-dark) 100%);
 }
 
+footer {
+    position: relative;
+}
+
 nav {
     background: linear-gradient(90deg, var(--color-white) 0%, var(--color-background) 100%);
 }
