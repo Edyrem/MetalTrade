@@ -5,18 +5,18 @@
     var isCurrentUserAdmin = User.IsInRole("admin");
 }
 
-<div class="row mb-3">
+<div class="row mb-3 mx-2">
     <div class="col-md-3">
         <input id="userName" class="form-control" placeholder="Логин" />
     </div>
     <div class="col-md-3">
         <input id="email" class="form-control" placeholder="Email" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <input id="phoneNumber" class="form-control" placeholder="Номер телефона" />
     </div>
 
-    <div class="col-md-1">
+    <div class="col-md-2">
         <select class="form-control" onchange="loadUsers()" id="sort">
             <option value="date_desc">Новые</option>
             <option value="date_asc">Старые</option>
@@ -24,12 +24,14 @@
     </div>
     
     <div class="col-md-2">
-        <button class="btn btn-primary" onclick="loadUsers()">Фильтр</button>
-        <button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button>
+        <div class="row">
+            <div class="col-md-6"><button class="btn btn-primary-custom" style="background-color: #2563EB;" onclick="loadUsers()">Фильтр</button></div>
+            <div class="col-md-6"><button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button></div>
+        </div>
     </div>
 </div>
 
-<div class="col-md-3">
+<div class="col-md-3 m-3">
     <a asp-action="CreateUser" asp-controller="User" class="btn btn-success">Создать нового пользователя</a>
 </div>
 <div id="usersContainer">

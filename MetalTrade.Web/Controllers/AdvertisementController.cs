@@ -80,8 +80,8 @@ public class AdvertisementController : Controller
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
         return View(models.OrderByDescending(x => x.IsAd)
-            .ThenBy(x => x.IsTop)
-            .ThenBy(x => x.CreateDate)
+            .ThenByDescending(x => x.IsTop)
+            .ThenByDescending(x => x.CreateDate)
             .ToList());
     }
 
