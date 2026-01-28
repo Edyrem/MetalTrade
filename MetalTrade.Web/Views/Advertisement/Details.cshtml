@@ -1,7 +1,12 @@
 ﻿@using MetalTrade.Domain.Enums
-@using MetalTrade.Web.ViewModels.Commercial
+@using MetalTrade.Web.ViewModels.Promotion
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MetalTrade.Web.ViewModels.Advertisement.AdvertisementViewModel
+
+@{
+    var adEndDate = ViewData["AdEndDate"];
+    var topEndDate = ViewData["TopEndDate"];
+}
 
 @if (Model == null)
 {
@@ -24,8 +29,6 @@
     var message = $"Здравствуйте! Пишу по поводу объявления '{Model.Title}' с сайта METALTRADE. " ;
     
 }
-
-
 
 <h1>Детали</h1>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -166,11 +169,11 @@
                     }
                     
                 </div>
-                @if (isOwner && Model.IsAd && Model.AdEndDate.HasValue)
+                @if (isOwner && Model.IsAd)
                 {
                     <div class="alert alert-info">
                         Ваша реклама активна до
-                        <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
+                        <b>@adEndDate</b>
                     </div>
                 }
 
@@ -180,12 +183,7 @@
                         @if (Model.IsAd)
                         {
                             <div class="alert alert-warning">
-                                Реклама активна до:
-                                @if (Model.AdEndDate.HasValue)
-                                {
-                                    <br />
-                                    <b>@Model.AdEndDate.Value.ToString("dd.MM.yyyy")</b>
-                                }
+                                Реклама активна до: <b>@adEndDate</b>
                             </div>
 
                             <button id="deactivateCommercialBtn"
@@ -196,25 +194,55 @@
                         }
                         else if (Model.Status == (int)AdvertisementStatus.Active)
                         {
+                            <div class="toggleParent">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button class="toggleCommercialBtn btn btn-warning">
+                                        Реклама
+                                    </button>
+                                </div>
+
+                                <div class="commercialFormContainer" style="display:none;">
+                                    @await Html.PartialAsync("_CommercialForm",
+                                    new PromotionActivateViewModel { TargetId = Model.Id })
+                                </div>
+                            </div>                            
+                        }
+                    @if (Model.IsTop)
+                    {
+                        <div class="alert alert-warning">
+                            Объявление в топе до: <b>@topEndDate</b>
+                        </div>
+
+                        <button id="deactivateTopBtn"
+                                class="btn btn-danger"
+                                data-id="@Model.Id">
+                            Убрать из топа
+                        </button>
+                    }
+                    else if (Model.Status == (int)AdvertisementStatus.Active)
+                    {
+                        <div class="toggleParent">
                             <div class="d-flex gap-2 align-items-center">
-                                <button id="toggleCommercialBtn"
-                                        class="btn btn-warning">
-                                    Реклама
+                                <button class="toggleCommercialBtn btn btn-warning">
+                                    Топ
                                 </button>
                             </div>
 
-                            <div id="commercialFormContainer" style="display:none;">
-                                @await Html.PartialAsync("_CommercialForm",
-                                    new CommercialViewModel { AdvertisementId = Model.Id })
+                            <div class="commercialFormContainer" style="display:none;">
+                                @await Html.PartialAsync("_TopForm",
+                                new PromotionActivateViewModel { TargetId = Model.Id })
                             </div>
-                        }
+                        </div>
                     }
+                }
+
                 @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.User.UserName)
                 {
                     <button class="btn btn-primary open-chat-user"
                             data-user-id="@Model.UserId">
                         Написать продавцу
                     </button>
+
 
                 }
                 

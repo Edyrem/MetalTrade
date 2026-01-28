@@ -1,13 +1,10 @@
 using AutoMapper;
-using ClosedXML.Excel;
 using MetalTrade.Business.Dtos;
 using MetalTrade.Business.Interfaces;
-using MetalTrade.Domain.Entities;
 using MetalTrade.Domain.Enums;
 using MetalTrade.Web.ViewModels.Advertisement;
-using MetalTrade.Web.ViewModels.AdvertisementPhoto;
-using MetalTrade.Web.ViewModels.Commercial;
 using MetalTrade.Web.ViewModels.Product;
+using MetalTrade.Web.ViewModels.Promotion;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -25,8 +22,6 @@ public class AdvertisementController : Controller
     private readonly IAdvertisementImportService _advertisementImportService;
     private readonly ILogger<AdvertisementController> _logger;
 
-    private readonly ICommercialService _commercialService;
-    
     public AdvertisementController(
         IAdvertisementService adsService,
         IUserService userService,
@@ -34,7 +29,6 @@ public class AdvertisementController : Controller
         IMetalService metalService,
         IMapper mapper,
         ILogger<AdvertisementController> logger,
-        ICommercialService commercialService,
         IAdvertisementImportService importService)
     {
         _adsService = adsService;
@@ -43,7 +37,6 @@ public class AdvertisementController : Controller
         _metalService = metalService;
         _mapper = mapper;
         _logger = logger;
-        _commercialService = commercialService;
         _advertisementImportService = importService;
     }
 
@@ -86,7 +79,10 @@ public class AdvertisementController : Controller
         ViewBag.Products = await _productService.GetAllAsync();
         ViewBag.MetalTypes = await _metalService.GetAllAsync();
 
-        return View(models.OrderByDescending(x => x.IsAd).ToList());
+        return View(models.OrderByDescending(x => x.IsAd)
+            .ThenBy(x => x.IsTop)
+            .ThenBy(x => x.CreateDate)
+            .ToList());
     }
 
     [HttpPost]
@@ -147,13 +143,18 @@ public class AdvertisementController : Controller
 
         var model = _mapper.Map<AdvertisementViewModel>(adsDto);
 
+        var topAdvertisementViewModel = model.TopAdvertisements?.LastOrDefault(x => x.IsActive);
+        var commercialViewModel = model.Commercials?.LastOrDefault(x => x.IsActive);
+
         bool isAdmin = await _userService.IsInRolesAsync(user, new[] { "admin", "moderator" });
+
+        var date = model.Commercials?.LastOrDefault()?.EndDate;
 
         ViewData["IsAdmin"] = isAdmin;
         ViewData["CurrentUserId"] = user.Id;
-        
-        ViewData["AdEndDate"] =
-            await _commercialService.GetActiveAdEndDateAsync(id);
+
+        ViewData["AdEndDate"] = commercialViewModel?.EndDate.ToString("dd.MM.yyyy");
+        ViewData["TopEndDate"] = topAdvertisementViewModel?.EndDate.ToString("dd.MM.yyyy");
         
         return View(model);
     }
@@ -161,7 +162,9 @@ public class AdvertisementController : Controller
     public async Task<IActionResult> Create()
     {
         var productDtos = await _productService.GetAllAsync();
+        var user = await _userService.GetCurrentUserAsync(HttpContext);
         CreateAdvertisementViewModel model = new() { Products = _mapper.Map<List<ProductViewModel>>(productDtos) };
+        ViewBag.UserId = user?.Id;
         return View(model);
     }
 
@@ -364,7 +367,7 @@ public class AdvertisementController : Controller
     [HttpPost]
     [Route("Advertisement/ActivateCommercial")]
     [Authorize(Roles = "admin,moderator")]
-    public async Task<IActionResult> ActivateCommercial(CommercialViewModel model)
+    public async Task<IActionResult> ActivateCommercial(PromotionActivateViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -377,11 +380,21 @@ public class AdvertisementController : Controller
 
         try
         {
-            await _commercialService.ActivateAsync(new CommercialDto
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user == null)
+                return Forbid();
+
+            var viewModel = new CommercialViewModel
             {
-                AdvertisementId = model.AdvertisementId,
-                Days = model.Days
-            });
+                AdvertisementId = model.TargetId,
+                //Days = model.Days,
+                CreatedByUserId = user.Id,                
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(model.Days)
+            };
+            
+            var dto = _mapper.Map<CommercialDto>(viewModel);
+            await _adsService.CreateCommercialAsync(dto);
 
             return Ok(new { success = true });
         }
@@ -389,8 +402,54 @@ public class AdvertisementController : Controller
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch
+        catch (Exception ex)
         {
+            var message = ex.Message + ex.InnerException;
+            return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
+        }
+    }
+
+    [HttpPost]
+    [Route("Advertisement/ActivateTop")]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> ActivateTop(PromotionActivateViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var error = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .FirstOrDefault()?.ErrorMessage;
+
+            return BadRequest(new { message = error ?? "Некорректные данные" });
+        }
+
+        try
+        {
+            var user = await _userService.GetCurrentUserAsync(HttpContext);
+            if (user == null)
+                return Forbid();
+
+            var viewModel = new TopAdvertisementViewModel
+            {
+                AdvertisementId = model.TargetId,
+                //Days = model.Days,
+                CreatedByUserId = user.Id,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(model.Days)
+            };
+
+            var dto = _mapper.Map<TopAdvertisementDto>(viewModel);
+            await _adsService.CreateTopAdvertisementAsync(dto);
+
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            var message = ex.Message + ex.InnerException;
             return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
         }
     }
@@ -398,11 +457,26 @@ public class AdvertisementController : Controller
 
     [HttpPost]
     [Authorize(Roles = "admin,moderator")]
-    public async Task<IActionResult> DeactivateCommercial(int advertisementId)
+    public async Task<IActionResult> DeactivateCommercial(int promotionId)
     {
         try
         {
-            await _commercialService.DeactivateAsync(advertisementId);
+            await _adsService.DeactivatePromotionAsync(promotionId, "Commercial");
+            return Ok(new { success = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<IActionResult> DeactivateTop(int promotionId)
+    {
+        try
+        {
+            await _adsService.DeactivatePromotionAsync(promotionId, "TopAdvertisement");
             return Ok(new { success = true });
         }
         catch (InvalidOperationException ex)
@@ -417,5 +491,5 @@ public class AdvertisementController : Controller
 
 
 
-    
+
 }

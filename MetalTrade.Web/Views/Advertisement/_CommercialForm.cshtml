@@ -1,10 +1,11 @@
+@using MetalTrade.Web.ViewModels.Promotion
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model MetalTrade.Web.ViewModels.Commercial.CommercialViewModel
+@model PromotionActivateViewModel
 
 <form id="commercialForm"
       data-url="@Url.Action("ActivateCommercial", "Advertisement")">
 
-    <input type="hidden" asp-for="AdvertisementId" />
+    <input type="hidden" asp-for="TargetId" />
 
     <div class="mb-2 d-flex gap-2">
         <span class="text-muted align-self-center">Быстро:</span>

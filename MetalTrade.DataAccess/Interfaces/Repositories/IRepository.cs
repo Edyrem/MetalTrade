@@ -10,5 +10,6 @@ namespace MetalTrade.DataAccess.Interfaces.Repositories
         Task CreateAsync(T item);
         Task UpdateAsync(T item);
         Task DeleteAsync(int id);
+        Task SaveChangesAsync();
     }
 }

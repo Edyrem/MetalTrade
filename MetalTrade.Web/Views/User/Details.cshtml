@@ -1,10 +1,12 @@
-﻿@using MetalTrade.Web.ViewModels.User
+﻿@using MetalTrade.Web.ViewModels.Promotion
+@using MetalTrade.Web.ViewModels.User
 @model UserViewModel
 
 @{
     ViewData["Title"] = "View";
 
     var isCurrentUserAdmin = User.IsInRole("admin");
+    var topEndDate = ViewData["TopEndDate"];
 }
 
 <h1>Пользователь</h1>
@@ -91,6 +93,7 @@
         {
             <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="supplier" asp-route-page="Details" class="btn btn-info">Сделать поставщиком</a>
         }
+
         @if (Model.Roles.Contains("moderator"))
         {
             <a asp-action="RemoveRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Удалить из модераторов</a>
@@ -98,6 +101,37 @@
         else
         {
             <a asp-action="AddRole" asp-route-id="@Model?.Id" asp-route-role="moderator" asp-route-page="Details" class="btn btn-primary">Сделать модератором</a>
+        }
+        @if (Model.Roles.Contains("supplier"))
+        {
+            @if(Model.IsTop)
+            {
+                <div class="alert alert-warning">
+                    Объявление в топе до: <b>@topEndDate</b>
+                </div>
+
+                <button id="deactivateUserTopBtn"
+                        class="btn btn-danger"
+                        data-id="@Model.Id">
+                    Убрать из топа
+                </button>
+            }
+            else
+            {
+                <div class="toggleParent">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button class="toggleCommercialBtn btn btn-warning">
+                            Топ
+                        </button>
+                    </div>
+
+                    <div class="commercialFormContainer" style="display:none;">
+                        @await Html.PartialAsync("_UserTopForm",
+                        new PromotionActivateViewModel { TargetId = Model.Id })
+                    </div>
+                </div>
+            }
+            
         }
     }
 </div>
@@ -110,3 +144,9 @@
 <div>
     <a asp-action="Index">Назад к списку</a>
 </div>
+
+
+@section Scripts {
+    <script src="~/js/commercial.js"></script>
+
+}

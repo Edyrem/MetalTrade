@@ -6,6 +6,8 @@ namespace MetalTrade.Web.ViewModels;
 
 public class UserViewModel
 {
+    public int Id { get; set; }
+
     [Remote(action:"CheckUserName", controller:"Validation", ErrorMessage = "Аккаунт с таким именем уже существует!")]
     [Required(ErrorMessage = "Укажите логин")]
     [Display(Name = "Логин")]
@@ -52,4 +54,6 @@ public class UserViewModel
     [Required(ErrorMessage = "Укажите роль")]
     [Display(Name = "Роль")]
     public UserRole Role { get; set; }
+
+    public bool IsTop { get; set; }
 }

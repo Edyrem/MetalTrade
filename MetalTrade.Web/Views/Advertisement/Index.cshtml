@@ -28,18 +28,18 @@
 </div>
 
 
-<div class="offcanvas offcanvas-top bg-secondary-subtle" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" style="height:350px;">
+<div class="offcanvas offcanvas-top bg-secondary-subtle" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" style="height:235px;">
 	<div class="offcanvas-header position-relative">
-		<h4 class="offcanvas-title position-absolute start-50 translate-middle-x" id="offcanvasExampleLabel">Фильтр объявлений</h4>
+		<h3 class="offcanvas-title position-absolute start-50 translate-middle-x" id="offcanvasExampleLabel">Фильтр объявлений</h3>
 		<button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 	</div>
 	
 	<div class="offcanvas-body">
 
-		<form method="get" class="mb-4" id="ads-filter-form">
+		<form method="get" class="mb-4 mx-5" id="ads-filter-form">
 			<div class="row g-2  d-flex justify-content-center">
 
-				<div class="col-md-5">
+				<div class="col-md-4">
 					<input class="form-control"
 					       type="text"
 					       name="title"
@@ -47,7 +47,7 @@
 					       value="@filter?.Title" />
 				</div>
 
-				<div class="col-md-5">
+				<div class="col-md-4">
 					<input class="form-control"
 					       type="text"
 					       name="city"
@@ -55,7 +55,21 @@
 					       value="@filter?.City" />
 				</div>
 
-				<div class="col-md-5">
+				<div class="col-md-4">
+					<select class="form-control" name="productId" id="productSelect">
+						<option value="">Продукт</option>
+						@foreach (var p in products)
+						{
+						<option value="@p.Id" selected="@(filter?.ProductId == p.Id)">
+							@p.Name
+						</option>
+						}
+					</select>
+				</div>
+				
+
+				
+				<div class="col-md-4">
 					<input class="form-control"
 					       type="number"
 					       name="priceFrom"
@@ -63,7 +77,7 @@
 					       value="@filter?.PriceFrom" />
 				</div>
 
-				<div class="col-md-5">
+				<div class="col-md-4">
 					<input class="form-control"
 					       type="number"
 					       name="priceTo"
@@ -71,20 +85,7 @@
 					       value="@filter?.PriceTo" />
 				</div>
 				
-				@{
-				// <div class="col-md-5">
-				// 	<input type="date" class="form-control"
-				// 	       name="dateFrom"
-				// 	       value="@filter?.DateFrom?.ToString("yyyy-MM-dd")" />
-				// </div>
-
-				// <div class="col-md-5">
-				// 	<input type="date" class="form-control"
-				// 	       name="dateTo"
-				// 	       value="@filter?.DateTo?.ToString("yyyy-MM-dd")" />
-				// </div>
-				}
-				<div class="col-md-5">
+				<div class="col-md-4">
 					<select class="form-control" name="metalTypeId" id="metalTypeSelect">
 						<option value="">Тип материала</option>
 						@foreach (var type in metalTypes)
@@ -96,31 +97,21 @@
 					</select>
 				</div>
 
-				<div class="col-md-5">
-					<select class="form-control" name="productId" id="productSelect">
-						<option value="">Продукт</option>
-						@foreach (var p in products)
-						{
-							<option value="@p.Id" selected="@(filter?.ProductId == p.Id)">
-								@p.Name
-							</option>
-						}
-					</select>
-				</div>
+				
 				
 				<div class="col-md-3">
 					<select class="form-control" name="sort">
 						<option value="" selected="@(string.IsNullOrWhiteSpace(filter?.Sort))">Сортировка</option>
-						<option value="price_asc" selected="@(filter?.Sort == "price_asc")">Цена ↑</option>
-						<option value="price_desc" selected="@(filter?.Sort == "price_desc")">Цена ↓</option>
-						<option value="date_asc" selected="@(filter?.Sort == "date_asc")">Дата ↑</option>
-						<option value="date_desc" selected="@(filter?.Sort == "date_desc")">Дата ↓</option>
+						<option value="price_asc" selected="@(filter?.Sort == "price_asc")">Цена по возрастанию ↑</option>
+						<option value="price_desc" selected="@(filter?.Sort == "price_desc")">Цена по убыванию ↓</option>
+						<option value="date_asc" selected="@(filter?.Sort == "date_asc")">Сначала старые ↑</option>
+						<option value="date_desc" selected="@(filter?.Sort == "date_desc")">Сначала новые ↓</option>
 					</select>
 				</div>
 
 				<div class="col-md-3 d-flex">
-					<button class="btn btn-primary w-100 me-1" id="filter-submit">Фильтр</button>
-					<a href="/Advertisement/Index" class="btn btn-secondary w-100">Сбросить</a>
+					<button class="btn btn-primary w-100 m-1" id="filter-submit">Фильтр</button>
+					<a href="/Advertisement/Index" class="btn btn-secondary w-100 m-1">Сбросить</a>
 				</div>
 
 			</div>

@@ -1,6 +1,17 @@
+@using MetalTrade.Domain.Enums
 @model MetalTrade.Web.ViewModels.Profile.UserProfileWithAdsViewModel
 
-
+@{
+    var status = "";
+    if (Model.Roles.Contains("user")) status = "Пользователь";
+    if (Model.Roles.Contains("supplier")) 
+        if (Model.IsTop) status = "ТОП Поставщик";
+        else status = "Поставщик";
+    if (Model.Roles.Contains("moderator")) status = "Модератор";
+    if (Model.Roles.Contains("admin")) status = "Админ";
+        
+    
+}
 <div class="container mt-4">
     <h2 class="mb-4">@Localizer["Header_2"]</h2>
 
@@ -15,8 +26,9 @@
 
                 @if (User.Identity!.IsAuthenticated)
                 {
-                    <p class="form-control-plaintext">@Localizer["P_Elem_Phone"] +996@(Model.PhoneNumber)</p>
-                    <p class="form-control-plaintext">@Localizer["P_Elem_WhatsApp"] +996@(Model.WhatsAppNumber)</p>
+                    <p class="form-control-plaintext">Телефон: <b>+996@(Model.PhoneNumber)</b></p>
+                    <p class="form-control-plaintext">WhatsApp: <b>+996@(Model.WhatsAppNumber)</b></p>
+                    <p class="form-control-plaintext">Статус: <b>@status</b></p>
                 }
                 else
                 {
@@ -50,9 +62,12 @@
                     <div class="row">
                         @foreach (var ad in Model.Advertisements)
                         {
-                            <div class="col-md-6 mb-3">
-                                <partial name="_AdCardPartial" model="ad" />
-                            </div>
+                            if (ViewBag.IsOwner || (!ViewBag.IsOwner && ad.Status == (int)AdvertisementStatus.Active))
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <partial name="_AdCardPartial" model="ad" />
+                                </div>
+                            }
                         }
                     </div>
                 }

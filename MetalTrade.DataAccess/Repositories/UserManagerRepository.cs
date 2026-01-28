@@ -1,4 +1,5 @@
-﻿using MetalTrade.DataAccess.Data;
+﻿using MetalTrade.DataAccess.Abstractions;
+using MetalTrade.DataAccess.Data;
 using MetalTrade.DataAccess.Interfaces.Repositories;
 using MetalTrade.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,7 @@ namespace MetalTrade.DataAccess.Repositories
 
         public async Task<User?> GetByIdAsync(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+            return await _dbSet.Include(x => x.TopUsers.Where(t => t.IsActive)).FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> GetWithAdvertisementsAsync(int id)
@@ -28,6 +29,7 @@ namespace MetalTrade.DataAccess.Repositories
                 .ThenInclude(c => c.MetalType)
                 .Include(u => u.Advertisements.Where(a => !a.IsDeleted))
                 .ThenInclude(a => a.Photoes.Where(p => !p.IsDeleted))
+                .Include(u => u.TopUsers.Where(t => t.IsActive))
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 

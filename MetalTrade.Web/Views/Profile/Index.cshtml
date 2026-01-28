@@ -2,7 +2,14 @@
 @using Newtonsoft.Json
 @model MetalTrade.Web.ViewModels.Profile.UserProfileWithAdsViewModel
 
-
+@{
+    var topEndDate = ViewData["TopEndDate"];
+    var status = "";   
+    if (Model.Roles.Contains("user")) status = "Пользователь";
+    if (Model.Roles.Contains("supplier")) status = "Поставщик";
+    if (Model.Roles.Contains("moderator")) status = "Модератор";
+    if (Model.Roles.Contains("admin")) status = "Админ";
+}
 
 <div class="container mt-4">
     <h2 class="mb-4">@Localizer["Header_2_Profile"]</h2>
@@ -17,9 +24,16 @@
 
                 <h5>@Model.UserName</h5>
 
-                <p class="form-control-plaintext">@Localizer["Elem_P_Phone"] +996@(Model.PhoneNumber)</p>
-                <p class="form-control-plaintext">@Localizer["Elem_P_WhatsApp"] +996@(Model.WhatsAppNumber)</p>
-
+                <p class="form-control-plaintext">Телефон: +996@(Model.PhoneNumber)</p>
+                <p class="form-control-plaintext">WhatsApp: +996@(Model.WhatsAppNumber)</p>
+                <p class="form-control-plaintext">Статус: @status</p>
+                @if(Model.IsTop)
+                {
+                    <div class="alert alert-warning">
+                        <div>Вы являетесь <b>ТОП Поставщиком</b></div>
+                        <div>Ваш статус активен до: <b>@topEndDate</b></div>
+                    </div>
+                }
                 <div class="d-grid gap-2">
                     <a href="/Profile/Edit"
                        class="btn btn-outline-primary btn-sm">

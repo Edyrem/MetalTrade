@@ -11,119 +11,128 @@
 }
 else
 {
-    <div class="row text-center">
-        <table class="mt-3 table " style="width: 100%;">
-            <tr>
-                <th>Аватар</th>
-                <th>Логин</th>
-                <th>Email</th>
-                <th>Номер телефона</th>
-                <th>Роль</th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tr>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    @if (!string.IsNullOrWhiteSpace(user.Photo))
-                    {
-                        if (user.Photo.StartsWith("http"))
-                        {
-                            <td><img src="@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
-                        }
-                        else
-                        {
-                            user.Photo = user.Photo.Substring(1);
-                            <td><img src="~/@user.Photo" style="width:40px;height:40px;border-radius:50%;" /></td>
-                        }
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
+    <div class="user-list">
 
-                    <td><a asp-action="Details" asp-route-id="@user.Id" class="link-underline-light"><strong>@user.UserName</strong></a></td>
-                    <td>@user.Email</td>
-                    <td>@user.PhoneNumber</td>
-                    @if(user.Roles!=null && user.Roles.Any())
-                    {
-                        @if (user.Roles.Contains("admin"))
-                        {
-                            <td class="text-danger">Админ</td>
-                            <td></td>
-                        }
-
-                        if (user.Roles.Contains("supplier"))
-                        {
-                            <td><div class="text-info">Поставщик</div></td>
-                            if (isCurrentUserAdmin)
-                            {
-                                <td>
-                                    <button class="btn btn-info" onclick="changeRole(@user.Id, 'supplier', false)">
-                                        Удалить из поставщиков
-                                    </button>
-                                </td>
-                            }
-                        }
-                        else
-                        {
-                            <td><div class="text-info">Пользователь</div></td>
-                            if (isCurrentUserAdmin)
-                            {
-                                <td>
-                                    <button class="btn btn-info"onclick="changeRole(@user.Id, 'supplier', true)">
-                                        Сделать поставщиком
-                                    </button>
-                                </td>
-                            }
-                        }
-                        if (user.Roles.Contains("moderator"))
-                        {
-                            <td><div class="text-primary">Модератор</div></td>
-                            if (isCurrentUserAdmin)
-                            {
-                                <td>
-                                    <button class="btn btn-primary" onclick="changeRole(@user.Id, 'moderator', false)">
-                                        Удалить из модераторов
-                                    </button>
-                                </td>
-                            }
-                        }
-                        else
-                        {
-                            <td><div class="text-info"></div></td>
-                            if (isCurrentUserAdmin)
-                            {
-                                <td>
-                                    <button class="btn btn-primary" onclick="changeRole(@user.Id, 'moderator', true)">
-                                        Сделать модератором
-                                    </button>
-                                </td>
-                            }
-                        }
-                    }
-                    <td><a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Удалить</a></td>
-
-                </tr>
-            }
-        </table>
-        
-        @if (ViewBag.TotalPages > 1)
+        @foreach (var user in Model)
         {
-            <div class="mt-3 gap-2">
-                @if (ViewBag.Page > 1)
-                {
-                    <button class="btn btn-secondary" onclick="loadUsers(@(ViewBag.Page - 1))">Назад</button>
-                }
-                <span>Страница <strong>@ViewBag.Page</strong> из <strong>@ViewBag.TotalPages</strong></span>
-                @if (ViewBag.Page < ViewBag.TotalPages)
-                {
-                    <button class="btn btn-secondary" onclick="loadUsers(@(ViewBag.Page + 1))">Вперёд</button>
-                }
+            <div class="user-card row d-flex align-items-center justify-content-between mx-5">
+
+                    
+                    <div class="d-flex align-items-center gap-3 col-5 border-end border-light-subtle">
+
+                        @if (!string.IsNullOrWhiteSpace(user.Photo))
+                        {
+                            if (user.Photo.StartsWith("http"))
+                            {
+                                <img src="@user.Photo" style="width:45px;height:45px;border-radius:50%;" />
+                            }
+                            else
+                            {
+                                
+                                <img src="~/@(user.Photo.TrimStart('/'))" style="width:45px;height:45px;border-radius:50%;" />
+                            }
+                        }
+                        else
+                        {
+                            <img src="/images/default/avatar.jpg" style="width:45px;height:45px;border-radius:50%;"  />
+                        }
+
+                        <div>
+                            <a asp-action="Details" asp-route-id="@user.Id" class="fw-bold text-decoration-none">
+                                @user.UserName
+                            </a>
+                            <div class=" small" style="color: #6B7280;">@user.Email</div>
+                        </div>
+                    </div>
+                   
+                    <div class=" col-2" style="color: #6B7280;">
+                        @user.PhoneNumber
+                    </div>
+                    
+                    <div class="d-flex gap-2 flex-wrap col-5 row">
+
+                        @if (user.Roles != null && user.Roles.Any())
+                        {
+                            
+                            @if (user.Roles.Contains("admin"))
+                            {
+                                <span class="badge bg-danger">Админ</span>
+                            }
+                            
+                            @if (isCurrentUserAdmin)
+                            {
+                                if (user.Roles.Contains("supplier"))
+                                {
+                                    <button class="btn btn-info col-4"
+                                            onclick="changeRole(@user.Id, 'supplier', false)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+                                            <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+                                        </svg>
+                                        Поставщик
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-info col-4"
+                                            onclick="changeRole(@user.Id, 'supplier', true)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="13" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                        </svg>
+                                        Поставщик
+                                    </button>
+                                }
+                            }
+                            
+                            @if (isCurrentUserAdmin)
+                            {
+                                if (user.Roles.Contains("moderator"))
+                                {
+                                    <button class="btn btn-primary  col-4" style="background-color: #2563EB;"
+                                            onclick="changeRole(@user.Id, 'moderator', false)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-shield-shaded" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 14.933a1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
+                                        </svg>
+                                        Модератор
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-primary col-4"
+                                            onclick="changeRole(@user.Id, 'moderator', true)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="13" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                        </svg>
+                                        Модератор
+                                    </button>
+                                }
+                            }
+                        }
+                        <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger col-3" style="background-color: #DC2626;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                            Удалить
+                        </a>
+                    </div>
+
             </div>
         }
     </div>
+    
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="mt-3 gap-2 text-center">
+            @if (ViewBag.Page > 1)
+            {
+                <button class="btn btn-secondary" onclick="loadUsers(@(ViewBag.Page - 1))">Назад</button>
+            }
+            <span>Страница <strong>@ViewBag.Page</strong> из <strong>@ViewBag.TotalPages</strong></span>
+            @if (ViewBag.Page < ViewBag.TotalPages)
+            {
+                <button class="btn btn-secondary" onclick="loadUsers(@(ViewBag.Page + 1))">Вперёд</button>
+            }
+        </div>
+    }
 }
 
