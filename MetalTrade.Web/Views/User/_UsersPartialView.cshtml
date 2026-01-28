@@ -15,10 +15,10 @@ else
 
         @foreach (var user in Model)
         {
-            <div class="user-card row d-flex align-items-center justify-content-between mx-5">
+            <div class="user-card row d-flex align-items-center justify-content-between mx-2">
 
-                    
-                    <div class="d-flex align-items-center gap-3 col-5 border-end border-light-subtle">
+
+                <div class="d-flex align-items-center gap-3 col-md-3 border-end border-light-subtle">
 
                         @if (!string.IsNullOrWhiteSpace(user.Photo))
                         {
@@ -41,15 +41,17 @@ else
                             <a asp-action="Details" asp-route-id="@user.Id" class="fw-bold text-decoration-none">
                                 @user.UserName
                             </a>
-                            <div class=" small" style="color: #6B7280;">@user.Email</div>
+                            
                         </div>
                     </div>
-                   
-                    <div class=" col-2" style="color: #6B7280;">
-                        @user.PhoneNumber
+                <div class="col-md-2 border-end" style="color: #6B7280;">
+                        <div class=" small" style="color: #6B7280;">@user.Email</div>
                     </div>
-                    
-                    <div class="d-flex gap-2 flex-wrap col-5 row">
+                <div class="col-md-2 border-end" style="color: #6B7280;">
+                        (+996)@user.PhoneNumber
+                    </div>
+
+                <div class="d-flex gap-2 flex-wrap col-md-5 row">
 
                         @if (user.Roles != null && user.Roles.Any())
                         {
@@ -63,7 +65,7 @@ else
                             {
                                 if (user.Roles.Contains("supplier"))
                                 {
-                                    <button class="btn btn-info col-4"
+                                <button class="btn btn-info col-md-4"
                                             onclick="changeRole(@user.Id, 'supplier', false)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
                                             <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
@@ -73,7 +75,7 @@ else
                                 }
                                 else
                                 {
-                                    <button class="btn btn-outline-info col-4"
+                                <button class="btn btn-outline-info col-md-4"
                                             onclick="changeRole(@user.Id, 'supplier', true)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="13" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
@@ -87,7 +89,7 @@ else
                             {
                                 if (user.Roles.Contains("moderator"))
                                 {
-                                    <button class="btn btn-primary  col-4" style="background-color: #2563EB;"
+                                <button class="btn btn-primary-moderator  col-md-4" style="background-color: #2563EB;"
                                             onclick="changeRole(@user.Id, 'moderator', false)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-shield-shaded" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M8 14.933a1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
@@ -97,17 +99,17 @@ else
                                 }
                                 else
                                 {
-                                    <button class="btn btn-outline-primary col-4"
-                                            onclick="changeRole(@user.Id, 'moderator', true)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="13" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                                        </svg>
-                                        Модератор
+                                <button class="btn btn-outline-primary-moderator col-md-4"
+                                                onclick="changeRole(@user.Id, 'moderator', true)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="13" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                            </svg>
+                                            Модератор
                                     </button>
                                 }
                             }
                         }
-                        <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger col-3" style="background-color: #DC2626;">
+                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger col-md-3" style="background-color: #DC2626;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
                                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>

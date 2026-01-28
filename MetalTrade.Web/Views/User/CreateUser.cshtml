@@ -40,12 +40,21 @@
                     </div>
 
                     <div class="form-group my-3">
+                        <label class="fw-semibold">Выберите роль </label><br />
+                        <select asp-for="Role" class="rounded form-control">
+                            <option value="Supplier">Поставщик</option>
+                            <option value="Moderator">Модератор</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+@*                     <div class="form-group my-3">
                         <label class="fw-semibold">Роль</label>
                         <select asp-for="Role"
                                 class="form-control text-center"
                                 asp-items="Html.GetEnumSelectList<UserRole>()">
                         </select>
-                    </div>
+                    </div> *@
 
                     <div class="form-group my-3">
                         <input asp-for="Password" placeholder="Пароль" class="form-control text-center" />
