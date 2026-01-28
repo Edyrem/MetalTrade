@@ -15,7 +15,12 @@
                class="chat-link">
 
                 <div class="chat-avatar">
-                    <img src="@(chat.Photo ?? "/img/avatar-placeholder.png")" />
+                    <img class="avatar"
+                         src="@(string.IsNullOrEmpty(ViewBag.OtherUserPhoto)
+                                  ? Url.Content("~/images/default/avatar.jpg")
+                                  : Url.Content(ViewBag.OtherUserPhoto))"
+                         onerror="this.src='/images/default/avatar.jpg'" />
+
                 </div>
 
                 <div class="chat-item-content">
@@ -32,8 +37,7 @@
             <div class="chat-actions">
                 <button class="chat-menu-btn">⋯</button>
             </div>
-
-            <!-- меню -->
+            
             <div class="chat-menu" hidden>
                 <button class="chat-delete-btn"
                         data-chat-id="@chat.ChatId">
