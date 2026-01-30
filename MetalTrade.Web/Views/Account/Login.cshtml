@@ -1,6 +1,4 @@
-@using Microsoft.AspNetCore.Mvc.Localization
 @model MetalTrade.Web.ViewModel.LoginViewModel
-@inject IViewLocalizer Localizer
 
 @{
     ViewBag.Title = Localizer["Login"];
@@ -14,7 +12,7 @@
             @Html.AntiForgeryToken()
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Login" class="control-label">@Localizer["Username or Email"]</label><br />
+                <label asp-for="Login" class="control-label">@Localizer["LoginOrEmail"]</label><br />
                 <input asp-for="Login" class="form-control" />
                 <span asp-validation-for="Login" class="text-danger"></span>
             </div>
@@ -34,11 +32,11 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RememberMe" class="control-label">@Localizer["Remember Me"]</label><br />
+                <label asp-for="RememberMe" class="control-label">@Localizer["RememberMe"]</label><br />
                 <input asp-for="RememberMe" />
             </div>
             <div class="form-group">
-                <input type="submit" value="@Localizer["Log In"]" class="btn btn-primary mt-3" />
+                <input type="submit" value="@Localizer["LogInBtn"]" class="btn btn-primary mt-3" />
             </div>
         </form>
     </div>

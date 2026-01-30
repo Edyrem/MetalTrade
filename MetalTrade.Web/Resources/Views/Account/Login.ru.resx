@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,25 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LogInBtn" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Вход</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Пароль</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Логин</value>
-  </data>
-  <data name="Username or Email" xml:space="preserve">
-    <value>Логин или Email</value>
-  </data>
-  <data name="Remember Me" xml:space="preserve">
+  <data name="RememberMe" xml:space="preserve">
     <value>Запомнить</value>
   </data>
-  <data name="Log In" xml:space="preserve">
-    <value>Войти</value>
-  </data>
-  <data name="Username5" xml:space="preserve">
-    <value>Логин или пароль</value>
-  </data>
-  <data name="Username6" xml:space="preserve">
-    <value>Логин или пароль</value>
+  <data name="LoginOrEmail" xml:space="preserve">
+    <value>Логин или Email</value>
   </data>
 </root>

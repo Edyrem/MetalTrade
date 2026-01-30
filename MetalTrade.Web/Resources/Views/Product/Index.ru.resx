@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,25 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Создать новый продукт</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="BtnDelete" xml:space="preserve">
+    <value>Удалить</value>
   </data>
-  <data name="Username or Email" xml:space="preserve">
-    <value>Username or Email</value>
+  <data name="BtnEdit" xml:space="preserve">
+    <value>Редактировать</value>
   </data>
-  <data name="Remember Me" xml:space="preserve">
-    <value>Remember Me</value>
+  <data name="TableHeaderAction" xml:space="preserve">
+    <value>Действие</value>
   </data>
-  <data name="Log In" xml:space="preserve">
-    <value>Log In</value>
+  <data name="TableHeaderName" xml:space="preserve">
+    <value>Название</value>
   </data>
-  <data name="Username5" xml:space="preserve">
-    <value>Username or Email</value>
-  </data>
-  <data name="Username6" xml:space="preserve">
-    <value>Username or Email</value>
+  <data name="ViewBagTitle" xml:space="preserve">
+    <value>Список продуктов</value>
   </data>
 </root>

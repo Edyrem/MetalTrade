@@ -1,22 +1,22 @@
 @model MetalTrade.Web.ViewModels.MetalType.DeleteMetalViewModel
 
 @{
-    ViewBag.Title = "Удаление типа материала";
+    ViewBag.Title = Localizer["ViewBagTitle"];
 }
 <div class="container mt-5 justify-content-center align-content-center text-center">
 
     <div class=" justify-content-center text-center mt-5">
-        <h1 class="mt-5">Удаление материала: @Model.Name</h1>
-        <h4 class="mt-5">Удалить данный тип материала?</h4>
+        <h1 class="mt-5">@Localizer["Header_1"] @Model.Name</h1>
+        <h4 class="mt-5">@Localizer["Header_4"]</h4>
         <div class="row justify-content-center text-center mt-3">
             <div class="col-1">
                 <form asp-action="Delete" method="post">
                     <input type="hidden" value="@Model.Id" name="id"/>
-                    <button type="submit" class="btn btn-success">Да</button>
+                    <button type="submit" class="btn btn-success">@Localizer["BtnDeleteYes"]</button>
                 </form>
             </div>
             <div class="col-1">
-                <a class="btn btn-danger" asp-action="Index"   asp-route-id="@Model.Id">Нет</a>
+                <a class="btn btn-danger" asp-action="Index" asp-route-id="@Model.Id">@Localizer["BtnDeleteNo"]</a>
             </div>
         </div>
     </div>

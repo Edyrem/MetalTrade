@@ -1,20 +1,20 @@
 @model MetalTrade.Web.ViewModels.MetalType.EditMetalViewModel
 
 @{
-    ViewBag.Title = "Редактирование типа материала";
+    ViewBag.Title = Localizer["ViewBagTitle"];
 }
 
-<h2>Изменение типа материала </h2>
+<h2>@Localizer["Header_2"]</h2>
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Edit" method="post" >
             <div class="form_row mt-3">
-                <label for="name">Название материала</label>
+                <label asp-for="Name">@Localizer["LabelMetalName"]</label>
                 <input asp-for="Name" type="text" id="name" class="form-control">
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-success mt-4 text-center">Сохранить</button>
+            <button type="submit" class="btn btn-success mt-4 text-center">@Localizer["BtnSave"]</button>
         </form>
     </div>
 </div>

@@ -1,14 +1,14 @@
 @model List<MetalTrade.Web.ViewModels.Product.ProductViewModel>
 @using MetalTrade.Business.Dtos;
 @{
-    ViewBag.Title = "Список продуктов";
+    ViewBag.Title = Localizer["ViewBagTitle"];
     var filter = ViewBag.Filter as ProductFilterDto;
     var counter = 1;
 }
 
 
 <div class="mb-2">
-    <a asp-action="Create" class="btn btn-outline-success">Создать Новый Продукт</a>
+    <a asp-action="Create" class="btn btn-outline-success">@Localizer["BtnCreate"]</a>
 </div>
 
 <div class="container mt-4">
@@ -19,13 +19,13 @@
                 <th>
                     <a asp-action="Index"
                        asp-route-sort="@(ViewBag.Filter?.Sort == "name_asc" ? "name_desc" : "name_asc")">
-                        Название
+                        @Localizer["TableHeaderName"]
                     </a>
                 </th>
                 <th>
                     <a asp-action="Index" asp-route-sort="@(ViewBag.Filter?.Sort == "metal_asc" ? "metal_desc" : "metal_asc")"></a>
                 </th>
-                <th>Действие</th>
+                <th>@Localizer["TableHeaderAction"]</th>
             </tr>
             @foreach (var product in Model)
             {
@@ -34,8 +34,8 @@
                     <td>@product.Name</td>
                     <td>@product.MetalType.Name</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-secondary">Редактировать</a><span> | </span>
-                        <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Удалить</a>
+                        <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-secondary">@Localizer["BtnEdit"]</a><span> | </span>
+                        <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">@Localizer["BtnDelete"]</a>
                     </td>
                 </tr>
             }

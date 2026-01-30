@@ -1,13 +1,14 @@
 @model List<MetalTrade.Web.ViewModels.MetalType.MetalTypeViewModel>
 
 @{
-    ViewBag.Title = "Список типов материалов";
+    ViewBag.Title = Localizer["ViewBagTitle"];
+
     var counter = 1;
 }
 
 
 <div class="mb-2">
-    <a asp-action="Create" class="btn btn-outline-success">Создать новый тип материала</a>
+    <a asp-action="Create" class="btn btn-outline-success">@Localizer["BtnCreate"]</a>
 </div>
 
 <div class="container mt-4">
@@ -16,8 +17,8 @@
             <thead class="thead-light">
                 <tr>
                     <th>#</th>
-                    <th>Название</th>
-                    <th>Действие</th>
+                    <th>@Localizer["TableHeaderName"]</th>
+                    <th>@Localizer["TableHeaderAction"]</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -27,9 +28,9 @@
                         <td>@(counter++)</td>
                         <td>@metal.Name</td>
                         <td>
-                            @* <a asp-action="Details" asp-route-id="@metal.Id" class="btn btn-success">Детали</a><span> | </span> *@
-                            <a asp-action="Edit" asp-route-id="@metal.Id" class="btn btn-secondary">Редактировать</a><span> | </span>
-                            <a asp-action="Delete" asp-route-id="@metal.Id" class="btn btn-danger">Удалить</a>
+                            @* <a asp-action="Details" asp-route-id="@metal.Id" class="btn btn-success">@Localizer["BtnDetails"]</a><span> | </span> *@
+                            <a asp-action="Edit" asp-route-id="@metal.Id" class="btn btn-secondary">@Localizer["BtnEdit"]</a><span> | </span>
+                            <a asp-action="Delete" asp-route-id="@metal.Id" class="btn btn-danger">@Localizer["BtnDelete"]</a>
                         </td>
                     </tr>
                 }

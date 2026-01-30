@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,25 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
+  <data name="BtnDeleteYes" xml:space="preserve">
+    <value>Да</value>
   </data>
-  <data name="User Name" xml:space="preserve">
-    <value>User Name</value>
+  <data name="Header_1" xml:space="preserve">
+    <value>Удаление материала:</value>
   </data>
-  <data name="Email" xml:space="preserve">
-    <value>Email</value>
+  <data name="Header_4" xml:space="preserve">
+    <value>Удалить данный тип материала?</value>
   </data>
-  <data name="Phone Number" xml:space="preserve">
-    <value>Phone Number</value>
+  <data name="BtnDeleteNo" xml:space="preserve">
+    <value>Нет</value>
   </data>
-  <data name="Photo" xml:space="preserve">
-    <value>Photo</value>
-  </data>
-  <data name="Confirm Password" xml:space="preserve">
-    <value>Confirm Password</value>
-  </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
+  <data name="ViewBagTitle" xml:space="preserve">
+    <value>Удаление типа материала</value>
   </data>
 </root>

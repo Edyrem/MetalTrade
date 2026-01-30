@@ -13,7 +13,7 @@
     
 }
 <div class="container mt-4">
-    <h2 class="mb-4">Профиль пользователя</h2>
+    <h2 class="mb-4">@Localizer["Header_2"]</h2>
 
     <div class="row">
         <div class="col-md-4">
@@ -26,19 +26,19 @@
 
                 @if (User.Identity!.IsAuthenticated)
                 {
-                    <p class="form-control-plaintext">Телефон: <b>+996@(Model.PhoneNumber)</b></p>
-                    <p class="form-control-plaintext">WhatsApp: <b>+996@(Model.WhatsAppNumber)</b></p>
-                    <p class="form-control-plaintext">Статус: <b>@status</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_Phone"] <b>+996@(Model.PhoneNumber)</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_WhatsApp"] <b>+996@(Model.WhatsAppNumber)</b></p>
+                    <p class="form-control-plaintext">@Localizer["P_Elem_Status"] <b>@status</b></p>
                 }
                 else
                 {
-                    <p class="text-muted">Контакты доступны после входа</p>
+                    <p class="text-muted">@Localizer["P_Elem_ContactAccess"]</p>
                 }
                 @if (User.Identity!.IsAuthenticated && User.Identity.Name != Model.UserName)
                 {
                     <button class="btn btn-primary open-chat-user"
                             data-user-id="@Model.UserId">
-                        Написать
+                        @Localizer["BtnOpenChat"]
                     </button>
                 }
 
@@ -50,12 +50,12 @@
         <div class="col-md-12">
             @if (Model.IsSupplier)
             {
-                <h4 class="mb-3">Объявления пользователя</h4>
+                <h4 class="mb-3">@Localizer["Header_4_UserAds"]</h4>
                 <hr />
 
                 @if (Model.Advertisements == null || !Model.Advertisements.Any())
                 {
-                    <p class="text-muted">У пользователя пока нет объявлений.</p>
+                    <p class="text-muted">@Localizer["P_Elem_NoAdsDesc"]</p>
                 }
                 else
                 {
